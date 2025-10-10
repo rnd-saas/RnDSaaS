@@ -12,3 +12,7 @@ npm run dev
 
 How to contribute to the project:
 - The main branch should always be deployable, use new branches for new features
+- To add ui elements (for example Card)
+  ```cmd
+  npx shadcn@latest add card
+  ```
