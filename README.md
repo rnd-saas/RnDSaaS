@@ -16,3 +16,5 @@ How to contribute to the project:
   ```cmd
   npx shadcn@latest add card
   ```
+
+deploy frontend
