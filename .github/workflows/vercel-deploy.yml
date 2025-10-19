@@ -19,16 +19,6 @@ jobs:
               uses: actions/setup-node@v3
               with:
                 node-version: 18
-            
-            # Install dependencies
-            - name: Install dependencies
-              run: npm install --include=dev
-              working-directory: ./frontend
-            
-            # Build the frontend
-            - name: Build
-              run: npm run build
-              working-directory: ./frontend
 
             # Deploy to Vercel
             - name: Deploy to Vercel
