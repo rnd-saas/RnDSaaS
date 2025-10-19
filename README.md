@@ -13,6 +13,8 @@ npm run dev
 How to contribute to the project:
 - The main branch should always be deployable, use new branches for new features
 - Always use develop branch to preview deployment on Vercel before pushing to main branch
+
+- Component library documentation: https://ui.shadcn.com
 - To add ui elements (for example Card)
   ```cmd
   npx shadcn@latest add card
