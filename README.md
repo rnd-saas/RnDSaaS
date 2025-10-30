@@ -10,6 +10,16 @@ npm install
 npm run dev
 ```
 
+How to test the backend setup:
+- make sure node.js is installed (at least v18)
+- open the backend folder in your command prompt and run the following commands:
+```cmd
+npm install
+npm run dev
+cp .env.example .env
+# open .env and input SUPABASE_URL、SUPABASE_KEY、PORT
+```
+
 How to contribute to the project:
 - The main branch should always be deployable, use new branches for new features
 - To add ui elements (for example Card)
