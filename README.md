@@ -14,6 +14,7 @@ npm run dev
 npm run dev -- --host
 ```
 - then browse to one of the ip addresses displayed, assuming phone and computer are on the same network
+  
 Component library:
 - Component library documentation: https://ui.shadcn.com
 - To add ui elements (for example Card)
