@@ -2,10 +2,7 @@ name: CI (Migrations sanity)
 
 on:
   pull_request:
-    branches: [develop, main]
-    paths:
-      - 'supabase/migrations/**'
-      - '.github/workflows/ci.yaml'
+    branches: [feat/backend-setup, main]
   workflow_dispatch:
 
 jobs:
