@@ -1,4 +1,4 @@
-name: Deploy to Staging
+name: Supabase Deploy to Staging
 
 on:
   push:

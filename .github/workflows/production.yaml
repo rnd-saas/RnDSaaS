@@ -1,4 +1,4 @@
-name: Deploy to Production
+name: Supabase Deploy to Production
 
 on:
   push:
