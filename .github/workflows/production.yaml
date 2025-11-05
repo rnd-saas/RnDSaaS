@@ -11,6 +11,7 @@ on:
 jobs:
   deploy-production:
     runs-on: ubuntu-latest
+    environment: production
     timeout-minutes: 20
     concurrency:
       group: supabase-deploy-production

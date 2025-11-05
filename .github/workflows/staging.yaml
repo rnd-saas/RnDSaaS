@@ -11,6 +11,7 @@ on:
 jobs:
   deploy-staging:
     runs-on: ubuntu-latest
+    environment: staging
     timeout-minutes: 20
     concurrency:
       group: supabase-deploy-staging
