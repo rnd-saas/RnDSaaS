@@ -1,0 +1,23 @@
+name: CI (Migrations sanity)
+
+on:
+  pull_request:
+    branches: [develop, main]
+    paths:
+      - 'supabase/migrations/**'
+      - '.github/workflows/ci.yaml'
+  workflow_dispatch:
+
+jobs:
+  migrations-sanity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Start local stack
+        run: supabase db start
+      - name: Validate migrations by reset
+        run: supabase db reset
