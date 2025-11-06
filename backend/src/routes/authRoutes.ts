@@ -115,14 +115,17 @@ router.post('/login', async (req, res) => {
  */
 router.post('/register', async (req, res) => {
     try {
+        console.log('📝 Registration request received');
         const { email, password, username, display_name } = req.body;
 
         if (!email || !password) {
+            console.log('❌ Missing email or password');
             return res.status(400).json({ 
                 error: { message: 'Email and password are required' } 
             });
         }
 
+        console.log('🔐 Attempting to create user with Supabase Auth...');
         // Create user using Supabase Auth
         // Note: If email confirmation is enabled in Supabase, users need to verify their email before logging in
         const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -139,6 +142,11 @@ router.post('/register', async (req, res) => {
         });
 
         if (authError) {
+            console.error('❌ Supabase Auth error:', {
+                message: authError.message,
+                status: authError.status,
+                name: authError.name
+            });
             return res.status(400).json({ 
                 error: { 
                     message: authError.message || 'Registration failed',
@@ -148,12 +156,16 @@ router.post('/register', async (req, res) => {
         }
 
         if (!authData.user) {
+            console.error('❌ No user data returned from Supabase Auth');
             return res.status(400).json({ 
                 error: { message: 'Failed to create user' } 
             });
         }
 
+        console.log('✅ User created in Supabase Auth:', authData.user.id);
+
         // Create user record in users table
+        console.log('📊 Creating user profile in database...');
         const { data: userData, error: userError } = await supabase
             .from('users')
             .insert([{
@@ -165,7 +177,12 @@ router.post('/register', async (req, res) => {
             .single();
 
         if (userError) {
-            console.error('Error creating user profile:', userError);
+            console.error('❌ Error creating user profile:', {
+                message: userError.message,
+                code: userError.code,
+                details: userError.details,
+                hint: userError.hint
+            });
             // User is already created in auth.users even if profile creation fails
             return res.status(201).json({
                 user: {
@@ -179,6 +196,8 @@ router.post('/register', async (req, res) => {
             });
         }
 
+        console.log('✅ User profile created successfully');
+
         // Check if email confirmation is needed
         const needsEmailConfirmation = !authData.session && authData.user && !authData.user.email_confirmed_at;
         
@@ -191,9 +210,16 @@ router.post('/register', async (req, res) => {
         });
 
     } catch (error: any) {
-        console.error('Registration error:', error);
+        console.error('❌ Registration error:', {
+            message: error.message,
+            stack: error.stack,
+            name: error.name
+        });
         res.status(500).json({ 
-            error: { message: 'Internal server error' } 
+            error: { 
+                message: 'Internal server error',
+                details: process.env.NODE_ENV === 'development' ? error.message : undefined
+            } 
         });
     }
 });

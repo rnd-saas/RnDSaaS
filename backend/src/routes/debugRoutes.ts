@@ -88,5 +88,119 @@ router.get('/test-connection', async (_req, res) => {
     }
 });
 
+/**
+ * GET /api/debug/env-check
+ * Check environment variables (without exposing sensitive data)
+ */
+router.get('/env-check', async (_req, res) => {
+    try {
+        const envCheck = {
+            SUPABASE_URL: process.env.SUPABASE_URL ? '✓ Set' : '✗ Missing',
+            SUPABASE_KEY: process.env.SUPABASE_KEY ? '✓ Set' : '✗ Missing',
+            SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY ? '✓ Set' : '✗ Missing',
+            NODE_ENV: process.env.NODE_ENV || 'not set',
+            VERCEL: process.env.VERCEL ? '✓ Running on Vercel' : '✗ Not Vercel',
+            // Show partial URL for debugging (first 30 chars)
+            SUPABASE_URL_PREVIEW: process.env.SUPABASE_URL 
+                ? process.env.SUPABASE_URL.substring(0, 30) + '...' 
+                : 'N/A'
+        };
+
+        const allSet = envCheck.SUPABASE_URL.includes('✓') && 
+                      (envCheck.SUPABASE_KEY.includes('✓') || envCheck.SUPABASE_ANON_KEY.includes('✓'));
+
+        res.json({
+            status: allSet ? 'ok' : 'error',
+            environment: envCheck,
+            message: allSet 
+                ? 'All required environment variables are set' 
+                : 'Missing required environment variables'
+        });
+    } catch (error: any) {
+        res.status(500).json({
+            error: error.message
+        });
+    }
+});
+
+/**
+ * GET /api/debug/test-register
+ * Test registration endpoint with mock data
+ */
+router.post('/test-register', async (req, res) => {
+    try {
+        const testEmail = `test-${Date.now()}@example.com`;
+        const testPassword = 'Test123456!';
+        
+        console.log('🧪 Testing registration with:', { email: testEmail });
+        
+        // Test Supabase Auth signup
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+            email: testEmail,
+            password: testPassword
+        });
+
+        if (authError) {
+            return res.status(400).json({
+                success: false,
+                step: 'auth_signup',
+                error: {
+                    message: authError.message,
+                    status: authError.status,
+                    name: authError.name
+                }
+            });
+        }
+
+        if (!authData.user) {
+            return res.status(400).json({
+                success: false,
+                step: 'auth_signup',
+                error: { message: 'No user data returned' }
+            });
+        }
+
+        // Test inserting into users table
+        const { data: userData, error: userError } = await supabase
+            .from('users')
+            .insert([{
+                id: authData.user.id,
+                username: testEmail.split('@')[0],
+                display_name: testEmail.split('@')[0]
+            }])
+            .select()
+            .single();
+
+        if (userError) {
+            return res.status(400).json({
+                success: false,
+                step: 'user_insert',
+                error: {
+                    message: userError.message,
+                    code: userError.code,
+                    details: userError.details,
+                    hint: userError.hint
+                },
+                authUserCreated: true,
+                userId: authData.user.id
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Registration test successful',
+            user: userData
+        });
+    } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            error: {
+                message: error.message,
+                stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+            }
+        });
+    }
+});
+
 export default router;
 
