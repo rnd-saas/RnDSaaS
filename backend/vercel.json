@@ -3,6 +3,5 @@
   "builds": [
     { "src": "api/index.ts", "use": "@vercel/node@3" }
   ],
-  "functions": { "api/index.ts": { "runtime": "nodejs18.x" } },
   "routes": [{ "src": "/(.*)", "dest": "/api/index.ts" }]
 }
