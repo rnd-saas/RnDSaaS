@@ -3,5 +3,8 @@
   "builds": [
     { "src": "api/index.ts", "use": "@vercel/node@3" }
   ],
-  "routes": [{ "src": "/(.*)", "dest": "/api/index.ts" }]
+  "routes": [
+    { "src": "^/$", "dest": "/api/index.ts" },
+    { "src": "^/api/(.*)$", "dest": "/api/index.ts" }
+  ]
 }
