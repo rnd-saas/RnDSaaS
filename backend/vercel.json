@@ -1,15 +1,15 @@
 {
   "version": 2,
   "functions": {
-    "api/*.ts": {
-      "runtime": "@vercel/node@22"
+    "api/**/*.ts": {
+      "runtime": "nodejs20.x"
     }
   },
   "routes": [
-    { "src": "^/$", "dest": "/api/index" },
-    { "src": "^/api/ping$", "dest": "/api/ping" },
-    { "src": "^/api/env-check$", "dest": "/api/env-check" },
-    { "src": "^/api/(.*)$", "dest": "/api/index" }
+    { "src": "^/$", "dest": "/api/index.ts" },
+    { "src": "^/api/ping$", "dest": "/api/ping.ts" },
+    { "src": "^/api/env-check$", "dest": "/api/env-check.ts" },
+    { "src": "^/api/(.*)$", "dest": "/api/index.ts" }
   ],
   "env": {
     "NODE_ENV": "production"
