@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import 'dotenv/config';
 import authRoutes from './routes/authRoutes';
@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 // Health check endpoint
-app.get('/', (_req, res) => {
+app.get('/', (_req: Request, res: Response) => {
     res.json({ 
         message: 'Backend is running!',
         version: '1.0.0'
