@@ -1,6 +1,8 @@
 ﻿import { useForm } from "react-hook-form";
 import {Button} from "@/components/ui/button.tsx";
 import {Link, useNavigate} from "react-router-dom";
+import { useState } from "react";
+import { authService, ApiError } from "@/lib/api";
 
 type Inputs = {
     email: string
@@ -8,18 +10,35 @@ type Inputs = {
 }
 function Login() {
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const {
         register,
         handleSubmit,
         formState: { errors },
     } = useForm<Inputs>();
 
-    const onSubmit = (data: { email: string; password: string; }) => {
-        const userData = {email:'sample@sample.com',password:'sample'};//should get from backend
-        if (userData && userData.password === data.password) {
-            alert(userData.email + " You Are Successfully Logged In");
-        } else {
-            alert("Email or Password is not matching with our record");
+    const onSubmit = async (data: { email: string; password: string; }) => {
+        setIsLoading(true);
+        setError(null);
+        
+        try {
+            const response = await authService.login({
+                email: data.email,
+                password: data.password
+            });
+            
+            alert(response.user.email + " You Are Successfully Logged In");
+            // 可以在这里添加导航逻辑，比如跳转到主页
+            // navigate("/");
+        } catch (err) {
+            if (err instanceof ApiError) {
+                setError(err.message);
+            } else {
+                setError("Email or Password is not matching with our record");
+            }
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -57,10 +76,14 @@ function Login() {
                     {errors.password && (
                         <span className="text-red-500 text-sm mt-1">*Password is mandatory</span>
                     )}
-                    {/*will need to implement properly with backend*/}
+                    {error && (
+                        <span className="text-red-500 text-sm mt-1">{error}</span>
+                    )}
                     <Link to={'/'} style={{ fontSize: "14px", display: "block", textAlign: "left", color: "var(--intuitive-names-secondary-text)" }}>Forgot password?</Link>
                 </div>
-                <Button variant={"default"} type="submit">Login</Button>
+                <Button variant={"default"} type="submit" disabled={isLoading}>
+                    {isLoading ? "Logging in..." : "Login"}
+                </Button>
             </form>
             <div className={'p-6'}>
                 <p>Don't have an account yet?</p>

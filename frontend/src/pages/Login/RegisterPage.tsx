@@ -1,6 +1,8 @@
 ﻿import { useForm } from "react-hook-form";
 import {Button} from "@/components/ui/button.tsx";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
+import { useState } from "react";
+import { authService, ApiError } from "@/lib/api";
 
 type Inputs = {
     email: string
@@ -8,6 +10,10 @@ type Inputs = {
     passwordConfirmation: string
 }
 function Register() {
+    const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState(false);
     const {
         register,
         handleSubmit,
@@ -15,13 +21,39 @@ function Register() {
         formState: { errors },
     } = useForm<Inputs>();
 
-    const onSubmit = (data: { email: string; password: string; passwordConfirmation: string}) => {
-        const existingUser = {email:'sample@sample.com',password:'sample'};// will need to get from backend
-        if (existingUser.email == data.email) {
-            alert("Email is already registered!");
-        } else {
-            //here will need to save new user to db
+    const onSubmit = async (data: { email: string; password: string; passwordConfirmation: string}) => {
+        setIsLoading(true);
+        setError(null);
+        setSuccess(false);
+        
+        try {
+            // 从邮箱生成默认用户名和显示名称
+            const username = data.email.split('@')[0];
+            const display_name = data.email.split('@')[0];
+            
+            const response = await authService.register({
+                email: data.email,
+                password: data.password,
+                username,
+                display_name
+            });
+            
+            setSuccess(true);
             alert(data.email + " has been successfully registered");
+            // 可以在这里添加导航逻辑，比如跳转到登录页
+            // navigate("/login");
+        } catch (err) {
+            if (err instanceof ApiError) {
+                if (err.message.includes('already exists') || err.message.includes('already registered')) {
+                    setError("Email is already registered!");
+                } else {
+                    setError(err.message);
+                }
+            } else {
+                setError("Registration failed. Please try again.");
+            }
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -78,8 +110,16 @@ function Register() {
                     {errors.passwordConfirmation && (
                         <span className="text-red-500 text-sm mt-1">*Passwords should match</span>
                     )}
+                    {error && (
+                        <span className="text-red-500 text-sm mt-1">{error}</span>
+                    )}
+                    {success && (
+                        <span className="text-green-500 text-sm mt-1">Registration successful! Please check your email to verify your account.</span>
+                    )}
                 </div>
-                <Button variant={"default"} type="submit">Register</Button>
+                <Button variant={"default"} type="submit" disabled={isLoading}>
+                    {isLoading ? "Registering..." : "Register"}
+                </Button>
             </form>
             <div className={'p-6'}>
                 <Link to={'/login'} style={{ color: "var(--intuitive-names-secondary-text)" }}>Already an existing user?</Link>
