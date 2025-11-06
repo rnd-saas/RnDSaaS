@@ -34,24 +34,50 @@ app.get('/api/test', (_req, res) => {
     });
 });
 
-// API routes - wrapped in try-catch to prevent app crash
-try {
-    const authRoutes = require('./routes/authRoutes').default;
-    const userRoutes = require('./routes/userRoutes').default;
-    const debugRoutes = require('./routes/debugRoutes').default;
-    
-    app.use('/api/auth', authRoutes);
-    app.use('/api/users', userRoutes);
-    app.use('/api/debug', debugRoutes);
-} catch (error: any) {
-    console.error('Error loading routes:', error.message);
-    // Add error route
-    app.use('/api/*', (_req, res) => {
-        res.status(500).json({
-            error: 'Routes failed to load',
-            message: error.message
+// API routes - lazy load to improve cold start
+const loadRoutes = async () => {
+    try {
+        console.log('Loading API routes...');
+        
+        // 动态导入路由，只在需要时加载
+        const [authRoutes, userRoutes, debugRoutes] = await Promise.all([
+            import('./routes/authRoutes').then(m => m.default),
+            import('./routes/userRoutes').then(m => m.default),
+            import('./routes/debugRoutes').then(m => m.default)
+        ]);
+        
+        app.use('/api/auth', authRoutes);
+        app.use('/api/users', userRoutes);
+        app.use('/api/debug', debugRoutes);
+        
+        console.log('API routes loaded successfully');
+    } catch (error: any) {
+        console.error('Error loading routes:', error.message);
+        
+        // Add fallback error route
+        app.use('/api/*', (_req, res) => {
+            res.status(500).json({
+                error: 'Routes failed to load',
+                message: error.message
+            });
         });
+    }
+};
+
+// 在 Vercel 环境中延迟加载路由
+if (process.env.VERCEL) {
+    // 在第一次请求时加载路由
+    let routesLoaded = false;
+    app.use('/api/*', async (req, res, next) => {
+        if (!routesLoaded) {
+            await loadRoutes();
+            routesLoaded = true;
+        }
+        next();
     });
+} else {
+    // 在本地开发中立即加载
+    loadRoutes();
 }
 
 export default app;
