@@ -2,14 +2,14 @@
   "version": 2,
   "functions": {
     "api/**/*.ts": {
-      "runtime": "nodejs20.x"
+      "runtime": "nodejs18.x"
     }
   },
   "routes": [
-    { "src": "^/$", "dest": "/api/index.ts" },
-    { "src": "^/api/ping$", "dest": "/api/ping.ts" },
-    { "src": "^/api/env-check$", "dest": "/api/env-check.ts" },
-    { "src": "^/api/(.*)$", "dest": "/api/index.ts" }
+    { "src": "^/$", "dest": "/api/index" },
+    { "src": "^/api/ping$", "dest": "/api/ping" },
+    { "src": "^/api/env-check$", "dest": "/api/env-check" },
+    { "src": "^/api/(.*)$", "dest": "/api/index" }
   ],
   "env": {
     "NODE_ENV": "production"
