@@ -21,11 +21,11 @@ jobs:
       
       - name: Deploy BE to Vercel (Staging)
         uses: amondnet/vercel-action@v20
-        env:
-            SUPABASE_URL: ${{ secrets.STAGING_DB_URL }}
-            SUPABASE_KEY: ${{ secrets.STAGING_DB_PASSWORD }}
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_BACKEND_PROJECT_ID }}
           working-directory: ./backend
+          args: >-
+            --env SUPABASE_URL: ${{ secrets.STAGING_DB_URL }}
+            --env SUPABASE_KEY: ${{ secrets.STAGING_DB_PASSWORD }}
