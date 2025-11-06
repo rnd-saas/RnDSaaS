@@ -34,46 +34,24 @@ app.get('/api/test', (_req, res) => {
     });
 });
 
-// API routes - lazy load to improve cold start
-const loadRoutes = async () => {
-    try {
-        console.log('Loading API routes...');
-        
-        const [authRoutes, userRoutes, debugRoutes] = await Promise.all([
-            import('./routes/authRoutes').then(m => m.default),
-            import('./routes/userRoutes').then(m => m.default),
-            import('./routes/debugRoutes').then(m => m.default)
-        ]);
-        
-        app.use('/api/auth', authRoutes);
-        app.use('/api/users', userRoutes);
-        app.use('/api/debug', debugRoutes);
-        
-        console.log('API routes loaded successfully');
-    } catch (error: any) {
-        console.error('Error loading routes:', error.message);
-        
-        // Add fallback error route
-        app.use('/api/*', (_req, res) => {
-            res.status(500).json({
-                error: 'Routes failed to load',
-                message: error.message
-            });
+// API routes - wrapped in try-catch to prevent app crash
+try {
+    const authRoutes = require('./routes/authRoutes').default;
+    const userRoutes = require('./routes/userRoutes').default;
+    const debugRoutes = require('./routes/debugRoutes').default;
+    
+    app.use('/api/auth', authRoutes);
+    app.use('/api/users', userRoutes);
+    app.use('/api/debug', debugRoutes);
+} catch (error: any) {
+    console.error('Error loading routes:', error.message);
+    // Add error route
+    app.use('/api/*', (_req, res) => {
+        res.status(500).json({
+            error: 'Routes failed to load',
+            message: error.message
         });
-    }
-};
-
-if (process.env.VERCEL) {
-    let routesLoaded = false;
-    app.use('/api/*', async (req, res, next) => {
-        if (!routesLoaded) {
-            await loadRoutes();
-            routesLoaded = true;
-        }
-        next();
     });
-} else {
-    loadRoutes();
 }
 
 export default app;
