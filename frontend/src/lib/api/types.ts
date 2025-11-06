@@ -1,8 +1,8 @@
 /**
- * API 类型定义
+ * API type definitions
  */
 
-// 用户类型
+// User type
 export interface User {
     id: string;
     username: string;
@@ -11,20 +11,20 @@ export interface User {
     updated_at: string;
 }
 
-// 登录请求
+// Login request
 export interface LoginRequest {
     email: string;
     password: string;
 }
 
-// 登录响应
+// Login response
 export interface LoginResponse {
     user: User;
     token?: string;
     message?: string;
 }
 
-// 注册请求
+// Register request
 export interface RegisterRequest {
     email: string;
     password: string;
@@ -32,13 +32,13 @@ export interface RegisterRequest {
     display_name?: string;
 }
 
-// 注册响应
+// Register response
 export interface RegisterResponse {
     user: User;
     message?: string;
 }
 
-// API 错误
+// API error
 export class ApiError extends Error {
     constructor(
         message: string,

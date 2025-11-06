@@ -29,7 +29,7 @@ function Login() {
             });
             
             alert(response.user.email + " You Are Successfully Logged In");
-            // 可以在这里添加导航逻辑，比如跳转到主页
+            // Add navigation logic here, e.g., navigate to home page
             // navigate("/");
         } catch (err) {
             if (err instanceof ApiError) {

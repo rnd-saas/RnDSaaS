@@ -1,5 +1,5 @@
 /**
- * API 服务统一导出
+ * API services unified export
  */
 
 export { default as apiClient } from './client';

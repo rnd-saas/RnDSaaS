@@ -1,26 +1,27 @@
 /**
- * 用户服务
+ * User service
+ * Handles all user data-related API calls
  */
 
 import apiClient from './client';
 import type { User } from './types';
 
 /**
- * 获取所有用户
+ * Get all users
  */
 export async function getAllUsers(): Promise<User[]> {
     return apiClient.get<User[]>('/api/users');
 }
 
 /**
- * 根据 ID 获取用户
+ * Get user by ID
  */
 export async function getUserById(userId: string): Promise<User> {
     return apiClient.get<User>(`/api/users/${userId}`);
 }
 
 /**
- * 创建用户
+ * Create user
  */
 export async function createUser(userData: {
     id: string;

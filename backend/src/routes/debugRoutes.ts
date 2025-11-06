@@ -1,6 +1,6 @@
 /**
- * 调试路由
- * 用于调试和查看 Supabase 状态
+ * Debug routes
+ * Used for debugging and viewing Supabase status
  */
 
 import { Router } from 'express';
@@ -10,12 +10,12 @@ const router = Router();
 
 /**
  * GET /api/debug/auth-users
- * 查看 Supabase Auth 中的用户（仅用于调试）
+ * View users in Supabase Auth (for debugging only)
  */
 router.get('/auth-users', async (_req, res) => {
     try {
-        // 注意：这需要管理员权限，通常不能直接查询 auth.users
-        // 这里只是示例，实际应该通过 Supabase Dashboard 查看
+        // Note: This requires admin permissions, usually cannot directly query auth.users
+        // This is just an example, should use Supabase Dashboard in practice
         res.json({ 
             message: 'Use Supabase Dashboard to view auth.users',
             note: 'Go to Authentication > Users in Supabase Dashboard'
@@ -28,7 +28,7 @@ router.get('/auth-users', async (_req, res) => {
 
 /**
  * GET /api/debug/public-users
- * 查看 public.users 表中的用户
+ * View users in public.users table
  */
 router.get('/public-users', async (_req, res) => {
     try {
@@ -57,11 +57,11 @@ router.get('/public-users', async (_req, res) => {
 
 /**
  * GET /api/debug/test-connection
- * 测试 Supabase 连接
+ * Test Supabase connection
  */
 router.get('/test-connection', async (_req, res) => {
     try {
-        // 测试基本连接
+        // Test basic connection
         const { data, error } = await supabase
             .from('users')
             .select('count')

@@ -1,5 +1,6 @@
 /**
- * 认证路由
+ * Authentication routes
+ * Handles user authentication operations (login, register, logout)
  */
 
 import { Router } from 'express';
@@ -9,7 +10,7 @@ const router = Router();
 
 /**
  * POST /api/auth/login
- * 用户登录
+ * User login
  */
 router.post('/login', async (req, res) => {
     try {
@@ -21,7 +22,7 @@ router.post('/login', async (req, res) => {
             });
         }
 
-        // 使用 Supabase Auth 进行认证
+        // Authenticate user using Supabase Auth
         const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
             email,
             password,
@@ -29,7 +30,7 @@ router.post('/login', async (req, res) => {
 
         if (authError) {
             console.error('Login auth error:', authError);
-            // 检查是否是邮箱未验证
+            // Check if email is not confirmed
             if (authError.message?.includes('Email not confirmed') || authError.message?.includes('email_not_confirmed')) {
                 return res.status(401).json({ 
                     error: { 
@@ -52,7 +53,7 @@ router.post('/login', async (req, res) => {
             });
         }
 
-        // 检查用户邮箱是否已验证
+        // Check if user email is verified
         if (!authData.user.email_confirmed_at && authData.user.email_confirmed_at === null) {
             return res.status(401).json({ 
                 error: { 
@@ -62,7 +63,7 @@ router.post('/login', async (req, res) => {
             });
         }
 
-        // 从 users 表获取用户详细信息
+        // Get user details from users table
         const { data: userData, error: userError } = await supabase
             .from('users')
             .select('*')
@@ -70,7 +71,7 @@ router.post('/login', async (req, res) => {
             .single();
 
         if (userError || !userData) {
-            // 如果 users 表中没有记录，创建一个
+            // Create a record in users table if it doesn't exist
             const { data: newUser, error: createError } = await supabase
                 .from('users')
                 .insert([{
@@ -110,7 +111,7 @@ router.post('/login', async (req, res) => {
 
 /**
  * POST /api/auth/register
- * 用户注册
+ * User registration
  */
 router.post('/register', async (req, res) => {
     try {
@@ -122,8 +123,8 @@ router.post('/register', async (req, res) => {
             });
         }
 
-        // 使用 Supabase Auth 创建用户
-        // 注意：如果 Supabase 启用了邮箱验证，用户需要验证邮箱后才能登录
+        // Create user using Supabase Auth
+        // Note: If email confirmation is enabled in Supabase, users need to verify their email before logging in
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email,
             password,
@@ -132,7 +133,7 @@ router.post('/register', async (req, res) => {
                     username: username || email.split('@')[0],
                     display_name: display_name || email.split('@')[0]
                 },
-                // 如果不需要邮箱验证，可以设置 emailRedirectTo
+                // Set emailRedirectTo if email verification is not required
                 // emailRedirectTo: 'http://localhost:5173/login'
             }
         });
@@ -152,7 +153,7 @@ router.post('/register', async (req, res) => {
             });
         }
 
-        // 在 users 表中创建用户记录
+        // Create user record in users table
         const { data: userData, error: userError } = await supabase
             .from('users')
             .insert([{
@@ -165,7 +166,7 @@ router.post('/register', async (req, res) => {
 
         if (userError) {
             console.error('Error creating user profile:', userError);
-            // 即使创建 profile 失败，用户已经在 auth.users 中创建了
+            // User is already created in auth.users even if profile creation fails
             return res.status(201).json({
                 user: {
                     id: authData.user.id,
@@ -178,7 +179,7 @@ router.post('/register', async (req, res) => {
             });
         }
 
-        // 检查是否需要邮箱验证
+        // Check if email confirmation is needed
         const needsEmailConfirmation = !authData.session && authData.user && !authData.user.email_confirmed_at;
         
         res.status(201).json({
@@ -199,7 +200,7 @@ router.post('/register', async (req, res) => {
 
 /**
  * POST /api/auth/logout
- * 用户登出
+ * User logout
  */
 router.post('/logout', async (req, res) => {
     try {
@@ -221,7 +222,7 @@ router.post('/logout', async (req, res) => {
 
 /**
  * GET /api/auth/me
- * 获取当前登录用户信息
+ * Get current logged-in user information
  */
 router.get('/me', async (req, res) => {
     try {
@@ -234,7 +235,7 @@ router.get('/me', async (req, res) => {
             });
         }
 
-        // 验证 token 并获取用户信息
+        // Verify token and get user information
         const { data: { user: authUser }, error: authError } = await supabase.auth.getUser(token);
 
         if (authError || !authUser) {
@@ -243,7 +244,7 @@ router.get('/me', async (req, res) => {
             });
         }
 
-        // 从 users 表获取用户详细信息
+        // Get user details from users table
         const { data: userData, error: userError } = await supabase
             .from('users')
             .select('*')

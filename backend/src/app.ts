@@ -9,7 +9,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 健康检查
+// Health check endpoint
 app.get('/', (_req, res) => {
     res.json({ 
         message: 'Backend is running!',
@@ -17,9 +17,9 @@ app.get('/', (_req, res) => {
     });
 });
 
-// API 路由
+// API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/debug', debugRoutes); // 调试路由
+app.use('/api/debug', debugRoutes); // Debug routes
 
 export default app;

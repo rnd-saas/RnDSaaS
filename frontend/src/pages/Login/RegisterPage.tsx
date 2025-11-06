@@ -27,7 +27,7 @@ function Register() {
         setSuccess(false);
         
         try {
-            // 从邮箱生成默认用户名和显示名称
+            // Generate default username and display name from email
             const username = data.email.split('@')[0];
             const display_name = data.email.split('@')[0];
             
@@ -40,7 +40,7 @@ function Register() {
             
             setSuccess(true);
             alert(data.email + " has been successfully registered");
-            // 可以在这里添加导航逻辑，比如跳转到登录页
+            // Add navigation logic here, e.g., navigate to login page
             // navigate("/login");
         } catch (err) {
             if (err instanceof ApiError) {

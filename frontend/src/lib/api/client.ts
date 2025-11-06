@@ -1,11 +1,11 @@
 /**
- * API 客户端
- * 统一管理所有 API 请求
+ * API Client
+ * Unified management of all API requests
  */
 
 import { ApiError } from './types';
 
-// API 基础 URL，从环境变量读取，默认为 localhost:4000
+// API base URL, read from environment variables, defaults to localhost:4000
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
 
 class ApiClient {
@@ -16,7 +16,7 @@ class ApiClient {
     }
 
     /**
-     * 获取完整的请求 URL
+     * Get full request URL
      */
     private getFullUrl(endpoint: string, params?: Record<string, any>): string {
         const url = endpoint.startsWith('http') 
@@ -38,7 +38,7 @@ class ApiClient {
     }
 
     /**
-     * 获取请求头
+     * Get request headers
      */
     private getHeaders(customHeaders?: HeadersInit): HeadersInit {
         const headers: HeadersInit = {
@@ -46,7 +46,7 @@ class ApiClient {
             ...customHeaders,
         };
 
-        // 如果有 token，添加到请求头
+        // Add token to request header if available
         const token = localStorage.getItem('auth_token');
         if (token) {
             headers['Authorization'] = `Bearer ${token}`;
@@ -56,7 +56,7 @@ class ApiClient {
     }
 
     /**
-     * 处理响应
+     * Handle response
      */
     private async handleResponse<T>(response: Response): Promise<T> {
         const contentType = response.headers.get('content-type');
@@ -81,7 +81,7 @@ class ApiClient {
     }
 
     /**
-     * GET 请求
+     * GET request
      */
     async get<T>(endpoint: string, params?: Record<string, any>): Promise<T> {
         const url = this.getFullUrl(endpoint, params);
@@ -94,7 +94,7 @@ class ApiClient {
     }
 
     /**
-     * POST 请求
+     * POST request
      */
     async post<T>(endpoint: string, data?: any): Promise<T> {
         const url = this.getFullUrl(endpoint);
@@ -108,7 +108,7 @@ class ApiClient {
     }
 
     /**
-     * PUT 请求
+     * PUT request
      */
     async put<T>(endpoint: string, data?: any): Promise<T> {
         const url = this.getFullUrl(endpoint);
@@ -122,7 +122,7 @@ class ApiClient {
     }
 
     /**
-     * DELETE 请求
+     * DELETE request
      */
     async delete<T>(endpoint: string): Promise<T> {
         const url = this.getFullUrl(endpoint);
@@ -135,21 +135,21 @@ class ApiClient {
     }
 
     /**
-     * 保存 token
+     * Save token
      */
     setToken(token: string): void {
         localStorage.setItem('auth_token', token);
     }
 
     /**
-     * 清除 token
+     * Clear token
      */
     clearToken(): void {
         localStorage.removeItem('auth_token');
     }
 }
 
-// 导出单例
+// Export singleton instance
 export const apiClient = new ApiClient();
 export default apiClient;
 

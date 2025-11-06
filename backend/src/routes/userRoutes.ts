@@ -1,5 +1,6 @@
 /**
- * 用户路由
+ * User routes
+ * Handles user data CRUD operations
  */
 
 import { Router } from 'express';
@@ -9,7 +10,7 @@ const router = Router();
 
 /**
  * GET /api/users
- * 获取所有用户
+ * Get all users
  */
 router.get('/', async (_req, res) => {
     try {
@@ -31,7 +32,7 @@ router.get('/', async (_req, res) => {
 
 /**
  * GET /api/users/:id
- * 根据 ID 获取用户
+ * Get user by ID
  */
 router.get('/:id', async (req, res) => {
     try {
@@ -67,7 +68,7 @@ router.get('/:id', async (req, res) => {
 
 /**
  * POST /api/users
- * 创建新用户
+ * Create new user
  */
 router.post('/', async (req, res) => {
     try {

@@ -1,17 +1,18 @@
 /**
- * 认证服务
+ * Authentication service
+ * Handles all authentication-related API calls
  */
 
 import apiClient from './client';
 import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from './types';
 
 /**
- * 用户登录
+ * User login
  */
 export async function login(credentials: LoginRequest): Promise<LoginResponse> {
     const response = await apiClient.post<LoginResponse>('/api/auth/login', credentials);
     
-    // 如果返回了 token，保存它
+    // Save token if returned
     if (response.token) {
         apiClient.setToken(response.token);
     }
@@ -20,14 +21,14 @@ export async function login(credentials: LoginRequest): Promise<LoginResponse> {
 }
 
 /**
- * 用户注册
+ * User registration
  */
 export async function register(userData: RegisterRequest): Promise<RegisterResponse> {
     return apiClient.post<RegisterResponse>('/api/auth/register', userData);
 }
 
 /**
- * 用户登出
+ * User logout
  */
 export async function logout(): Promise<void> {
     try {
@@ -38,7 +39,7 @@ export async function logout(): Promise<void> {
 }
 
 /**
- * 获取当前用户
+ * Get current user
  */
 export async function getCurrentUser(): Promise<any> {
     return apiClient.get('/api/auth/me');
