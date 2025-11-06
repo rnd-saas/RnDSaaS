@@ -26,6 +26,3 @@ jobs:
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_BACKEND_PROJECT_ID }}
           working-directory: ./backend
-          vercel-args: >-
-            --env SUPABASE_URL=${{ secrets.STAGING_DB_URL }}
-            --env SUPABASE_KEY=${{ secrets.STAGING_DB_PASSWORD }}
