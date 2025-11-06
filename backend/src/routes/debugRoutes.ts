@@ -4,9 +4,22 @@
  */
 
 import { Router } from 'express';
-import { supabase } from '../db/supabase';
 
 const router = Router();
+
+// Lazy load supabase to avoid initialization errors
+let supabase: any = null;
+function getSupabase() {
+    if (!supabase) {
+        try {
+            supabase = require('../db/supabase').supabase;
+        } catch (error: any) {
+            console.error('Failed to load Supabase:', error.message);
+            throw error;
+        }
+    }
+    return supabase;
+}
 
 /**
  * GET /api/debug/auth-users
@@ -32,7 +45,8 @@ router.get('/auth-users', async (_req, res) => {
  */
 router.get('/public-users', async (_req, res) => {
     try {
-        const { data, error, count } = await supabase
+        const supabaseClient = getSupabase();
+        const { data, error, count } = await supabaseClient
             .from('users')
             .select('*', { count: 'exact' })
             .order('created_at', { ascending: false });
@@ -51,7 +65,12 @@ router.get('/public-users', async (_req, res) => {
         });
     } catch (error: any) {
         console.error('Debug error:', error);
-        res.status(500).json({ error: { message: 'Internal server error' } });
+        res.status(500).json({ 
+            error: { 
+                message: 'Internal server error',
+                details: error.message
+            } 
+        });
     }
 });
 
@@ -61,8 +80,9 @@ router.get('/public-users', async (_req, res) => {
  */
 router.get('/test-connection', async (_req, res) => {
     try {
+        const supabaseClient = getSupabase();
         // Test basic connection
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('users')
             .select('count')
             .limit(1);
@@ -81,9 +101,11 @@ router.get('/test-connection', async (_req, res) => {
             timestamp: new Date().toISOString()
         });
     } catch (error: any) {
+        console.error('test-connection error:', error);
         res.status(500).json({
             connected: false,
-            error: error.message
+            error: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
     }
 });
@@ -91,6 +113,7 @@ router.get('/test-connection', async (_req, res) => {
 /**
  * GET /api/debug/env-check
  * Check environment variables (without exposing sensitive data)
+ * This endpoint doesn't require Supabase to work
  */
 router.get('/env-check', async (_req, res) => {
     try {
@@ -114,11 +137,14 @@ router.get('/env-check', async (_req, res) => {
             environment: envCheck,
             message: allSet 
                 ? 'All required environment variables are set' 
-                : 'Missing required environment variables'
+                : 'Missing required environment variables',
+            timestamp: new Date().toISOString()
         });
     } catch (error: any) {
+        console.error('env-check error:', error);
         res.status(500).json({
-            error: error.message
+            error: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
     }
 });
@@ -129,13 +155,14 @@ router.get('/env-check', async (_req, res) => {
  */
 router.post('/test-register', async (req, res) => {
     try {
+        const supabaseClient = getSupabase();
         const testEmail = `test-${Date.now()}@example.com`;
         const testPassword = 'Test123456!';
         
         console.log('🧪 Testing registration with:', { email: testEmail });
         
         // Test Supabase Auth signup
-        const { data: authData, error: authError } = await supabase.auth.signUp({
+        const { data: authData, error: authError } = await supabaseClient.auth.signUp({
             email: testEmail,
             password: testPassword
         });
@@ -161,7 +188,7 @@ router.post('/test-register', async (req, res) => {
         }
 
         // Test inserting into users table
-        const { data: userData, error: userError } = await supabase
+        const { data: userData, error: userError } = await supabaseClient
             .from('users')
             .insert([{
                 id: authData.user.id,
