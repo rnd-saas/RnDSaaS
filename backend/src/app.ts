@@ -1,20 +1,25 @@
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
-import { supabase } from './db/supabase';
+import authRoutes from './routes/authRoutes';
+import userRoutes from './routes/userRoutes';
+import debugRoutes from './routes/debugRoutes';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+// 健康检查
 app.get('/', (_req, res) => {
-    res.send('Backend is running!');
+    res.json({ 
+        message: 'Backend is running!',
+        version: '1.0.0'
+    });
 });
 
-app.get('/user', async (_req, res) => {
-    const { data, error } = await supabase.from('users').select('*');
-    if (error) return res.status(400).json({ error });
-    res.json(data);
-});
+// API 路由
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/debug', debugRoutes); // 调试路由
 
 export default app;
