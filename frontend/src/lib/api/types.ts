@@ -7,6 +7,7 @@ export interface User {
     id: string;
     username: string;
     display_name: string;
+    email?: string;
     created_at: string;
     updated_at: string;
 }
@@ -40,14 +41,21 @@ export interface RegisterResponse {
 
 // API error
 export class ApiError extends Error {
+    status: number;
+    code?: string;
+    details?: string;
+
     constructor(
         message: string,
-        public status: number,
-        public code?: string,
-        public details?: string
+        status: number,
+        code?: string,
+        details?: string
     ) {
         super(message);
         this.name = 'ApiError';
+        this.status = status;
+        this.code = code;
+        this.details = details;
     }
 }
 

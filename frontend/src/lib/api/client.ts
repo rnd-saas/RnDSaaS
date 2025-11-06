@@ -41,10 +41,24 @@ class ApiClient {
      * Get request headers
      */
     private getHeaders(customHeaders?: HeadersInit): HeadersInit {
-        const headers: HeadersInit = {
+        const headers: Record<string, string> = {
             'Content-Type': 'application/json',
-            ...customHeaders,
         };
+
+        // Merge custom headers
+        if (customHeaders) {
+            if (customHeaders instanceof Headers) {
+                customHeaders.forEach((value, key) => {
+                    headers[key] = value;
+                });
+            } else if (Array.isArray(customHeaders)) {
+                customHeaders.forEach(([key, value]) => {
+                    headers[key] = value;
+                });
+            } else {
+                Object.assign(headers, customHeaders);
+            }
+        }
 
         // Add token to request header if available
         const token = localStorage.getItem('auth_token');
@@ -60,7 +74,7 @@ class ApiClient {
      */
     private async handleResponse<T>(response: Response): Promise<T> {
         const contentType = response.headers.get('content-type');
-        const isJson = contentType?.includes('application/json');
+        const isJson = contentType !== null && contentType.includes('application/json');
         
         const data = isJson ? await response.json() : await response.text();
         

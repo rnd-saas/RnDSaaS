@@ -31,7 +31,7 @@ function Register() {
             const username = data.email.split('@')[0];
             const display_name = data.email.split('@')[0];
             
-            const response = await authService.register({
+            await authService.register({
                 email: data.email,
                 password: data.password,
                 username,
@@ -41,7 +41,7 @@ function Register() {
             setSuccess(true);
             alert(data.email + " has been successfully registered");
             // Add navigation logic here, e.g., navigate to login page
-            // navigate("/login");
+            navigate("/login");
         } catch (err) {
             if (err instanceof ApiError) {
                 if (err.message.includes('already exists') || err.message.includes('already registered')) {

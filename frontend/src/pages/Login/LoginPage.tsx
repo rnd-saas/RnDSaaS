@@ -23,14 +23,14 @@ function Login() {
         setError(null);
         
         try {
-            const response = await authService.login({
+            await authService.login({
                 email: data.email,
                 password: data.password
             });
             
-            alert(response.user.email + " You Are Successfully Logged In");
+            alert(data.email + " You Are Successfully Logged In");
             // Add navigation logic here, e.g., navigate to home page
-            // navigate("/");
+            navigate("/");
         } catch (err) {
             if (err instanceof ApiError) {
                 setError(err.message);
