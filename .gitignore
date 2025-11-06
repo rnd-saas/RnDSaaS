@@ -7,10 +7,18 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# Node workspaces / monorepo
+**/node_modules/
+**/dist/
+**/build/
+**/.cache/
+**/coverage/
+**/dist-ssr/
+
+# Env
+**/.env
+**/.env.*
+!.env.example
 
 # Environmental variables
 .env
