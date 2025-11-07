@@ -10,18 +10,7 @@ if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
 }
 
 const app = express();
-
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
-    .split(',')
-    .map(origin => origin.trim())
-    .filter(Boolean);
-
-const corsOptions = allowedOrigins.length > 0
-    ? { origin: allowedOrigins, credentials: true }
-    : { origin: true, credentials: true };
-
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 
 // Health check endpoint
