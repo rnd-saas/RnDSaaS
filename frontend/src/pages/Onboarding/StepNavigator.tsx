@@ -10,7 +10,7 @@ export default function StepNavigator({prevStep, nextStep, prevDisabled, nextDis
 
     return (
         <div className="flex justify-between">
-            <Button type={"button"} size="sm" onClick={prevStep} disabled={prevDisabled}>
+            <Button type={"button"} variant={"outline"} size="sm" onClick={prevStep} disabled={prevDisabled}>
                 Previous
             </Button>
             <Button type={"button"} size="sm" onClick={nextStep} disabled={nextDisabled}>

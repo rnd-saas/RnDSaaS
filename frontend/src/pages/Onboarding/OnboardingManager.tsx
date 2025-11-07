@@ -61,13 +61,15 @@ export default function OnboardingManager() {
 
     return (
         <FormProvider {...methods}>
-            <form onSubmit={methods.handleSubmit(onSubmit)} className="w-full max-w-md min-h-[75vh] min-w-[40vw]">
+            <form onSubmit={methods.handleSubmit(onSubmit)} className="w-full max-w-md min-h-[75vh] min-w-[75vw]">
                 <div className="sticky top-0 p-4 ">
                     <FormProgress currentStep={formStep} totalSteps={stepComponents.length - 1} />
                 </div>
-                <CurrentStep />
+                <div className="flex flex-col items-center gap-4">
+                    <CurrentStep />
+                </div>
                 {/*todo: need to check data was filled in before allowing next button*/}
-                <div className="fixed w-[40vw] bottom-[20vh] p-4" >
+                <div className="fixed w-[75vw] bottom-[20vh] p-4" >
                     <StepNavigator prevStep={back} nextStep={next} prevDisabled={formStep==0} nextDisabled={formStep==totalSteps}/>
                     {formStep==totalSteps && <Button>Submit</Button>}
                 </div>

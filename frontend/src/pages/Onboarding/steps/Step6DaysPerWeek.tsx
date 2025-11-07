@@ -1,16 +1,16 @@
-﻿import {FieldDescription, FieldLabel, FieldSet} from "@/components/ui/field.tsx";
+﻿import {FieldDescription, FieldLabel, FieldLegend, FieldSet} from "@/components/ui/field.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 
 
 export default function Step6DaysPerWeek() {
 
     return (
-        <div className="w-full max-w-md">
-            <FieldSet>
-                <FieldLabel>Days per week</FieldLabel>
-                <FieldDescription>
-                    How many days per week would you like to train?
-                </FieldDescription>
+        <FieldSet>
+            <FieldLegend>Days per week</FieldLegend>
+            <FieldDescription>
+                How many days per week would you like to train?
+            </FieldDescription>
+            <div className="flex justify-center">
                 <Select>
                     <SelectTrigger>
                         <SelectValue placeholder="Select the number of days"/>
@@ -25,7 +25,7 @@ export default function Step6DaysPerWeek() {
                         <SelectItem value="7">7</SelectItem>
                     </SelectContent>
                 </Select>
-            </FieldSet>
-        </div>
+            </div>
+        </FieldSet>
     )
 }
