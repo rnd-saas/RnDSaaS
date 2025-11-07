@@ -85,4 +85,23 @@ app.use('/api', async (req, res, next) => {
     next();
 });
 
+// 404 handler for unmatched routes
+app.use((req, res) => {
+    res.status(404).json({
+        error: 'Not Found',
+        message: `Route ${req.method} ${req.path} not found`,
+        availableRoutes: [
+            'GET /',
+            'GET /api/test',
+            'GET /api/ping',
+            'GET /api/env-check',
+            'POST /api/auth/register',
+            'POST /api/auth/login',
+            'GET /api/auth/me',
+            'POST /api/auth/logout'
+        ],
+        timestamp: new Date().toISOString()
+    });
+});
+
 export default app;
