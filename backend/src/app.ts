@@ -11,7 +11,6 @@ if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
 
 const app = express();
 app.use(cors());
-app.options('*', cors()); // Handle preflight requests
 app.use(express.json());
 
 // Health check endpoint
