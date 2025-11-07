@@ -2,6 +2,8 @@
 import LoginPage from "../pages/Login/LoginPage.tsx";
 import RegisterPage from "../pages/Login/RegisterPage.tsx";
 import DefaultPage from "@/pages/DefaultPage.tsx";
+import DashboardPage from '@/pages/Dashboard/DashboardPage';
+import ProtectedRoute from '@/routes/ProtectedRoute';
 
 export default function AppRoutes() {
     return (
