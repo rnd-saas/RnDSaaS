@@ -26,7 +26,7 @@ export default function Step0Welcome() {
                                     <img src={tomImage} alt={"Tom waving"}/>
                                     <p>I’m Tom - nice to meet you!<br/>I’ll be your workout buddy</p>
                                 </FieldLabel>
-                                <RadioGroupItem value="tom" id="tom" />
+                                <RadioGroupItem value="0" id="tom" />
                             </Field>
                         </CarouselItem>
                         <CarouselItem>
@@ -35,7 +35,7 @@ export default function Step0Welcome() {
                                     <img src={sarahImage} alt={"Sarah waving"}/>
                                     <p>I’m Sarah - nice to meet you!<br/>I’ll be your workout buddy</p>
                                 </FieldLabel>
-                                <RadioGroupItem value="sarah" id="sarah"/>
+                                <RadioGroupItem value="1" id="sarah"/>
                             </Field>
                         </CarouselItem>
                     </CarouselContent>

@@ -6,7 +6,6 @@ import StepNavigator from "./StepNavigator.tsx";
 
 import Step0Welcome from "./steps/Step0Welcome.tsx";
 import Step4Experience from "./steps/Step4Experience.tsx";
-import Step5LocationPreference from "@/pages/Onboarding/steps/Step5LocationPreference.tsx";
 import Step6DaysPerWeek from "@/pages/Onboarding/steps/Step6DaysPerWeek.tsx";
 import Step7WhichDays from "@/pages/Onboarding/steps/Step7WhichDays.tsx";
 import Step8SessionLength from "@/pages/Onboarding/steps/Step8SessionLength.tsx";
@@ -16,17 +15,34 @@ import Step11ComfortLevel from "@/pages/Onboarding/steps/Step11ComfortLevel.tsx"
 import Step2Gender from "@/pages/Onboarding/steps/Step2Gender.tsx";
 import Step1Data from "@/pages/Onboarding/steps/Step1Data.tsx";
 import Step3PrimaryGoal from "./steps/Step3PrimaryGoal.tsx";
+import {list} from "postcss";
+import type {PrimaryGoal} from "@/utils/InputTypes.tsx";
+import {Gender, GymComfortLevel, PreferredSplit} from "@/utils/InputTypes.tsx";
 
 export default function OnboardingManager() {
     const [formStep, setStep] = useState(0);
-    const methods = useForm()
+    type Inputs = {
+        strTrainer:string,
+        weight:number,
+        height:number,
+        gender:Gender,
+        goal:PrimaryGoal,
+        strExperience:string,
+        strDaysPerWeek:string,
+        strAvailableDays:string[],
+        strSessionDuration:string,
+        problemAreas:string[],
+        preferredSplit:PreferredSplit,
+        comfortLevel:GymComfortLevel,
+    }
+    const methods = useForm<Inputs>()
+
     const stepComponents = [
         Step0Welcome,
         Step1Data,
         Step2Gender,
         Step3PrimaryGoal,
         Step4Experience,
-        Step5LocationPreference,
         Step6DaysPerWeek,
         Step7WhichDays,
         Step8SessionLength,
@@ -54,9 +70,14 @@ export default function OnboardingManager() {
     };
 
 
-    const onSubmit = (data) => {
+    const onSubmit = (data:Inputs) => {
         //todo: need to ensure data is available and save the data somewhere
-        console.log("submit clicked");
+        const trainer = { strTrainer: Number(data.strTrainer) };
+        const experience = {strExperience: Number(data.strExperience)};
+        const daysPerWeek= { strDaysPerWeek: Number(data.strDaysPerWeek) };
+        // const availableDays = {strAvailableDays: data.strAvailableDays.map(Number),};
+        const sessionDuration= { strSessionDuration: Number(data.strSessionDuration) };
+        console.log("submit clicked", data.strTrainer, data.strExperience);
     }
 
     return (

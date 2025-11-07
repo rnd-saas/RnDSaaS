@@ -1,9 +1,16 @@
 ﻿import {Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet} from "@/components/ui/field.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
+import {GymComfortLevel, PreferredSplit} from "@/utils/InputTypes.tsx";
 
 
 export default function Step11ComfortLevel() {
-
+    const comfortOptions: { value: GymComfortLevel; label: string }[]  = [
+        { value: GymComfortLevel.Anxious, label: "I feel anxious and insecure" },
+        { value: GymComfortLevel.Nervous, label: "I feel nervous" },
+        { value: GymComfortLevel.Fine, label: "I feel fine most of the time" },
+        { value: GymComfortLevel.Comfortable, label: "I’m comfortable" },
+        { value: GymComfortLevel.NeverBeen, label: "I have never been" },
+    ];
     return (
         <FieldGroup>
             <FieldSet>
@@ -12,26 +19,14 @@ export default function Step11ComfortLevel() {
                     How comfortable do you feel at the gym? (multiple options possible)
                 </FieldDescription>
                 <FieldGroup className="gap-3">
-                    <Field orientation="horizontal">
-                        <Checkbox id="anxious" />
-                        <FieldLabel htmlFor="anxious" className="font-normal">I feel anxious and insecure </FieldLabel>
-                    </Field>
-                    <Field orientation="horizontal">
-                        <Checkbox id="nervous" />
-                        <FieldLabel htmlFor="nervous" className="font-normal">I feel nervous</FieldLabel>
-                    </Field>
-                    <Field orientation="horizontal">
-                        <Checkbox id="fine" />
-                        <FieldLabel htmlFor="fine" className="font-normal">I feel fine most of the time</FieldLabel>
-                    </Field>
-                    <Field orientation="horizontal">
-                        <Checkbox id="comfortable" />
-                        <FieldLabel htmlFor="comfortable" className="font-normal">I’m comfortable</FieldLabel>
-                    </Field>
-                    <Field orientation="horizontal">
-                        <Checkbox id="never-been" />
-                        <FieldLabel htmlFor="never-been" className="font-normal">I have never been </FieldLabel>
-                    </Field>
+                    {comfortOptions.map((g) => (
+                        <Field key={g.value} orientation="horizontal">
+                            <Checkbox value={g.value} id={g.value} />
+                            <FieldLabel htmlFor={g.value} className="font-normal">
+                                {g.label}
+                            </FieldLabel>
+                        </Field>
+                    ))}
                 </FieldGroup>
             </FieldSet>
         </FieldGroup>

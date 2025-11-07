@@ -1,9 +1,17 @@
 ﻿import {Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet} from "@/components/ui/field.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
+import {PreferredSplit} from "@/utils/InputTypes.tsx";
+import {RadioGroupItem} from "@/components/ui/radio-group.tsx";
 
 
 export default function Step10WorkoutType() {
-
+    const splitOptions: { value: PreferredSplit; label: string }[]  = [
+        { value: PreferredSplit.DontKnow, label: "Suggest something for me" },
+        { value: PreferredSplit.FullBody, label: "Full body" },
+        { value: PreferredSplit.UpperLower, label: "Upper-lower body" },
+        { value: PreferredSplit.PushPullLegs, label: "Push-pull-Legs" },
+        { value: PreferredSplit.Other, label: "Other" },
+    ];
     return (
         <FieldGroup>
             <FieldSet>
@@ -12,22 +20,14 @@ export default function Step10WorkoutType() {
                     Which type of workouts would you like to do?
                 </FieldDescription>
                 <FieldGroup className="gap-3">
-                    <Field orientation="horizontal">
-                        <Checkbox id="full-body" />
-                        <FieldLabel htmlFor="full-body" className="font-normal">Full body</FieldLabel>
-                    </Field>
-                    <Field orientation="horizontal">
-                        <Checkbox id="upper-lower-body" />
-                        <FieldLabel htmlFor="upper-lower-body" className="font-normal">Upper-lower body</FieldLabel>
-                    </Field>
-                    <Field orientation="horizontal">
-                        <Checkbox id="push-pull-legs" />
-                        <FieldLabel htmlFor="push-pull-legs" className="font-normal">Push-pull-legs</FieldLabel>
-                    </Field>
-                    <Field orientation="horizontal">
-                        <Checkbox id="unknown" />
-                        <FieldLabel htmlFor="unknown" className="font-normal">I don’t know, guide me</FieldLabel>
-                    </Field>
+                    {splitOptions.map((g) => (
+                        <Field key={g.value} orientation="horizontal">
+                            <Checkbox value={g.value} id={g.value} />
+                            <FieldLabel htmlFor={g.value} className="font-normal">
+                                {g.label}
+                            </FieldLabel>
+                        </Field>
+                    ))}
                 </FieldGroup>
             </FieldSet>
         </FieldGroup>
