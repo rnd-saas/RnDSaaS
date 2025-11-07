@@ -2,7 +2,7 @@
 import { Input } from "@/components/ui/input"
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select"
 
-export default function Step12Data() {
+export default function Step1Data() {
 
     return (
         <div className="w-full max-w-md">

@@ -1,7 +1,7 @@
 ﻿import {Field, FieldDescription, FieldLabel, FieldSet,} from "@/components/ui/field"
 import {RadioGroup, RadioGroupItem,} from "@/components/ui/radio-group"
 
-export default function Step11Gender() {
+export default function Step2Gender() {
         return (
             <div className="w-full max-w-md">
                 <FieldSet>

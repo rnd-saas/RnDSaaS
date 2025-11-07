@@ -4,7 +4,7 @@ import {Input} from "@/components/ui/input.tsx";
 import {useState} from "react";
 
 
-export default function Step4LocationPreference() {
+export default function Step5LocationPreference() {
     const [atHome, setAtHome] = useState(false);
     return (
         <div className="w-full max-w-md">

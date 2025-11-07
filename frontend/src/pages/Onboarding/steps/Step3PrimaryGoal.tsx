@@ -2,7 +2,7 @@
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group.tsx";
 
 
-export default function Step2Welcome() {
+export default function Step3PrimaryGoal() {
 
     return (
         <div className="w-full max-w-md">

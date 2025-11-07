@@ -2,7 +2,7 @@
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group.tsx";
 
 
-export default function Step7SessionLength() {
+export default function Step8SessionLength() {
 
     return (
         <div className="w-full max-w-md">

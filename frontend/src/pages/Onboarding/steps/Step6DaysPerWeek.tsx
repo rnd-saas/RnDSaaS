@@ -2,7 +2,7 @@
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 
 
-export default function Step5DaysPerWeek() {
+export default function Step6DaysPerWeek() {
 
     return (
         <div className="w-full max-w-md">

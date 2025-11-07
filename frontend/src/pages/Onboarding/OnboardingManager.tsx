@@ -4,35 +4,35 @@ import {Button} from "@/components/ui/button.tsx";
 import FormProgress from "./FormProgress.tsx";
 import StepNavigator from "./StepNavigator.tsx";
 
-import Step1Welcome from "./steps/Step1Welcome.tsx";
-import Step2PrimaryGoal from "./steps/Step2PrimaryGoal.tsx";
-import Step3Experience from "./steps/Step3Experience.tsx";
-import Step4LocationPreference from "@/pages/Onboarding/steps/Step4LocationPreference.tsx";
-import Step5DaysPerWeek from "@/pages/Onboarding/steps/Step5DaysPerWeek.tsx";
-import Step6WhichDays from "@/pages/Onboarding/steps/Step6WhichDays.tsx";
-import Step7SessionLength from "@/pages/Onboarding/steps/Step7SessionLength.tsx";
-import Step8ProtectedAreas from "@/pages/Onboarding/steps/Step8ProtectedAreas.tsx";
-import Step9WorkoutType from "@/pages/Onboarding/steps/Step9WorkoutType.tsx";
-import Step10ComfortLevel from "@/pages/Onboarding/steps/Step10ComfortLevel.tsx";
-import Step11Gender from "@/pages/Onboarding/steps/Step11Gender.tsx";
-import Step12Data from "@/pages/Onboarding/steps/Step12Data.tsx";
+import Step0Welcome from "./steps/Step0Welcome.tsx";
+import Step4Experience from "./steps/Step4Experience.tsx";
+import Step5LocationPreference from "@/pages/Onboarding/steps/Step5LocationPreference.tsx";
+import Step6DaysPerWeek from "@/pages/Onboarding/steps/Step6DaysPerWeek.tsx";
+import Step7WhichDays from "@/pages/Onboarding/steps/Step7WhichDays.tsx";
+import Step8SessionLength from "@/pages/Onboarding/steps/Step8SessionLength.tsx";
+import Step9ProtectedAreas from "@/pages/Onboarding/steps/Step9ProtectedAreas.tsx";
+import Step10WorkoutType from "@/pages/Onboarding/steps/Step10WorkoutType.tsx";
+import Step11ComfortLevel from "@/pages/Onboarding/steps/Step11ComfortLevel.tsx";
+import Step2Gender from "@/pages/Onboarding/steps/Step2Gender.tsx";
+import Step1Data from "@/pages/Onboarding/steps/Step1Data.tsx";
+import Step3PrimaryGoal from "./steps/Step3PrimaryGoal.tsx";
 
 export default function OnboardingManager() {
     const [formStep, setStep] = useState(0);
     const methods = useForm()
     const stepComponents = [
-        Step1Welcome,
-        Step2PrimaryGoal,
-        Step3Experience,
-        Step4LocationPreference,
-        Step5DaysPerWeek,
-        Step6WhichDays,
-        Step7SessionLength,
-        Step8ProtectedAreas,
-        Step9WorkoutType,
-        Step10ComfortLevel,
-        Step11Gender,
-        Step12Data,
+        Step0Welcome,
+        Step1Data,
+        Step2Gender,
+        Step3PrimaryGoal,
+        Step4Experience,
+        Step5LocationPreference,
+        Step6DaysPerWeek,
+        Step7WhichDays,
+        Step8SessionLength,
+        Step9ProtectedAreas,
+        Step10WorkoutType,
+        Step11ComfortLevel,
     ];
     const totalSteps=stepComponents.length-1;
     const CurrentStep = stepComponents[formStep];

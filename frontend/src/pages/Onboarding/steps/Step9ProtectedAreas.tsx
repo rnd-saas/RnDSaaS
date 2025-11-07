@@ -2,7 +2,7 @@
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 
 
-export default function Step8ProtectedAreas() {
+export default function Step9ProtectedAreas() {
 
     return (
         <div className="w-full max-w-md">

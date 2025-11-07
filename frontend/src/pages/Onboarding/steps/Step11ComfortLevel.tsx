@@ -2,7 +2,7 @@
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 
 
-export default function Step10ComfortLevel() {
+export default function Step11ComfortLevel() {
 
     return (
         <div className="w-full max-w-md min-h-[60vh] min-w-[60vw]">

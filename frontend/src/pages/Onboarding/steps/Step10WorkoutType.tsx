@@ -2,7 +2,7 @@
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 
 
-export default function Step9WorkoutType() {
+export default function Step10WorkoutType() {
 
     return (
         <div className="w-full max-w-md">

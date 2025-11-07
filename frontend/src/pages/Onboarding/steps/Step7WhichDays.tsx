@@ -1,7 +1,7 @@
 ﻿import { Checkbox } from "@/components/ui/checkbox"
 import {Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet,} from "@/components/ui/field"
 
-export default function Step6WhichDays() {
+export default function Step7WhichDays() {
 
     return (
         <div className="w-full max-w-md">
