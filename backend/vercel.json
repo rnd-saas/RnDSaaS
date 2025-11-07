@@ -1,5 +1,10 @@
 {
   "version": 2,
+  "builds": [
+    { "src": "api/index.ts", "use": "@vercel/node@3" },
+    { "src": "api/ping.ts", "use": "@vercel/node@3" },
+    { "src": "api/env-check.ts", "use": "@vercel/node@3" }
+  ],
   "rewrites": [
     { "source": "/", "destination": "/api/index" },
     { "source": "/api/ping", "destination": "/api/ping" },
@@ -15,9 +20,5 @@
         { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
       ]
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  },
-  "regions": ["hkg1"]
+  ]
 }
