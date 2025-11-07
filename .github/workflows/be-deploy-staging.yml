@@ -3,7 +3,7 @@ name: Deploy BE Staging
 on:
     push:
         branches:
-            - debug/vercel-cor308-1
+            - vercel-cor308-1
 
 jobs:
   deploy:
