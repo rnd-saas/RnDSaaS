@@ -3,7 +3,7 @@ import LoginPage from "../pages/Login/LoginPage.tsx";
 import RegisterPage from "../pages/Login/RegisterPage.tsx";
 import DefaultPage from "@/pages/DefaultPage.tsx";
 import OnboardingManager from "@/pages/Onboarding/OnboardingManager.tsx";
-import DashboardPage from "@/pages/Dashboard/DashboardPage";
+import DashboardPage from "@/pages/DashboardPage";
 
 export default function AppRoutes() {
     return (
