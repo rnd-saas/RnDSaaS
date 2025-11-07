@@ -34,17 +34,29 @@ const createHandler = () => {
         const startTime = Date.now();
         
         try {
-            // 快速健康检查端点，不需要加载整个应用
-            if (req.url === '/' && req.method === 'GET') {
-                res.status(200).json({
-                    message: 'Backend is running!',
-                    version: '1.0.0',
-                    timestamp: new Date().toISOString()
-                });
+            const urlPath = (req.url || '').split('?')[0];
+
+            if (urlPath === '/favicon.ico') {
+                res.status(204).end();
                 return;
             }
 
-            // 为其他请求加载完整应用
+            if ((req.method === 'GET' || req.method === 'HEAD') &&
+                (urlPath === '/' || urlPath === '/api' || urlPath === '/api/index')) {
+                const payload = {
+                    message: 'Backend is running!',
+                    version: '1.0.0',
+                    timestamp: new Date().toISOString()
+                };
+
+                if (req.method === 'HEAD') {
+                    res.status(200).end();
+                } else {
+                    res.status(200).json(payload);
+                }
+                return;
+            }
+
             const expressApp = await getApp();
             const handler = serverless(expressApp);
             
