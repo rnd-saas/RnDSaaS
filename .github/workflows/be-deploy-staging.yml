@@ -3,7 +3,7 @@ name: Deploy BE Staging
 on:
     push:
         branches:
-            - debug/vercel
+            - staging
 
 jobs:
   deploy:
