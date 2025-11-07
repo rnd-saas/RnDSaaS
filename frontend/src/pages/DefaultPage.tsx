@@ -12,6 +12,7 @@ export default function DefaultPage() {
                     <p>This is a card component.</p>
                     <Button onClick={() => alert('Button inside card clicked!')}>Click Me</Button>
                     <Button onClick={() => navigate("/login")}>To login</Button>
+                    <Button onClick={() => navigate("/onboarding")}>See onboarding</Button>
                 </Card>
             </header>
         </div>
