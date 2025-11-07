@@ -13,6 +13,9 @@
   "author": "",
   "license": "ISC",
   "description": "",
+  "engines": {
+    "node": "22.x"
+  },
   "dependencies": {
     "@supabase/supabase-js": "^2.78.0",
     "@vercel/node": "^5.5.4",
