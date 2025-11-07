@@ -11,6 +11,7 @@ if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
 
 const app = express();
 app.use(cors());
+app.options('*', cors()); // Handle preflight requests
 app.use(express.json());
 
 // Health check endpoint
@@ -34,56 +35,20 @@ app.get('/api/test', (_req, res) => {
     });
 });
 
-// API routes - lazy load to prevent blocking initialization
-let routesLoaded = false;
-let routesLoadPromise: Promise<void> | null = null;
-
-const loadRoutes = async () => {
-    console.log('Loading API routes...');
-
-    // Dynamic imports to prevent blocking module initialization
-    const [authRoutes, userRoutes, debugRoutes] = await Promise.all([
-        import('./routes/authRoutes').then(m => m.default),
-        import('./routes/userRoutes').then(m => m.default), 
-        import('./routes/debugRoutes').then(m => m.default)
-    ]);
-
+// API routes - import synchronously since we already have lazy loading in api/index.ts
+try {
+    const authRoutes = require('./routes/authRoutes').default;
+    const userRoutes = require('./routes/userRoutes').default;
+    const debugRoutes = require('./routes/debugRoutes').default;
+    
     app.use('/api/auth', authRoutes);
     app.use('/api/users', userRoutes);
     app.use('/api/debug', debugRoutes);
-
-    routesLoaded = true;
-    console.log('✅ API routes loaded successfully');
-};
-
-// Middleware to ensure routes are loaded before processing API requests
-app.use('/api', async (req, res, next) => {
-    if (!routesLoaded) {
-        if (!routesLoadPromise) {
-            routesLoadPromise = loadRoutes()
-                .then(() => {
-                    routesLoadPromise = null;
-                })
-                .catch((error) => {
-                    routesLoadPromise = null;
-                    throw error;
-                });
-        }
-
-        try {
-            await routesLoadPromise;
-        } catch (error: any) {
-            console.error('❌ Error loading routes:', error?.message || error);
-            return res.status(500).json({
-                error: 'Routes failed to load',
-                message: error?.message || 'Unknown error',
-                timestamp: new Date().toISOString()
-            });
-        }
-    }
-
-    next();
-});
+    
+    console.log('✅ API routes loaded');
+} catch (error: any) {
+    console.error('❌ Error loading routes:', error?.message || error);
+}
 
 // 404 handler for unmatched routes
 app.use((req, res) => {
