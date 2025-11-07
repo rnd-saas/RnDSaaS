@@ -11,18 +11,18 @@ export default function Step4Experience() {
                 How experienced are you with training?
             </FieldDescription>
             <RadioGroup className="flex flex-row space-x-4">
-                <Field orientation={"vertical"} >
+                <Field className="flex items-center flex-col" orientation="horizontal">
                     <RadioGroupItem value="beginner" id="beginner" />
                     <FieldLabel htmlFor="beginner">Total beginner<br/>(less than 6 months) </FieldLabel>
                 </Field>
-                <div className="flex items-center flex-col">
+                <Field className="flex items-center flex-col" orientation="horizontal">
                     <RadioGroupItem value="intermediate" id="intermediate" />
-                    <label htmlFor="intermediate">Some experience<br/>(6 months - 1 year)</label>
-                </div>
-                <div className="flex items-center flex-col">
+                    <FieldLabel htmlFor="intermediate">Some experience<br/>(6 months - 1 year)</FieldLabel>
+                </Field>
+                <Field className="flex items-center flex-col" orientation="horizontal">
                     <RadioGroupItem value="experienced" id="experienced" />
-                    <label htmlFor="experienced">Experienced lifter<br/>(2-5 years) </label>
-                </div>
+                    <FieldLabel htmlFor="experienced">Experienced lifter<br/>(2-5 years) </FieldLabel>
+                </Field>
             </RadioGroup>
         </FieldSet>
     )
