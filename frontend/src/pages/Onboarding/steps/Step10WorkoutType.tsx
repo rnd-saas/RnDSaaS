@@ -2,9 +2,12 @@
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {PreferredSplit} from "@/utils/InputTypes.tsx";
 import {RadioGroupItem} from "@/components/ui/radio-group.tsx";
+import {Controller, useFormContext} from "react-hook-form";
+import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
 
 
 export default function Step10WorkoutType() {
+    const { control } = useFormContext<Inputs>();
     const splitOptions: { value: PreferredSplit; label: string }[]  = [
         { value: PreferredSplit.DontKnow, label: "Suggest something for me" },
         { value: PreferredSplit.FullBody, label: "Full body" },
@@ -19,16 +22,28 @@ export default function Step10WorkoutType() {
                 <FieldDescription>
                     Which type of workouts would you like to do?
                 </FieldDescription>
-                <FieldGroup className="gap-3">
-                    {splitOptions.map((g) => (
-                        <Field key={g.value} orientation="horizontal">
-                            <Checkbox value={g.value} id={g.value} />
-                            <FieldLabel htmlFor={g.value} className="font-normal">
-                                {g.label}
-                            </FieldLabel>
-                        </Field>
-                    ))}
-                </FieldGroup>
+                <Controller name="preferredSplit" control={control} defaultValue={[]}
+                    render={({ field }) => {
+                        const selected = field.value || [];
+                        const toggleValue = (val: string) => {
+                            if (selected.includes(val)) {
+                                field.onChange(selected.filter(v => v !== val)); // remove
+                            } else {
+                                field.onChange([...selected, val]); // add
+                            }
+                        };
+                        return (
+                            <FieldGroup className="gap-3">
+                                {splitOptions.map(split => (
+                                    <Field key={split.value} orientation="horizontal">
+                                        <Checkbox id={split.value} checked={selected.includes(split.value)} onCheckedChange={() => toggleValue(split.value)}/>
+                                        <FieldLabel htmlFor={split.value} className="font-normal">{split.label}</FieldLabel>
+                                    </Field>
+                                ))}
+                            </FieldGroup>
+                        );
+                    }}
+                />
             </FieldSet>
         </FieldGroup>
     )

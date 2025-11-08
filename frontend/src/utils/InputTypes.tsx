@@ -14,11 +14,11 @@ export enum PrimaryGoal{
     GeneralFitness="general-fitness"
 }
 export enum PreferredSplit{
-    FullBody,
-    UpperLower,
-    PushPullLegs,
-    Other,
-    DontKnow
+    FullBody = "full-body",
+    UpperLower = "upper-lower",
+    PushPullLegs = "push-pull-legs",
+    Other = "other",
+    DontKnow = "dont-know"
 }
 export enum GymComfortLevel{
     Anxious,

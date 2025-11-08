@@ -3,6 +3,9 @@ import {Field, FieldDescription, FieldLabel, FieldLegend, FieldSet} from "@/comp
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group.tsx";
 import tomImage from '@/assets/onboarding_welcome/onboarding-tom.png';
 import sarahImage from '@/assets/onboarding_welcome/onboarding-sarah.png';
+import {Controller, useFormContext} from "react-hook-form";
+import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
+import {Gender} from "@/utils/InputTypes.tsx";
 
 declare module '*.png' {
     const value: string;
@@ -10,7 +13,7 @@ declare module '*.png' {
 }
 
 export default function Step0Welcome() {
-
+    const { control } = useFormContext<Inputs>();
     return (
         <FieldSet>
             <FieldLegend>Hello!</FieldLegend>
@@ -18,30 +21,34 @@ export default function Step0Welcome() {
                 Pick who you'd like to work out with!
             </FieldDescription>
             <Carousel className="w-full max-w-xs">
-                <RadioGroup name={"helperChoice"} className="flex flex-row space-x-4" defaultValue={"tom"}>
-                    <CarouselContent>
-                        <CarouselItem>
-                            <Field className="flex items-center flex-col" orientation="horizontal">
-                                <FieldLabel htmlFor={"tom"} className="flex items-center flex-col" >
-                                    <img src={tomImage} alt={"Tom waving"}/>
-                                    <p>I’m Tom - nice to meet you!<br/>I’ll be your workout buddy</p>
-                                </FieldLabel>
-                                <RadioGroupItem value="0" id="tom" />
-                            </Field>
-                        </CarouselItem>
-                        <CarouselItem>
-                            <Field className="flex items-center flex-col" orientation="horizontal">
-                                <FieldLabel htmlFor={"sarah"} className="flex items-center flex-col" >
-                                    <img src={sarahImage} alt={"Sarah waving"}/>
-                                    <p>I’m Sarah - nice to meet you!<br/>I’ll be your workout buddy</p>
-                                </FieldLabel>
-                                <RadioGroupItem value="1" id="sarah"/>
-                            </Field>
-                        </CarouselItem>
-                    </CarouselContent>
-                    <CarouselPrevious/>
-                    <CarouselNext />
-                </RadioGroup>
+                <Controller control={control} name="strTrainer" defaultValue="0" rules={{ required: true }}
+                    render={({ field }) => (
+                        <RadioGroup value={field.value} onValueChange={field.onChange} className="flex flex-row space-x-4">
+                            <CarouselContent>
+                                <CarouselItem>
+                                    <Field className="flex items-center flex-col" orientation="horizontal">
+                                        <FieldLabel htmlFor={"tom"} className="flex items-center flex-col" >
+                                            <img src={tomImage} alt={"Tom waving"}/>
+                                            <p>I’m Tom - nice to meet you!<br/>I’ll be your workout buddy</p>
+                                        </FieldLabel>
+                                        <RadioGroupItem value="0" id="tom" />
+                                    </Field>
+                                </CarouselItem>
+                                <CarouselItem>
+                                    <Field className="flex items-center flex-col" orientation="horizontal">
+                                        <FieldLabel htmlFor={"sarah"} className="flex items-center flex-col" >
+                                            <img src={sarahImage} alt={"Sarah waving"}/>
+                                            <p>I’m Sarah - nice to meet you!<br/>I’ll be your workout buddy</p>
+                                        </FieldLabel>
+                                        <RadioGroupItem value="1" id="sarah"/>
+                                    </Field>
+                                </CarouselItem>
+                            </CarouselContent>
+                            <CarouselPrevious/>
+                            <CarouselNext />
+                        </RadioGroup>
+                    )}
+                />
             </Carousel>
         </FieldSet>
     )

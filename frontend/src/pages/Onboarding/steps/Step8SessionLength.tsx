@@ -1,33 +1,37 @@
 ﻿import {Field, FieldDescription, FieldLabel, FieldLegend, FieldSet} from "@/components/ui/field.tsx";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group.tsx";
+import {Controller, useFormContext} from "react-hook-form";
+import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
 
 
 export default function Step8SessionLength() {
-
+    const { control } = useFormContext<Inputs>();
+    const lengthOptions = [
+        { id: "30", label: "30 minutes", value: "30" },
+        { id: "45", label: "45 minutes", value: "45" },
+        { id: "60", label: "60 minutes", value: "60" },
+        { id: "90", label: "90 minutes", value: "90" },
+    ];
     return (
         <FieldSet>
             <FieldLegend>Session length</FieldLegend>
             <FieldDescription>
                 How long do you want each session to be?
             </FieldDescription>
-            <RadioGroup defaultValue="none">
-                <Field orientation="horizontal">
-                    <RadioGroupItem value="30" id="30" />
-                    <FieldLabel htmlFor="30" className="font-normal">30 minutes</FieldLabel>
-                </Field>
-                <Field orientation="horizontal">
-                    <RadioGroupItem value="45" id="45" />
-                    <FieldLabel htmlFor="45" className="font-normal">45 minutes</FieldLabel>
-                </Field>
-                <Field orientation="horizontal">
-                    <RadioGroupItem value="60" id="60" />
-                    <FieldLabel htmlFor="60" className="font-normal">60 minutes</FieldLabel>
-                </Field>
-                <Field orientation="horizontal">
-                    <RadioGroupItem value="90" id="90" />
-                    <FieldLabel htmlFor="90" className="font-normal">90 minutes</FieldLabel>
-                </Field>
-            </RadioGroup>
+            <Controller control={control} name="strSessionDuration" defaultValue="" rules={{ required: true }}
+                        render={({ field }) => (
+                            <RadioGroup value={field.value} onValueChange={field.onChange}>
+                                {lengthOptions.map((g) => (
+                                    <Field key={g.value} orientation="horizontal">
+                                        <RadioGroupItem value={g.value} id={g.value} />
+                                        <FieldLabel htmlFor={g.value} className="font-normal">
+                                            {g.label}
+                                        </FieldLabel>
+                                    </Field>
+                                ))}
+                            </RadioGroup>
+                        )}
+            />
         </FieldSet>
     )
 }
