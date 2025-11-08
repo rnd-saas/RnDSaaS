@@ -57,18 +57,18 @@ export default function Step9ProtectedAreas() {
                                         <Checkbox id={area.value} checked={selected.includes(area.value)}
                                                   onCheckedChange={() => toggleCheckbox(selected, field, area.value)}
                                         />
-                                        <FieldLabel htmlFor={area.value}>{area.label}</FieldLabel>
+                                        <FieldLabel htmlFor={area.value} className="font-normal">{area.label}</FieldLabel>
                                     </Field>
                                 ))}
                                 <Field orientation="horizontal">
                                     <Checkbox id="other" checked={hasOther}
                                         onCheckedChange={checked => toggleOther(selected, field, checked)}
                                     />
-                                    <FieldLabel htmlFor="other">Other</FieldLabel>
+                                    <FieldLabel htmlFor="other" className="font-normal">Other</FieldLabel>
                                 </Field>
                                 {hasOther && (
                                     <Field orientation="vertical">
-                                        <FieldLabel htmlFor="other-input">Which other areas? (separate by commas)</FieldLabel>
+                                        <FieldLabel htmlFor="other-input" className="font-normal">Which other areas? (separate by commas)</FieldLabel>
                                         <Input id="other-input" type="text" value={otherText}
                                             onChange={e => updateOtherText(selected, field, e.target.value)}
                                         />
