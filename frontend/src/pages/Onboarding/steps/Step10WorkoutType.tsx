@@ -1,7 +1,6 @@
 ﻿import {Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet} from "@/components/ui/field.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {PreferredSplit} from "@/utils/InputTypes.tsx";
-import {RadioGroupItem} from "@/components/ui/radio-group.tsx";
 import {Controller, useFormContext} from "react-hook-form";
 import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
 
@@ -22,14 +21,14 @@ export default function Step10WorkoutType() {
                 <FieldDescription>
                     Which type of workouts would you like to do?
                 </FieldDescription>
-                <Controller name="preferredSplit" control={control} defaultValue={[]}
+                <Controller name="preferredSplit" control={control} defaultValue={undefined} rules={{ required: "Please select at least one option" }}
                     render={({ field }) => {
                         const selected = field.value || [];
                         const toggleValue = (val: string) => {
                             if (selected.includes(val)) {
-                                field.onChange(selected.filter(v => v !== val)); // remove
+                                field.onChange((selected as unknown as string[]).filter((v) => v !== val));
                             } else {
-                                field.onChange([...selected, val]); // add
+                                field.onChange([...selected, val]);
                             }
                         };
                         return (

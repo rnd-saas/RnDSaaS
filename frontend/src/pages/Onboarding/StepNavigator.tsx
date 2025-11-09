@@ -13,10 +13,10 @@ export default function StepNavigator({prevStep, nextStep, prevDisabled, nextDis
             <Button type={"button"} variant={"outline"} size="sm" onClick={prevStep} disabled={prevDisabled}>
                 Previous
             </Button>
-            {nextDisabled && <Button>Submit</Button>}
-            <Button type={"button"} size="sm" onClick={nextStep} disabled={nextDisabled}>
+            {nextDisabled && <Button type={"submit"} size="sm">Submit</Button>}
+            {!nextDisabled && <Button type={"button"} size="sm" onClick={nextStep} disabled={nextDisabled}>
                 Next
-            </Button>
+            </Button>}
         </div>
     )
 }

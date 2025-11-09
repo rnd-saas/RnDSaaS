@@ -24,7 +24,7 @@ export default function Step7WhichDays() {
                 <FieldDescription>
                     Which days of the week are you available to train most often?<br/>(multiple options possible)
                 </FieldDescription>
-                <Controller name="strAvailableDays" control={control} defaultValue={[]}
+                <Controller name="strAvailableDays" control={control} defaultValue={[]} rules={{ required: "Please select at least one day" }}
                     render={({ field }) => {
                         const selected = field.value || [];
                         const toggleValue = (val: string) => {

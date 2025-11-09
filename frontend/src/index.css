@@ -82,6 +82,7 @@
   --intuitive-names-secondary-disabled: var(--basic-colours-yellow-100);
   --intuitive-names-secondary-hover: var(--basic-colours-yellow-200);
   --intuitive-names-secondary-pressed: var(--basic-colours-yellow-600);
+  --intuitive-names-error-message: var(--basic-colours-yellow-800);
   --intuitive-names-secondary-text: var(--basic-colours-yellow-950);
   --intuitive-names-text: var(--basic-colours-green-950);
   --shawdow-card: 0px 4px 9.899999618530273px 0px rgba(228, 228, 231, 1);

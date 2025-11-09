@@ -21,9 +21,9 @@ export default function Step3PrimaryGoal() {
             <FieldDescription>
                 What is your primary goal right now?
             </FieldDescription>
-            <Controller control={control} name="goal" defaultValue="" rules={{ required: true }}
+            <Controller control={control} name="goal" defaultValue={undefined} rules={{ required: "Please give your primary goal in choosing to exerise" }}
                 render={({ field }) => (
-                    <RadioGroup value={field.value} onValueChange={field.onChange}>
+                    <RadioGroup value={field.value ?? ""} onValueChange={field.onChange}>
                         {goalOptions.map((g) => (
                             <Field key={g.value} orientation="horizontal">
                                 <RadioGroupItem value={g.value} id={g.value} />

@@ -1,5 +1,5 @@
-﻿import { useForm, FormProvider} from "react-hook-form"
-import {useState} from "react";
+﻿import {useForm, FormProvider} from "react-hook-form"
+import {useState, type ComponentType} from "react";
 import FormProgress from "./FormProgress.tsx";
 import StepNavigator from "./StepNavigator.tsx";
 
@@ -35,42 +35,82 @@ export type Inputs = {
 }
 export default function OnboardingManager() {
     const [formStep, setStep] = useState(0);
-    const methods = useForm<Inputs>()
+    const methods = useForm<Inputs>();
 
-    const stepComponents = [
-        Step0Welcome,
-        Step1Data,
-        Step2Gender,
-        Step3PrimaryGoal,
-        Step4Experience,
-        Step6DaysPerWeek,
-        Step7WhichDays,
-        Step8SessionLength,
-        Step9ProtectedAreas,
-        Step10WorkoutType,
-        Step11ComfortLevel,
+    type Step = {
+        component: ComponentType;
+        fields: (keyof Inputs)[];
+    };
+
+    const stepComponents: Step[] = [
+        {
+            component: Step0Welcome,
+            fields: ["strTrainer"]
+        },
+        {
+            component: Step1Data,
+            fields: ["weight", "weightUnit", "height", "heightUnit"]
+        },
+        {
+            component: Step2Gender,
+            fields: ["gender"]
+        },
+        {
+            component: Step3PrimaryGoal,
+            fields: ["goal"]
+        },
+        {
+            component: Step4Experience,
+            fields: ["strExperience"]
+        },
+        {
+            component: Step6DaysPerWeek,
+            fields: ["strDaysPerWeek"]
+        },
+        {
+            component: Step7WhichDays,
+            fields: ["strAvailableDays"]
+        },
+        {
+            component: Step8SessionLength,
+            fields: ["strSessionDuration"]
+        },
+        {
+            component: Step9ProtectedAreas,
+            fields: ["problemAreas"]
+        },
+        {
+            component: Step10WorkoutType,
+            fields: ["preferredSplit"]
+        },
+        {
+            component: Step11ComfortLevel,
+            fields: ["comfortLevel"]
+        },
     ];
-    const totalSteps=stepComponents.length-1;
-    const CurrentStep = stepComponents[formStep];
 
-    const next = () => {
+    const totalSteps=stepComponents.length-1;
+    const CurrentStep = stepComponents[formStep].component;
+
+    const next = async () => {
         const stepValues = methods.getValues();
         console.log("Saving step data:", stepValues);
-        setStep((s) => {
-            const newStep = s + 1;
-            console.log("step:", newStep);
-            return newStep;
-        });
+        const { fields } = stepComponents[formStep];
+        const valid = await methods.trigger(fields);
+        if (!valid) return;
+        setStep((s) => s + 1);
     };
 
     const back = () => {
-        setStep((s) => {
-            const newStep = s - 1;
-            console.log("step:", newStep);
-            return newStep;
-        });
+        setStep((s) => s - 1);
     };
 
+    const getStepErrors = (stepIndex: number) => {
+        const step = stepComponents[stepIndex];
+        return step.fields
+            .map((f) => methods.formState.errors[f])
+            .filter(Boolean);
+    };
 
     const onSubmit = (data:Inputs) => {
         const trainer = { trainer: Number(data.strTrainer) };
@@ -79,6 +119,7 @@ export default function OnboardingManager() {
         const availableDays = {availableDays: data.strAvailableDays.map(Number),};
         const sessionDuration= { sessionDuration: Number(data.strSessionDuration) };
         console.log("submit clicked", trainer, experience, daysPerWeek, availableDays, sessionDuration);
+        alert("onboarding completed");
     }
 
     return (
@@ -91,10 +132,15 @@ export default function OnboardingManager() {
                     <div className="w-full flex justify-center">
                         <CurrentStep/>
                     </div>
-                    {/*todo: need to check data was filled in before allowing next button*/}
+                    <div className={"p-4"}>
+                        {getStepErrors(formStep).map((error, i) => (
+                            <p key={i} className="text-[var(--intuitive-names-error-message)]">
+                                {error?.message}
+                            </p>
+                        ))}
+                    </div>
                     <div className="fixed w-[75vw] bottom-[10vh] p-4">
-                        <StepNavigator prevStep={back} nextStep={next} prevDisabled={formStep == 0}
-                                       nextDisabled={formStep == totalSteps}/>
+                        <StepNavigator prevStep={back} nextStep={next} prevDisabled={formStep == 0} nextDisabled={formStep == totalSteps}/>
                     </div>
                 </form>
             </div>

@@ -21,9 +21,9 @@ export enum PreferredSplit{
     DontKnow = "dont-know"
 }
 export enum GymComfortLevel{
-    Anxious,
-    Nervous,
-    Fine,
-    Comfortable,
-    NeverBeen
+    Anxious = "anxious",
+    Nervous = "nervous",
+    Fine = "fine",
+    Comfortable = "comfortable",
+    NeverBeen = "never-been"
 }

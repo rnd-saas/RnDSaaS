@@ -18,7 +18,7 @@ export default function Step4Experience() {
             <FieldDescription>
                 How experienced are you with training?
             </FieldDescription>
-            <Controller control={control} name="strExperience" defaultValue="" rules={{ required: true }}
+            <Controller control={control} name="strExperience" defaultValue="" rules={{ required: "Please give an approximate experience level" }}
                  render={({ field }) => (
                     <RadioGroup value={field.value} onValueChange={field.onChange} className="flex flex-row space-x-4">
                         {expOptions.map((g) => (

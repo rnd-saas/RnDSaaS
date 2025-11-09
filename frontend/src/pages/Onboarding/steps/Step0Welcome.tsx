@@ -5,15 +5,13 @@ import tomImage from '@/assets/onboarding_welcome/onboarding-tom.png';
 import sarahImage from '@/assets/onboarding_welcome/onboarding-sarah.png';
 import {Controller, useFormContext} from "react-hook-form";
 import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
-import {Gender} from "@/utils/InputTypes.tsx";
 
 declare module '*.png' {
     const value: string;
-    export default value;
 }
 
 export default function Step0Welcome() {
-    const { control } = useFormContext<Inputs>();
+    const { control, trigger } = useFormContext<Inputs>();
     return (
         <FieldSet>
             <FieldLegend>Hello!</FieldLegend>
@@ -21,7 +19,7 @@ export default function Step0Welcome() {
                 Pick who you'd like to work out with!
             </FieldDescription>
             <Carousel className="w-full max-w-xs">
-                <Controller control={control} name="strTrainer" defaultValue="0" rules={{ required: true }}
+                <Controller control={control} name="strTrainer" defaultValue="0" rules={{onChange: () => trigger("strTrainer"), required: "Trainer is required" }}
                     render={({ field }) => (
                         <RadioGroup value={field.value} onValueChange={field.onChange} className="flex flex-row space-x-4">
                             <CarouselContent>

@@ -13,7 +13,7 @@ export default function Step6DaysPerWeek() {
                 How many days per week would you like to train?
             </FieldDescription>
             <div className="flex justify-center">
-                <Controller control={control} name="strDaysPerWeek" defaultValue="" rules={{ required: true }}
+                <Controller control={control} name="strDaysPerWeek" defaultValue="" rules={{ required: "Please provide your preferred number of workout days" }}
                     render={({ field }) => (
                         <Select value={field.value} onValueChange={field.onChange}>
                             <SelectTrigger>

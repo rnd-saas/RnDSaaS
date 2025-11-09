@@ -19,7 +19,7 @@ export default function Step2Gender() {
             <FieldDescription>
                 Which gender should we tailor the program for?
             </FieldDescription>
-            <Controller control={control} name="gender" defaultValue={Gender.PreferNotToSay} rules={{ required: true }}
+            <Controller control={control} name="gender" defaultValue={Gender.PreferNotToSay} rules={{ required: "Gender is required" }}
                 render={({ field }) => (
                     <RadioGroup value={field.value} onValueChange={field.onChange}>
                         {genderOptions.map((g) => (
