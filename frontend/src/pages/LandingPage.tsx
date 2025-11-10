@@ -12,7 +12,7 @@ export default function LandingPage() {
   const { state } = useLocation() as { state?: { trainerId?: number; firstName?: string } };
 
   console.log("LandingPage state:", state);
-    console.log("LandingPage localStorage.firstName:", localStorage.getItem("firstName"));
+console.log("LandingPage localStorage.firstName:", localStorage.getItem("firstName"));
 
   // Prefer router state; fall back to localStorage; default to Tom (0)
   const trainerId =
@@ -45,14 +45,14 @@ export default function LandingPage() {
       <footer className="w-full max-w-xs space-y-4 mb-10">
         <Button
           className="w-full rounded-2xl h-12 text-base"
-          /*</footer>onClick={() => navigate("/dashboard")}*/
+          /*</footer>onClick={() => navigate("/dashboard",  { state: { firstName, trainerId } })}*/
         >
           Ready to work out?
         </Button>
         <button
           type="button"
           className="w-full h-10 text-base text-muted-foreground"
-          onClick={() => navigate("/dashboard")}
+          onClick={() => navigate("/dashboard",  { state: { firstName, trainerId } })}
         >
           Not now, I need a sec
         </button>

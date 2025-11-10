@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useLocation } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
@@ -10,6 +11,10 @@ import { Button } from "@/components/ui/button";
  */
 
 export default function DashboardPage() {
+  const { state } = useLocation() as { state?: { firstName?: string } };
+  const firstName =
+    state?.firstName ?? localStorage.getItem("firstName") ?? "User";
+
   const today = useMemo(() => {
     const d = new Date();
     return d.toLocaleDateString(undefined, {
@@ -21,7 +26,6 @@ export default function DashboardPage() {
   }, []);
 
   // ----- Mock data -----
-  const userFirstName = "User";
   const goal = {
     workoutsCompleted: { current: 70, target: 100 },
     exercisesDiscovered: { current: 30, target: 40 },
@@ -41,7 +45,7 @@ export default function DashboardPage() {
         {/* Header */}
         <header className="flex items-start justify-between">
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight">Hi, {userFirstName}!</h1>
+            <h1 className="text-3xl font-semibold tracking-tight">Hi, {firstName}!</h1>
             <p className="text-sm text-muted-foreground">{today}</p>
           </div>
           <button
