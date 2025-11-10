@@ -4,6 +4,7 @@ import RegisterPage from "../pages/Login/RegisterPage.tsx";
 import DefaultPage from "@/pages/DefaultPage.tsx";
 import OnboardingManager from "@/pages/Onboarding/OnboardingManager.tsx";
 import DashboardPage from "@/pages/DashboardPage";
+import LandingPage from "@/pages/LandingPage";
 
 export default function AppRoutes() {
     return (
@@ -14,6 +15,7 @@ export default function AppRoutes() {
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/onboarding" element={<OnboardingManager/>}/>
                 <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/landing" element={<LandingPage />} />
             </Routes>
         </BrowserRouter>
     );

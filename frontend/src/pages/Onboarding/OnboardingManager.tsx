@@ -1,4 +1,5 @@
 ﻿import {useForm, FormProvider} from "react-hook-form"
+import { useNavigate } from "react-router-dom";
 import {useState, type ComponentType} from "react";
 import FormProgress from "./FormProgress.tsx";
 import StepNavigator from "./StepNavigator.tsx";
@@ -36,6 +37,7 @@ export type Inputs = {
 export default function OnboardingManager() {
     const [formStep, setStep] = useState(0);
     const methods = useForm<Inputs>();
+    const navigate = useNavigate();
 
     type Step = {
         component: ComponentType;
@@ -118,8 +120,17 @@ export default function OnboardingManager() {
         const daysPerWeek= { daysPerWeek: Number(data.strDaysPerWeek) };
         const availableDays = {availableDays: data.strAvailableDays.map(Number),};
         const sessionDuration= { sessionDuration: Number(data.strSessionDuration) };
+        const trainerId = Number(data.strTrainer); // 0 = Tom, 1 = Sarah
+        const firstName = "Hugo";
         console.log("submit clicked", trainer, experience, daysPerWeek, availableDays, sessionDuration);
         alert("onboarding completed");
+
+        try {
+            localStorage.setItem("trainerId", String(trainerId)); // fallback for refresh/direct visit
+          } catch {}
+        
+          navigate("/landing", { state: { trainerId, firstName } });
+
     }
 
     return (
