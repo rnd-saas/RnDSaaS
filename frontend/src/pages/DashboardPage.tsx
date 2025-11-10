@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useLocation } from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
@@ -39,6 +39,9 @@ export default function DashboardPage() {
   ];
   // ----------------------
 
+  const navigate = useNavigate();
+
+
   return (
     <div className="relative min-h-[100dvh] bg-background">
       <div className="mx-auto w-full max-w-screen-sm px-4 pb-28 pt-6 sm:pb-8">
@@ -51,6 +54,7 @@ export default function DashboardPage() {
           <button
             aria-label="Settings"
             className="rounded-full border p-2 text-muted-foreground hover:bg-accent"
+            onClick={() => navigate("/settings")}
           >
             ⚙️
           </button>
