@@ -4,7 +4,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/
 import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
 import {Controller, useFormContext} from "react-hook-form";
 
-export default function Step1Data() {
+export default function Step2Data() {
     const { register, control } = useFormContext<Inputs>();
 
     return (

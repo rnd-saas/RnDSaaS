@@ -4,7 +4,7 @@ import {Gender} from "@/utils/InputTypes.tsx";
 import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
 import {Controller, useFormContext} from "react-hook-form";
 
-export default function Step2Gender() {
+export default function Step3Gender() {
     const { control } = useFormContext<Inputs>();
     const genderOptions: { value: Gender; label: string }[]  = [
         { value: Gender.Male, label: "Male" },

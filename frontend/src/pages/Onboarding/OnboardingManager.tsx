@@ -5,21 +5,23 @@ import FormProgress from "./FormProgress.tsx";
 import StepNavigator from "./StepNavigator.tsx";
 
 import Step0Welcome from "./steps/Step0Welcome.tsx";
-import Step4Experience from "./steps/Step4Experience.tsx";
+import Step5Experience from "./steps/Step5Experience.tsx";
 import Step6DaysPerWeek from "@/pages/Onboarding/steps/Step6DaysPerWeek.tsx";
 import Step7WhichDays from "@/pages/Onboarding/steps/Step7WhichDays.tsx";
 import Step8SessionLength from "@/pages/Onboarding/steps/Step8SessionLength.tsx";
 import Step9ProtectedAreas from "@/pages/Onboarding/steps/Step9ProtectedAreas.tsx";
 import Step10WorkoutType from "@/pages/Onboarding/steps/Step10WorkoutType.tsx";
 import Step11ComfortLevel from "@/pages/Onboarding/steps/Step11ComfortLevel.tsx";
-import Step2Gender from "@/pages/Onboarding/steps/Step2Gender.tsx";
-import Step1Data from "@/pages/Onboarding/steps/Step1Data.tsx";
-import Step3PrimaryGoal from "./steps/Step3PrimaryGoal.tsx";
+import Step3Gender from "@/pages/Onboarding/steps/Step3Gender.tsx";
+import Step2Data from "@/pages/Onboarding/steps/Step2Data.tsx";
+import Step4PrimaryGoal from "./steps/Step4PrimaryGoal.tsx";
 import type {PrimaryGoal} from "@/utils/InputTypes.tsx";
 import {Gender, GymComfortLevel, PreferredSplit} from "@/utils/InputTypes.tsx";
+import Step1Nickname from "@/pages/Onboarding/steps/Step1Nickname.tsx";
 
 export type Inputs = {
     strTrainer:string,
+    nickname:string,
     weight:number,
     weightUnit:string,
     height:number,
@@ -50,19 +52,23 @@ export default function OnboardingManager() {
             fields: ["strTrainer"]
         },
         {
-            component: Step1Data,
+            component: Step1Nickname,
+            fields: ["nickname"]
+        },
+        {
+            component: Step2Data,
             fields: ["weight", "weightUnit", "height", "heightUnit"]
         },
         {
-            component: Step2Gender,
+            component: Step3Gender,
             fields: ["gender"]
         },
         {
-            component: Step3PrimaryGoal,
+            component: Step4PrimaryGoal,
             fields: ["goal"]
         },
         {
-            component: Step4Experience,
+            component: Step5Experience,
             fields: ["strExperience"]
         },
         {

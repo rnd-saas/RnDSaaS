@@ -5,7 +5,7 @@ import {Controller, useFormContext} from "react-hook-form";
 import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
 
 
-export default function Step3PrimaryGoal() {
+export default function Step4PrimaryGoal() {
     const { control } = useFormContext<Inputs>();
     const goalOptions: { value: PrimaryGoal; label: string }[]  = [
         { value: PrimaryGoal.MuscleGain, label: "Build muscle" },

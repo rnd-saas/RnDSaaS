@@ -4,7 +4,7 @@ import {Controller, useFormContext} from "react-hook-form";
 import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
 
 
-export default function Step4Experience() {
+export default function Step5Experience() {
     const { control } = useFormContext<Inputs>();
     const expOptions = [
         { id: "beginner", top: "Total beginner", bottom: "(less than 6 months)", value: "0" },
