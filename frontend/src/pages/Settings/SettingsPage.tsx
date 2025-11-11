@@ -4,6 +4,7 @@ import UserSettings from "@/pages/Settings/SettingGroups/UserSettings.tsx";
 import SubscriptionSettings from "@/pages/Settings/SettingGroups/SubscriptionSettings.tsx";
 import avatarPlaceholder from '@/assets/avatar-placeholder.png';
 import {useLocation} from "react-router-dom";
+import ChatbotButton from "@/components/chatbotButton.tsx";
 
 export default function SettingsPage() {
     const settingsComponents = [
@@ -30,6 +31,7 @@ export default function SettingsPage() {
                     </AccordionItem>
                 ))}
             </Accordion>
+            <ChatbotButton variant={"primary"}/>
         </div>
     )
 }
