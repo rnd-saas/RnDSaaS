@@ -22,24 +22,36 @@ function Register() {
         formState: { errors },
     } = useForm<Inputs>();
 
-    const onSubmit = (data: { email: string; username: string; password: string; passwordConfirmation: string}) => {
-        const existingUser = {email:'sample@sample.com',username: 'sample', password:'sample'};// will need to get from backend
-        if (existingUser.email == data.email || existingUser.username == data.username) {
-            alert("User is already registered!");
-        } else {
-            //here will need to save new user to db
-            alert(data.email + " has been successfully registered");
-            // Add navigation logic here, e.g., navigate to login page
-            navigate("/login");
+    const onSubmit = async (data: { email: string; username: string; password: string; passwordConfirmation: string}) => {
+        setError(null);
+        setSuccess(false);
+        setIsLoading(true);
+
+        try {
+            const response = await authService.register({
+                email: data.email,
+                password: data.password,
+                username: data.username,
+                display_name: data.username,
+            });
+
+            setSuccess(true);
+
+            if (response.needsEmailConfirmation) {
+                // Delay navigation to show success message when email confirmation required
+                setTimeout(() => navigate('/login'), 1200);
+            } else {
+                navigate('/login');
+            }
         } catch (err) {
             if (err instanceof ApiError) {
                 if (err.message.includes('already exists') || err.message.includes('already registered')) {
-                    setError("Email is already registered!");
+                    setError('Email is already registered!');
                 } else {
                     setError(err.message);
                 }
             } else {
-                setError("Registration failed. Please try again.");
+                setError('Registration failed. Please try again.');
             }
         } finally {
             setIsLoading(false);
@@ -79,7 +91,7 @@ function Register() {
                         {...register("username", {required: true})}
                         placeholder="Enter your username"
                     />
-                    {errors.email && (
+                    {errors.username && (
                         <span className="text-red-500 text-sm mt-1">*Username is mandatory</span>
                     )}
                 </div>

@@ -37,6 +37,7 @@ export interface RegisterRequest {
 export interface RegisterResponse {
     user: User;
     message?: string;
+    needsEmailConfirmation?: boolean;
 }
 
 // API error
