@@ -38,8 +38,8 @@ function Register() {
             setSuccess(true);
 
             if (response.needsEmailConfirmation) {
-                // Delay navigation to show success message when email confirmation required
-                setTimeout(() => navigate('/login'), 1200);
+                // Give users a moment to read the confirmation notice before continuing onboarding
+                setTimeout(() => navigate('/onboarding', { state: { needsEmailConfirmation: true } }), 1200);
             } else {
                 navigate('/login');
             }
