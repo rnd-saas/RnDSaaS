@@ -6,6 +6,7 @@ import { authService, ApiError } from "@/lib/api";
 
 type Inputs = {
     email: string
+    username: string
     password: string
     passwordConfirmation: string
 }
@@ -21,24 +22,12 @@ function Register() {
         formState: { errors },
     } = useForm<Inputs>();
 
-    const onSubmit = async (data: { email: string; password: string; passwordConfirmation: string}) => {
-        setIsLoading(true);
-        setError(null);
-        setSuccess(false);
-        
-        try {
-            // Generate default username and display name from email
-            const username = data.email.split('@')[0];
-            const display_name = data.email.split('@')[0];
-            
-            await authService.register({
-                email: data.email,
-                password: data.password,
-                username,
-                display_name
-            });
-            
-            setSuccess(true);
+    const onSubmit = (data: { email: string; username: string; password: string; passwordConfirmation: string}) => {
+        const existingUser = {email:'sample@sample.com',username: 'sample', password:'sample'};// will need to get from backend
+        if (existingUser.email == data.email || existingUser.username == data.username) {
+            alert("User is already registered!");
+        } else {
+            //here will need to save new user to db
             alert(data.email + " has been successfully registered");
             // Add navigation logic here, e.g., navigate to login page
             navigate("/login");
@@ -74,7 +63,7 @@ function Register() {
                     <input
                         id="email"
                         type="email"
-                        {...register("email", { required: true })}
+                        {...register("email", {required: true})}
                         placeholder="Enter your email"
                     />
                     {errors.email && (
@@ -83,11 +72,24 @@ function Register() {
                 </div>
 
                 <div className="flex flex-col">
+                    <label htmlFor="username" className="mb-1 font-medium text-left">Username</label>
+                    <input
+                        id="username"
+                        type="username"
+                        {...register("username", {required: true})}
+                        placeholder="Enter your username"
+                    />
+                    {errors.email && (
+                        <span className="text-red-500 text-sm mt-1">*Username is mandatory</span>
+                    )}
+                </div>
+
+                <div className="flex flex-col">
                     <label htmlFor="password" className="mb-1 font-medium text-left">Password</label>
                     <input
                         id="password"
                         type="password"
-                        {...register("password", { required: true })}
+                        {...register("password", {required: true})}
                         placeholder="Enter your password"
                     />
                     {errors.password && (
@@ -96,7 +98,8 @@ function Register() {
                 </div>
 
                 <div className="flex flex-col">
-                    <label htmlFor="passwordConfirmation" className="mb-1 font-medium text-left">Password Confirmation</label>
+                    <label htmlFor="passwordConfirmation" className="mb-1 font-medium text-left">Password
+                        Confirmation</label>
                     <input
                         id="passwordConfirm"
                         type="password"
@@ -122,7 +125,8 @@ function Register() {
                 </Button>
             </form>
             <div className={'p-6'}>
-                <Link to={'/login'} style={{ color: "var(--intuitive-names-secondary-text)" }}>Already an existing user?</Link>
+                <Link to={'/login'} style={{color: "var(--intuitive-names-secondary-text)"}}>Already an existing
+                    user?</Link>
             </div>
         </>
     );
