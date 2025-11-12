@@ -1,13 +1,13 @@
-name: Deploy Staging
+name: Deploy BE Staging
 
 on:
-  push:
-    branches:
-      - vercel-cor308-1
+    push:
+        branches:
+            - vercel-cor308-1
 
 jobs:
   deploy:
-    name: Deploy to Vercel (Staging)
+    name: Deploy BE to Vercel (Staging)
     runs-on: ubuntu-latest
     environment: staging
 
@@ -19,10 +19,10 @@ jobs:
         with:
           node-version: 18
       
-      - name: Deploy to Vercel (Staging)
-        uses: amondnet/vercel-action@v20
+      - name: Deploy BE to Vercel (Staging)
+        uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: ./frontend
+          vercel-project-id: ${{ secrets.VERCEL_BACKEND_PROJECT_ID }}
+          working-directory: ./backend

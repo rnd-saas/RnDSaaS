@@ -1,5 +1,18 @@
 {
-  "version": 2,
-  "functions": { "api/index.ts": { "runtime": "nodejs18.x" } },
-  "routes": [{ "src": "/(.*)", "dest": "/api/index.ts" }]
+  "rewrites": [
+    { "source": "/", "destination": "/api/index" },
+    { "source": "/api/ping", "destination": "/api/ping" },
+    { "source": "/api/env-check", "destination": "/api/env-check" },
+    { "source": "/api/:path*", "destination": "/api/index" }
+  ],
+  "headers": [
+    {
+      "source": "/api/:path*",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,PUT,DELETE,OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
+      ]
+    }
+  ]
 }
