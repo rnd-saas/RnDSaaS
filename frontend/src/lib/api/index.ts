@@ -13,3 +13,7 @@ export const authService = authServiceFunctions;
 import * as userServiceFunctions from './userService';
 export const userService = userServiceFunctions;
 
+// Export onboarding service functions
+import * as onboardingServiceFunctions from './onboardingService';
+export const onboardingService = onboardingServiceFunctions;
+

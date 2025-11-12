@@ -156,10 +156,47 @@ class ApiClient {
     }
 
     /**
+     * Save refresh token for session renewal
+     */
+    setRefreshToken(refreshToken: string): void {
+        localStorage.setItem('auth_refresh_token', refreshToken);
+    }
+
+    /**
+     * Save token expiry timestamp (seconds since epoch)
+     */
+    setTokenExpiry(expiresAt: number | null | undefined): void {
+        if (typeof expiresAt === 'number') {
+            localStorage.setItem('auth_expires_at', String(expiresAt));
+        } else {
+            localStorage.removeItem('auth_expires_at');
+        }
+    }
+
+    /**
+     * Retrieve refresh token when needed
+     */
+    getRefreshToken(): string | null {
+        return localStorage.getItem('auth_refresh_token');
+    }
+
+    /**
+     * Retrieve stored expiry timestamp
+     */
+    getTokenExpiry(): number | null {
+        const raw = localStorage.getItem('auth_expires_at');
+        if (!raw) return null;
+        const parsed = Number(raw);
+        return Number.isNaN(parsed) ? null : parsed;
+    }
+
+    /**
      * Clear token
      */
     clearToken(): void {
         localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_refresh_token');
+        localStorage.removeItem('auth_expires_at');
     }
 }
 

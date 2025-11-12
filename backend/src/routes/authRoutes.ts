@@ -53,6 +53,8 @@ router.post('/login', async (req, res) => {
             });
         }
 
+        const session = authData.session;
+
         // Check if user email is verified
         if (!authData.user.email_confirmed_at && authData.user.email_confirmed_at === null) {
             return res.status(401).json({ 
@@ -90,14 +92,18 @@ router.post('/login', async (req, res) => {
 
             return res.json({
                 user: newUser,
-                token: authData.session?.access_token,
+                token: session?.access_token,
+                refreshToken: session?.refresh_token,
+                expiresAt: session?.expires_at ?? null,
                 message: 'Login successful'
             });
         }
 
         res.json({
             user: userData,
-            token: authData.session?.access_token,
+            token: session?.access_token,
+            refreshToken: session?.refresh_token,
+            expiresAt: session?.expires_at ?? null,
             message: 'Login successful'
         });
 
@@ -162,7 +168,9 @@ router.post('/register', async (req, res) => {
             });
         }
 
-        console.log('✅ User created in Supabase Auth:', authData.user.id);
+    console.log('✅ User created in Supabase Auth:', authData.user.id);
+
+    const session = authData.session;
 
         // Create user record in users table
         console.log('📊 Creating user profile in database...');
@@ -192,6 +200,9 @@ router.post('/register', async (req, res) => {
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString()
                 },
+                token: session?.access_token,
+                refreshToken: session?.refresh_token,
+                expiresAt: session?.expires_at ?? null,
                 message: 'Registration successful (profile creation pending)'
             });
         }
@@ -203,6 +214,9 @@ router.post('/register', async (req, res) => {
         
         res.status(201).json({
             user: userData,
+            token: session?.access_token,
+            refreshToken: session?.refresh_token,
+            expiresAt: session?.expires_at ?? null,
             message: needsEmailConfirmation 
                 ? 'Registration successful! Please check your email to verify your account before logging in.'
                 : 'Registration successful',

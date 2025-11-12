@@ -18,6 +18,115 @@ import Step4PrimaryGoal from "./steps/Step4PrimaryGoal.tsx";
 import type {PrimaryGoal} from "@/utils/InputTypes.tsx";
 import {Gender, GymComfortLevel, PreferredSplit} from "@/utils/InputTypes.tsx";
 import Step1Nickname from "@/pages/Onboarding/steps/Step1Nickname.tsx";
+import { onboardingService } from "@/lib/api";
+import type { OnboardingPayload } from "@/lib/api";
+
+const POUNDS_TO_KG = 0.45359237;
+const STONES_TO_KG = 6.35029318;
+const FEET_TO_CM = 30.48;
+
+const roundToTwoDecimals = (value: number): number => {
+    return Math.round(value * 100) / 100;
+};
+
+const convertWeightToKg = (weight: number | undefined, unit: string | undefined): number | null => {
+    if (weight === undefined || weight === null) return null;
+    if (!Number.isFinite(weight)) return null;
+
+    switch (unit) {
+    case "kg":
+        return roundToTwoDecimals(weight);
+    case "lbs":
+        return roundToTwoDecimals(weight * POUNDS_TO_KG);
+    case "st":
+        return roundToTwoDecimals(weight * STONES_TO_KG);
+    default:
+        return roundToTwoDecimals(weight);
+    }
+};
+
+const convertHeightToCm = (height: number | undefined, unit: string | undefined): number | null => {
+    if (height === undefined || height === null) return null;
+    if (!Number.isFinite(height)) return null;
+
+    switch (unit) {
+    case "cm":
+        return roundToTwoDecimals(height);
+    case "ft":
+        return roundToTwoDecimals(height * FEET_TO_CM);
+    default:
+        return roundToTwoDecimals(height);
+    }
+};
+
+const toNumberOrNull = (value: string | number | undefined): number | null => {
+    if (value === undefined || value === null) return null;
+    const parsed = typeof value === "number" ? value : Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+};
+
+const toNumberArrayOrNull = (values: string[] | undefined): number[] | null => {
+    if (!values || values.length === 0) return null;
+    const numbers = values
+        .map((value) => Number(value))
+        .filter((num): num is number => Number.isFinite(num));
+    return numbers.length ? numbers : null;
+};
+
+const normalizeString = (value: string | undefined): string | null => {
+    const trimmed = value?.trim();
+    return trimmed && trimmed.length > 0 ? trimmed : null;
+};
+
+const toEnumValue = (value: string | null | undefined): string | null => {
+    if (!value) return null;
+
+    const mappings: Record<string, string> = {
+        'fat-loss': 'fat_loss',
+        'muscle-gain': 'muscle_gain',
+        strength: 'strength',
+        endurance: 'endurance',
+        mobility: 'mobility',
+        'general-fitness': 'general_fitness',
+        'full-body': 'full_body',
+        'upper-lower': 'upper_lower',
+        'push-pull-legs': 'push_pull_legs',
+        other: 'other',
+        'dont-know': 'dont_know',
+        anxious: 'anxious_insecure',
+        nervous: 'nervous',
+        fine: 'mostly_fine',
+        comfortable: 'comfortable',
+        'never-been': 'never_been',
+    };
+
+    return mappings[value] ?? value.replace(/-/g, '_');
+};
+
+const mapGenderToDbValue = (gender: Gender | undefined): string | null => {
+    return toEnumValue(gender);
+};
+
+const mapSelectionArrayToEnums = (values: string[] | undefined): string[] | null => {
+    if (!values || values.length === 0) return null;
+    const mapped = values
+        .map((value) => toEnumValue(value))
+        .filter((value): value is string => Boolean(value));
+    return mapped.length ? mapped : null;
+};
+
+const mapComfortLevelsToDbValues = (comfortLevels: GymComfortLevel[] | undefined): string[] | null => {
+    return mapSelectionArrayToEnums(comfortLevels);
+};
+
+const mapPrimaryGoalToDbValues = (goal: PrimaryGoal | undefined): string[] | null => {
+    const normalized = toEnumValue(goal);
+    return normalized ? [normalized] : null;
+};
+
+const mapPreferredSplitToDbValues = (split: PreferredSplit[] | undefined): string[] | null => {
+    return mapSelectionArrayToEnums(split);
+};
 
 export type Inputs = {
     strTrainer:string,
@@ -32,14 +141,16 @@ export type Inputs = {
     strDaysPerWeek:string,
     strAvailableDays:string[],
     strSessionDuration:string,
-    problemAreas:string[],
-    preferredSplit:PreferredSplit,
-    comfortLevel:GymComfortLevel,
+        problemAreas:string[],
+        preferredSplit:PreferredSplit[],
+        comfortLevel:GymComfortLevel[],
 }
 export default function OnboardingManager() {
     const [formStep, setStep] = useState(0);
     const methods = useForm<Inputs>();
     const navigate = useNavigate();
+    const [submitError, setSubmitError] = useState<string | null>(null);
+    const { isSubmitting } = methods.formState;
 
     type Step = {
         component: ComponentType;
@@ -101,8 +212,6 @@ export default function OnboardingManager() {
     const CurrentStep = stepComponents[formStep].component;
 
     const next = async () => {
-        const stepValues = methods.getValues();
-        console.log("Saving step data:", stepValues);
         const { fields } = stepComponents[formStep];
         const valid = await methods.trigger(fields);
         if (!valid) return;
@@ -120,25 +229,45 @@ export default function OnboardingManager() {
             .filter(Boolean);
     };
 
-    const onSubmit = (data:Inputs) => {
-        const trainer = { trainer: Number(data.strTrainer) };
-        const experience = {experience: Number(data.strExperience)};
-        const daysPerWeek= { daysPerWeek: Number(data.strDaysPerWeek) };
-        const availableDays = {availableDays: data.strAvailableDays.map(Number),};
-        const sessionDuration= { sessionDuration: Number(data.strSessionDuration) };
-        const trainerId = Number(data.strTrainer); // 0 = Tom, 1 = Sarah
-        const firstName = "Hugo";
-        console.log("submit clicked", trainer, experience, daysPerWeek, availableDays, sessionDuration);
-        alert("onboarding completed");
+    const onSubmit = async (data: Inputs) => {
+        setSubmitError(null);
+
+        const payload: OnboardingPayload = {
+            preferredName: normalizeString(data.nickname),
+            gender: mapGenderToDbValue(data.gender),
+            heightCm: convertHeightToCm(data.height, data.heightUnit),
+            weightKg: convertWeightToKg(data.weight, data.weightUnit),
+            primaryGoal: mapPrimaryGoalToDbValues(data.goal),
+            trainingDaysPerWeek: toNumberOrNull(data.strDaysPerWeek),
+            availableDays: toNumberArrayOrNull(data.strAvailableDays),
+            sessionDuration: toNumberOrNull(data.strSessionDuration),
+            problemAreas: data.problemAreas?.length ? data.problemAreas : null,
+            preferredSplit: mapPreferredSplitToDbValues(data.preferredSplit),
+            gymComfortLevel: mapComfortLevelsToDbValues(data.comfortLevel),
+            experienceLevel: toNumberOrNull(data.strExperience)
+        };
 
         try {
-            localStorage.setItem("trainerId", String(trainerId)); // fallback for refresh/direct visit
-            localStorage.setItem("firstName", firstName);
-          } catch {}
-        
-          navigate("/landing", { state: { trainerId, firstName } });
+            console.log("Submitting onboarding payload", payload);
+            await onboardingService.saveResponses(payload);
+            console.log("Onboarding payload saved");
 
-    }
+            const trainerId = Number(data.strTrainer);
+            const firstName = normalizeString(data.nickname) ?? "Friend";
+
+            try {
+                localStorage.setItem("trainerId", String(trainerId));
+                localStorage.setItem("firstName", firstName);
+            } catch (storageErr) {
+                console.warn("Failed to persist onboarding context", storageErr);
+            }
+
+            navigate("/landing", { state: { trainerId, firstName } });
+        } catch (error: any) {
+            console.error("Failed to save onboarding responses", error);
+            setSubmitError(error?.message ?? "Failed to save your onboarding responses. Please try again.");
+        }
+    };
 
     return (
         <FormProvider {...methods}>
@@ -156,12 +285,21 @@ export default function OnboardingManager() {
                                 {error?.message}
                             </p>
                         ))}
+                        {submitError && (
+                            <p className="text-[var(--intuitive-names-error-message)]">{submitError}</p>
+                        )}
                     </div>
                     <div className="fixed w-[75vw] bottom-[10vh] p-4">
-                        <StepNavigator prevStep={back} nextStep={next} prevDisabled={formStep == 0} nextDisabled={formStep == totalSteps}/>
+                        <StepNavigator
+                            prevStep={back}
+                            nextStep={next}
+                            prevDisabled={formStep == 0}
+                            nextDisabled={formStep == totalSteps}
+                            isSubmitting={isSubmitting}
+                        />
                     </div>
                 </form>
             </div>
         </FormProvider>
-)
+);
 }

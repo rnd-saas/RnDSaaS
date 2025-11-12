@@ -21,12 +21,18 @@ export default function Step10WorkoutType() {
                 <FieldDescription>
                     Which type of workouts would you like to do?
                 </FieldDescription>
-                <Controller name="preferredSplit" control={control} defaultValue={undefined} rules={{ required: "Please select at least one option" }}
+                <Controller
+                    name="preferredSplit"
+                    control={control}
+                    defaultValue={[]}
+                    rules={{
+                        validate: (value) => (value && value.length > 0) || "Please select at least one option",
+                    }}
                     render={({ field }) => {
-                        const selected = field.value || [];
-                        const toggleValue = (val: string) => {
+                        const selected: PreferredSplit[] = field.value || [];
+                        const toggleValue = (val: PreferredSplit) => {
                             if (selected.includes(val)) {
-                                field.onChange((selected as unknown as string[]).filter((v) => v !== val));
+                                field.onChange(selected.filter((v) => v !== val));
                             } else {
                                 field.onChange([...selected, val]);
                             }

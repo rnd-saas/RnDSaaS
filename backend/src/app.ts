@@ -39,10 +39,12 @@ try {
     const authRoutes = require('./routes/authRoutes').default;
     const userRoutes = require('./routes/userRoutes').default;
     const debugRoutes = require('./routes/debugRoutes').default;
+    const onboardingRoutes = require('./routes/onboardingRoutes').default;
     
     app.use('/api/auth', authRoutes);
     app.use('/api/users', userRoutes);
     app.use('/api/debug', debugRoutes);
+    app.use('/api/onboarding', onboardingRoutes);
     
     console.log('✅ API routes loaded');
 } catch (error: any) {
@@ -62,7 +64,9 @@ app.use((req, res) => {
             'POST /api/auth/register',
             'POST /api/auth/login',
             'GET /api/auth/me',
-            'POST /api/auth/logout'
+            'POST /api/auth/logout',
+            'GET /api/onboarding',
+            'POST /api/onboarding'
         ],
         timestamp: new Date().toISOString()
     });

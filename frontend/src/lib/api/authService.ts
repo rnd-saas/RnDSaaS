@@ -16,6 +16,10 @@ export async function login(credentials: LoginRequest): Promise<LoginResponse> {
     if (response.token) {
         apiClient.setToken(response.token);
     }
+    if (response.refreshToken) {
+        apiClient.setRefreshToken(response.refreshToken);
+    }
+    apiClient.setTokenExpiry(response.expiresAt);
     
     return response;
 }
@@ -24,7 +28,17 @@ export async function login(credentials: LoginRequest): Promise<LoginResponse> {
  * User registration
  */
 export async function register(userData: RegisterRequest): Promise<RegisterResponse> {
-    return apiClient.post<RegisterResponse>('/api/auth/register', userData);
+    const response = await apiClient.post<RegisterResponse>('/api/auth/register', userData);
+
+    if (response.token) {
+        apiClient.setToken(response.token);
+    }
+    if (response.refreshToken) {
+        apiClient.setRefreshToken(response.refreshToken);
+    }
+    apiClient.setTokenExpiry(response.expiresAt);
+
+    return response;
 }
 
 /**

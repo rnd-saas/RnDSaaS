@@ -22,6 +22,8 @@ export interface LoginRequest {
 export interface LoginResponse {
     user: User;
     token?: string;
+    refreshToken?: string;
+    expiresAt?: number | null;
     message?: string;
 }
 
@@ -38,6 +40,24 @@ export interface RegisterResponse {
     user: User;
     message?: string;
     needsEmailConfirmation?: boolean;
+    token?: string;
+    refreshToken?: string;
+    expiresAt?: number | null;
+}
+
+export interface OnboardingPayload {
+    preferredName?: string | null;
+    gender?: string | null;
+    heightCm?: number | null;
+    weightKg?: number | null;
+    primaryGoal?: string[] | null;
+    trainingDaysPerWeek?: number | null;
+    availableDays?: number[] | null;
+    sessionDuration?: number | null;
+    problemAreas?: string[] | null;
+    preferredSplit?: string[] | null;
+    gymComfortLevel?: string[] | null;
+    experienceLevel?: number | null;
 }
 
 // API error

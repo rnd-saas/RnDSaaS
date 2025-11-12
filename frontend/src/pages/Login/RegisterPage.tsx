@@ -41,7 +41,7 @@ function Register() {
                 // Give users a moment to read the confirmation notice before continuing onboarding
                 setTimeout(() => navigate('/onboarding', { state: { needsEmailConfirmation: true } }), 1200);
             } else {
-                navigate('/login');
+                navigate('/onboarding');
             }
         } catch (err) {
             if (err instanceof ApiError) {

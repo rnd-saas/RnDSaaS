@@ -30,7 +30,7 @@ function Login() {
             
             alert(data.email + " You Are Successfully Logged In");
             // Add navigation logic here, e.g., navigate to home page
-            navigate("/");
+            navigate("/dashboard");
         } catch (err) {
             if (err instanceof ApiError) {
                 setError(err.message);

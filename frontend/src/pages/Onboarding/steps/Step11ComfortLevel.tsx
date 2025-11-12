@@ -21,12 +21,12 @@ export default function Step11ComfortLevel() {
                 <FieldDescription>
                     How comfortable do you feel at the gym? (multiple options possible)
                 </FieldDescription>
-                <Controller name="comfortLevel" control={control} defaultValue={undefined} rules={{ required: "Please provide a comfort level" }}
+                <Controller name="comfortLevel" control={control} defaultValue={[]} rules={{ required: "Please provide a comfort level" }}
                             render={({ field }) => {
-                                const selected = field.value || [];
-                                const toggleValue = (val: string) => {
+                                const selected: GymComfortLevel[] = field.value || [];
+                                const toggleValue = (val: GymComfortLevel) => {
                                     if (selected.includes(val)) {
-                                        field.onChange((selected as unknown as string[]).filter((v) => v !== val));
+                                        field.onChange(selected.filter((v) => v !== val));
                                     } else {
                                         field.onChange([...selected, val]);
                                     }
