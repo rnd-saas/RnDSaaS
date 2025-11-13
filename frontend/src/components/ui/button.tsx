@@ -20,7 +20,8 @@ const buttonVariants = cva(
             "bg-[var(--intuitive-names-app-secondary)] text-[var(--intuitive-names-secondary-text)] hover:bg-[var(--intuitive-names-secondary-hover)] active:bg-[var(--intuitive-names-secondary-pressed)] disabled:bg-[var(--intuitive-names-secondary-disabled)] disabled:text-[var(--intuitive-names-app-background)]",
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-        link: "text-primary underline-offset-4 hover:underline",
+        link:
+            "text-[var(--intuitive-names-link)] underline-offset-4 hover:underline active:text-[var(--intuitive-names-secondary-text)]",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
