@@ -122,7 +122,7 @@ export default function ChatbotPage() {
                     <div ref={messagesEndRef} />
                 </div>
             </main>
-            <footer className="px-6 py-8 rounded-tl-[48px] fixed bottom-10 w-full md:max-w-xl mx-auto">
+            <footer className="px-6 py-8 rounded-tl-[48px] fixed bottom-10 w-[90vw] lg:w-[60vw] inset-x-0 mx-auto">
                 <div className="flex items-center gap-4">
                     <div className="flex-1 flex items-center justify-between px-5 py-2.5 rounded-[48px] border-[1.5px] border-solid">
                         <Input placeholder="Type a message ... " onChange={handleInputChange} value={inputValue} onKeyDown={handleKeyDown}
