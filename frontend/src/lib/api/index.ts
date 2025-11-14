@@ -25,3 +25,7 @@ export const chatbotService = chatbotServiceFunctions;
 import * as dashboardServiceFunctions from './dashboardService';
 export const dashboardService = dashboardServiceFunctions;
 
+// Export settings service functions
+import * as settingsServiceFunctions from './settingsService';
+export const settingsService = settingsServiceFunctions;
+

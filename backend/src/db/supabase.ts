@@ -19,7 +19,8 @@ function getSupabaseClient(): SupabaseClient {
     }
 
     const url = process.env.SUPABASE_URL;
-    const key = process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY;
+    // Prefer SERVICE_ROLE_KEY to bypass RLS, fallback to SUPABASE_KEY or SUPABASE_ANON_KEY
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY;
 
     if (!url || !key) {
         const error = new Error(
@@ -31,12 +32,14 @@ function getSupabaseClient(): SupabaseClient {
             VERCEL: process.env.VERCEL,
             hasUrl: !!url,
             hasKey: !!key,
+            hasServiceRoleKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
             urlPreview: url ? url.substring(0, 30) + '...' : 'N/A'
         });
         throw error;
     }
 
-    console.log('✅ Initializing Supabase client...');
+    const keyType = process.env.SUPABASE_SERVICE_ROLE_KEY ? 'SERVICE_ROLE' : (process.env.SUPABASE_KEY ? 'KEY' : 'ANON_KEY');
+    console.log(`✅ Initializing Supabase client with ${keyType}...`);
     supabaseClient = createClient(url, key);
     return supabaseClient;
 }

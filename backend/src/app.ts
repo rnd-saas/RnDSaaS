@@ -42,6 +42,7 @@ try {
     const onboardingRoutes = require('./routes/onboardingRoutes').default;
     const chatbotRoutes = require('./routes/chatbotRoutes').default;
     const dashboardRoutes = require('./routes/dashboardRoutes').default;
+    const settingsRoutes = require('./routes/settingsRoutes').default;
     
     app.use('/api/auth', authRoutes);
     app.use('/api/users', userRoutes);
@@ -49,6 +50,7 @@ try {
     app.use('/api/onboarding', onboardingRoutes);
     app.use('/api/chatbot', chatbotRoutes);
     app.use('/api/dashboard', dashboardRoutes);
+    app.use('/api/settings', settingsRoutes);
     
     console.log('✅ API routes loaded');
 } catch (error: any) {
@@ -71,7 +73,9 @@ app.use((req, res) => {
             'POST /api/auth/logout',
             'GET /api/onboarding',
             'POST /api/onboarding',
-            'GET /api/dashboard'
+            'GET /api/dashboard',
+            'GET /api/settings',
+            'PUT /api/settings'
         ],
         timestamp: new Date().toISOString()
     });
