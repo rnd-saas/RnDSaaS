@@ -22,6 +22,7 @@ interface OnboardingPayload {
     gymComfortLevel?: string[] | null;
     experienceLevel?: number | null;
     trainerId?: number | null;
+    trainer?: boolean | null;
 }
 
 const sanitizeRecord = (record: Record<string, unknown>): Record<string, unknown> => {
@@ -90,6 +91,7 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
             preferred_split: payload.preferredSplit,
             gym_comfort_level: payload.gymComfortLevel,
             experience_level: payload.experienceLevel,
+            trainer: payload.trainer,
             updated_at: new Date().toISOString()
         });
 

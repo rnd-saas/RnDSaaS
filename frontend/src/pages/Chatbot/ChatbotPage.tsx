@@ -1,13 +1,14 @@
 ﻿import {Button} from "@/components/ui/button.tsx";
 import {AlertTriangle, ArrowLeft, Loader2, MoreVertical, Send} from "lucide-react";
-import avatarPlaceholder from "@/assets/avatar-placeholder.png";
+import tomAvatar from "@/assets/tom_avatar.png";
+import sarahAvatar from "@/assets/sarah_avatar.png";
 import {Input} from "@/components/ui/input.tsx";
-import {useLocation, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import AvatarIcon from "@/components/avatarIcon.tsx";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu.tsx";
 import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {chatbotService} from "@/lib/api";
-import type {ChatbotMessage} from "@/lib/api/types";
+import type {ChatbotMessage, ChatbotTrainerProfile} from "@/lib/api/types";
 
 type ConversationMessage = {
     id: string;
@@ -17,10 +18,10 @@ type ConversationMessage = {
     fallback?: boolean;
 };
 
-const TRAINER_NAMES: Record<number, string> = {
-    0: "Tom",
-    1: "Sarah"
-};
+const AVATAR_MAP = {
+    tom: tomAvatar,
+    sarah: sarahAvatar
+} as const;
 
 const createMessageId = () => {
     if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -30,39 +31,66 @@ const createMessageId = () => {
 };
 
 export default function ChatbotPage() {
-    const { state } = useLocation() as { state?: { trainerId?: number } };
-
-    const trainerFromStorage = useMemo(() => {
-        if (typeof window === "undefined") return null;
-        try {
-            return window.localStorage.getItem("trainerId");
-        } catch (err) {
-            console.warn("Unable to read trainerId from storage", err);
-            return null;
-        }
-    }, []);
-
-    const rawTrainer = state?.trainerId ?? trainerFromStorage ?? 0;
-    const numericTrainer = Number(rawTrainer);
-    const safeTrainerId = numericTrainer === 1 ? 1 : 0;
-    const trainerName = TRAINER_NAMES[safeTrainerId] ?? "Tom";
+    const [profile, setProfile] = useState<ChatbotTrainerProfile | null>(null);
+    const [isProfileLoading, setIsProfileLoading] = useState(true);
+    const [profileError, setProfileError] = useState<string | null>(null);
+    const greetingInitializedRef = useRef(false);
 
     const preferredLanguage = useMemo(() => {
         if (typeof navigator === "undefined") return "en";
         return navigator.language || "en";
     }, []);
 
-    const [messages, setMessages] = useState<ConversationMessage[]>(() => [
-        {
-            id: createMessageId(),
-            role: "assistant",
-            status: "sent",
-            content: `Hey, I'm ${trainerName}. Tell me how your training feels today and I'll fine-tune the next session with you.`
-        }
-    ]);
+    const [messages, setMessages] = useState<ConversationMessage[]>([]);
     const [inputValue, setInputValue] = useState<string>("");
     const [isSending, setIsSending] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+    const trainerName = profile?.name ?? "Tom";
+    const trainerAvatar = AVATAR_MAP[profile?.avatarKey ?? "tom"] ?? tomAvatar;
+    const trainerId = profile?.trainerId ?? 0;
+
+    const initGreeting = useCallback((name: string) => {
+        if (greetingInitializedRef.current) return;
+        greetingInitializedRef.current = true;
+        setMessages([
+            {
+                id: createMessageId(),
+                role: "assistant",
+                status: "sent",
+                content: `Hey, I'm ${name}. Tell me how your training feels today and I'll fine-tune the next session with you.`
+            }
+        ]);
+    }, []);
+
+    useEffect(() => {
+        let active = true;
+
+        const loadProfile = async () => {
+            try {
+                setProfileError(null);
+                const data = await chatbotService.fetchProfile();
+                if (!active) return;
+                setProfile(data);
+                initGreeting(data.name);
+            } catch (error: any) {
+                if (!active) return;
+                console.error("Failed to load chatbot profile", error);
+                setProfileError(error?.message ?? "Failed to load your coach profile.");
+                initGreeting("your coach");
+            } finally {
+                if (active) {
+                    setIsProfileLoading(false);
+                }
+            }
+        };
+
+        loadProfile();
+
+        return () => {
+            active = false;
+        };
+    }, [initGreeting]);
 
     const buildPayloadMessages = useCallback((history: ConversationMessage[]): ChatbotMessage[] => {
         return history
@@ -78,6 +106,10 @@ export default function ChatbotPage() {
     const handleSendMessage = async () => {
         const trimmedValue = inputValue.trim();
         if (!trimmedValue || isSending) {
+            return;
+        }
+        if (!profile && !profileError && isProfileLoading) {
+            setErrorMessage("Still loading your coach profile. Please try again in a moment.");
             return;
         }
 
@@ -103,7 +135,7 @@ export default function ChatbotPage() {
 
         try {
             const response = await chatbotService.sendMessage({
-                trainerId: safeTrainerId,
+                trainerId,
                 messages: buildPayloadMessages(updatedHistory),
                 metadata: {
                     language: preferredLanguage
@@ -173,7 +205,7 @@ export default function ChatbotPage() {
                         <ArrowLeft className="h-6 w-6"/>
                     </Button>
                     <div className="flex items-center gap-3">
-                        <AvatarIcon icon={avatarPlaceholder}/>
+                        <AvatarIcon icon={trainerAvatar}/>
                         <div className="flex flex-col gap-0.5">
                             <h2>{trainerName}</h2>
                             <div className="flex items-center gap-1">
@@ -197,6 +229,12 @@ export default function ChatbotPage() {
                 </div>
             </header>
             <main className="flex-1 px-6 pt-4 h-full pb-[6rem] overflow-y-auto">
+                {profileError && (
+                    <div className="mb-4 rounded-2xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4" />
+                        <span>{profileError}</span>
+                    </div>
+                )}
                 {errorMessage && (
                     <div className="mb-4 rounded-2xl border border-amber-400/60 bg-amber-50 px-4 py-3 text-sm text-amber-900 flex items-center gap-2">
                         <AlertTriangle className="h-4 w-4" />
@@ -208,7 +246,7 @@ export default function ChatbotPage() {
                         if (message.role === "assistant") {
                             return (
                                 <div key={message.id} className="flex items-start gap-2">
-                                    <AvatarIcon icon={avatarPlaceholder}/>
+                                    <AvatarIcon icon={trainerAvatar}/>
                                     <div className="flex flex-col gap-2 p-4 rounded-[0px_24px_24px_24px] max-w-[calc(100%-56px)] text-[var(--intuitive-names-grey-text)] bg-[var(--intuitive-names-grey-background)]">
                                         <p>{message.status === "pending" ? (
                                             <span className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -246,11 +284,11 @@ export default function ChatbotPage() {
             <footer className="px-6 py-8 rounded-tl-[48px] fixed bottom-10 w-[90vw] lg:w-[60vw] inset-x-0 mx-auto">
                 <div className="flex items-center gap-4">
                     <div className="flex-1 flex items-center justify-between px-5 py-2.5 rounded-[48px] border-[1.5px] border-solid">
-                        <Input placeholder="Type a message ... " onChange={handleInputChange} value={inputValue} onKeyDown={handleKeyDown} disabled={isSending}
+                        <Input placeholder={isProfileLoading ? "Loading coach..." : "Type a message ... "} onChange={handleInputChange} value={inputValue} onKeyDown={handleKeyDown} disabled={isSending || isProfileLoading}
                             className="border-0 p-0 h-auto font-normal text-base leading-6 focus-visible:ring-0 focus-visible:ring-offset-0"
                         />
                     </div>
-                    <Button size="icon" className="h-11 w-11 rounded-full" onClick={handleSendMessage} disabled={isSending || !inputValue.trim()}>
+                    <Button size="icon" className="h-11 w-11 rounded-full" onClick={handleSendMessage} disabled={isSending || !inputValue.trim() || isProfileLoading}>
                         {isSending ? <Loader2 className="h-[18px] w-[18px] animate-spin" /> : <Send className="h-[18px] w-[18px]" />}
                     </Button>
                 </div>

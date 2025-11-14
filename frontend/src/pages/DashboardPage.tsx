@@ -1,19 +1,75 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import { dashboardService } from "@/lib/api";
+import type { DashboardData } from "@/lib/api/types";
 
-/**
- * Pure UI mock: no data fetching yet.
- * Replace the hardcoded values with real data when backend wiring is ready.
- */
+const FALLBACK_DASHBOARD: DashboardData = {
+  firstName: null,
+  trainer: null,
+  goal: {
+    workoutsCompleted: { current: 70, target: 100 },
+    exercisesDiscovered: { current: 30, target: 40 },
+    longestStreak: { current: 30, target: 60 },
+  },
+  level: { label: "Novice", currentXp: 500, nextLevelXp: 1200 },
+  achievements: [
+    { id: "workouts-100", title: "100 Workouts", sub: "Completed", emoji: "💪" },
+    { id: "streak-7", title: "7 Days", sub: "Streak", emoji: "📆" },
+    { id: "consecutive-12", title: "Consecutive", sub: "Workout 12", emoji: "🔥" },
+  ],
+  mood: "😣",
+  nextWorkout: "🏋️‍♂️",
+  streakDays: 20,
+  advice: "Fill half your plate with colorful vegetables!",
+};
 
 export default function DashboardPage() {
   const { state } = useLocation() as { state?: { firstName?: string } };
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    const loadDashboard = async () => {
+      try {
+        setFetchError(null);
+        const data = await dashboardService.fetchDashboard();
+        if (!active) return;
+        setDashboardData(data);
+        if (data.firstName) {
+          try {
+            localStorage.setItem("firstName", data.firstName);
+          } catch {
+            // ignore storage failures
+          }
+        }
+      } catch (error: any) {
+        if (!active) return;
+        console.error("Failed to load dashboard data", error);
+        setFetchError(error?.message ?? "Failed to load dashboard data");
+      } finally {
+        if (active) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadDashboard();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const resolvedData = dashboardData ?? FALLBACK_DASHBOARD;
   const firstName =
-    state?.firstName ?? localStorage.getItem("firstName") ?? "User";
+    dashboardData?.firstName ?? state?.firstName ?? localStorage.getItem("firstName") ?? "User";
 
   const today = useMemo(() => {
     const d = new Date();
@@ -25,19 +81,13 @@ export default function DashboardPage() {
     });
   }, []);
 
-  // ----- Mock data -----
-  const goal = {
-    workoutsCompleted: { current: 70, target: 100 },
-    exercisesDiscovered: { current: 30, target: 40 },
-    longestStreak: { current: 30, target: 60 },
-  };
-  const level = { label: "Novice", currentXp: 500, nextLevelXp: 1200 };
-  const achievements = [
-    { id: 1, title: "100 Workouts", sub: "Completed", emoji: "💪" },
-    { id: 2, title: "7 Days", sub: "Streak", emoji: "📆" },
-    { id: 3, title: "Consecutive", sub: "Workout 12", emoji: "🔥" },
-  ];
-  // ----------------------
+  const goal = resolvedData.goal;
+  const level = resolvedData.level;
+  const achievements = resolvedData.achievements;
+  const streakDays = resolvedData.streakDays;
+  const advice = resolvedData.advice;
+  const moodEmoji = resolvedData.mood;
+  const nextWorkoutEmoji = resolvedData.nextWorkout;
 
   const navigate = useNavigate();
 
@@ -62,6 +112,16 @@ export default function DashboardPage() {
 
         <Separator className="my-4" />
 
+        {fetchError && (
+          <div className="mb-4 rounded-md border border-amber-500/60 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+            {fetchError}
+          </div>
+        )}
+
+        {isLoading && !dashboardData && (
+          <p className="mb-4 text-sm text-muted-foreground">Loading your latest stats…</p>
+        )}
+
         {/* To your goal */}
         <section className="space-y-3">
           <h2 className="text-xl font-semibold">To your goal:</h2>
@@ -77,7 +137,7 @@ export default function DashboardPage() {
               <CardTitle className="text-2xl">Mood</CardTitle>
             </CardHeader>
             <CardContent className="flex items-center justify-center py-4">
-              <div className="text-6xl">😣</div>
+              <div className="text-6xl">{moodEmoji}</div>
             </CardContent>
           </Card>
 
@@ -86,7 +146,7 @@ export default function DashboardPage() {
               <CardTitle className="text-2xl">Next Workout</CardTitle>
             </CardHeader>
             <CardContent className="flex items-center justify-center py-4">
-              <div className="text-6xl">🏋️‍♂️</div>
+              <div className="text-6xl">{nextWorkoutEmoji}</div>
             </CardContent>
           </Card>
         </section>
@@ -95,7 +155,7 @@ export default function DashboardPage() {
 
         {/* Streak + Level */}
         <section className="mt-6 space-y-3">
-          <h2 className="text-3xl font-semibold">Streak: 20 days</h2>
+          <h2 className="text-3xl font-semibold">Streak: {streakDays} days</h2>
 
           <div className="flex items-center gap-2">
             <span className="text-base text-muted-foreground">Current level:</span>
@@ -141,7 +201,7 @@ export default function DashboardPage() {
               </button>
             </CardHeader>
             <CardContent className="text-base">
-              Fill half your plate with colorful vegetables!
+              {advice}
             </CardContent>
           </Card>
         </section>

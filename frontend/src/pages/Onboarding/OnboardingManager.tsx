@@ -257,6 +257,8 @@ export default function OnboardingManager() {
 
         const selectedTrainerId = Number(data.strTrainer) === 1 ? 1 : 0;
 
+        const trainerPreference = selectedTrainerId === 1;
+
         const payload: OnboardingPayload = {
             preferredName: normalizeString(data.nickname),
             gender: mapGenderToDbValue(data.gender),
@@ -270,7 +272,8 @@ export default function OnboardingManager() {
             preferredSplit: mapPreferredSplitToDbValues(data.preferredSplit),
             gymComfortLevel: mapComfortLevelsToDbValues(data.comfortLevel),
             experienceLevel: toNumberOrNull(data.strExperience),
-            trainerId: selectedTrainerId
+            trainerId: selectedTrainerId,
+            trainer: trainerPreference
         };
 
         try {
@@ -280,12 +283,14 @@ export default function OnboardingManager() {
 
             const trainerId = selectedTrainerId;
             const firstName = normalizeString(data.nickname) ?? "Friend";
+            const analyticsPrimaryGoal = payload.primaryGoal?.[0] ?? undefined;
+            const analyticsExperienceLevel = payload.experienceLevel ?? undefined;
 
             // Track successful onboarding completion
             trackOnboardingComplete({
                 trainerId: trainerId,
-                primaryGoal: payload.primaryGoal,
-                experienceLevel: payload.experienceLevel
+                primaryGoal: analyticsPrimaryGoal,
+                experienceLevel: analyticsExperienceLevel
             });
             trackFormSubmit('onboarding', true);
 

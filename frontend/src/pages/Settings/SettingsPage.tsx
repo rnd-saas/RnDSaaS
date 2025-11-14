@@ -2,7 +2,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import UserSettings from "@/pages/Settings/SettingGroups/UserSettings.tsx";
 import SubscriptionSettings from "@/pages/Settings/SettingGroups/SubscriptionSettings.tsx";
-import avatarPlaceholder from '@/assets/avatar-placeholder.png';
+import tomAvatar from '@/assets/tom_avatar.png';
 import {useLocation} from "react-router-dom";
 import ChatbotButton from "@/components/chatbotButton.tsx";
 import AccountSettings from "@/pages/Settings/SettingGroups/AccountSettings.tsx";
@@ -18,8 +18,8 @@ export default function SettingsPage() {
 
     return (
         <div className="w-[70vw] max-w-[70vw] sm:w-[70vw] md:w-[50vw] lg:w-[30vw] min-h-[75vh] flex flex-col items-center space-y-6">
-        <Avatar className="w-32 h-32">
-                <AvatarImage src={avatarPlaceholder} />
+    <Avatar className="w-32 h-32">
+        <AvatarImage src={tomAvatar} />
                 <AvatarFallback className="text-3xl">Tom Avatar</AvatarFallback>
             </Avatar>
             <h2 className="text-3xl font-semibold tracking-tight">{userName}!</h2>

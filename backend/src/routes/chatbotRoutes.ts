@@ -26,6 +26,7 @@ interface TrainerPersona {
     specialties: string[];
     tone: string;
     voice: string;
+    avatarKey: 'tom' | 'sarah';
 }
 
 const TRAINER_PERSONAS: Record<string, TrainerPersona> = {
@@ -34,14 +35,16 @@ const TRAINER_PERSONAS: Record<string, TrainerPersona> = {
         name: 'Tom',
         specialties: ['strength training', 'progressive overload'],
         tone: 'direct yet friendly',
-        voice: 'Explains the why behind each drill and keeps motivation high.'
+        voice: 'Explains the why behind each drill and keeps motivation high.',
+        avatarKey: 'tom'
     },
     '1': {
         id: 1,
         name: 'Sarah',
         specialties: ['mobility', 'injury-free progression'],
         tone: 'empathetic and energizing',
-        voice: 'Focuses on sustainable pace and celebrates every win.'
+        voice: 'Focuses on sustainable pace and celebrates every win.',
+        avatarKey: 'sarah'
     }
 };
 
@@ -75,6 +78,34 @@ if (geminiModelNormalized) {
 }
 const geminiClient = geminiApiKey ? new GoogleGenerativeAI(geminiApiKey) : null;
 
+router.get('/profile', requireAuth, async (req: AuthedRequest, res) => {
+    try {
+        const userId = req.user?.id;
+        if (!userId) {
+            return res.status(401).json({
+                error: { message: 'Unauthenticated' }
+            });
+        }
+
+        const trainerId = await determineTrainerId(userId);
+        const persona = resolvePersona(trainerId);
+
+        return res.json({
+            trainerId: persona.id,
+            name: persona.name,
+            avatarKey: persona.avatarKey,
+            specialties: persona.specialties,
+            tone: persona.tone,
+            voice: persona.voice
+        });
+    } catch (error: any) {
+        console.error('Failed to fetch chatbot profile:', error?.message || error);
+        return res.status(500).json({
+            error: { message: 'Failed to load chatbot profile' }
+        });
+    }
+});
+
 router.post('/', requireAuth, async (req: AuthedRequest, res) => {
     const parseResult = requestSchema.safeParse(req.body);
 
@@ -94,8 +125,10 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
         });
     }
 
-    const { trainerId = 0, messages, metadata } = parseResult.data;
-    const persona = resolvePersona(trainerId);
+    const resolvedTrainerId = await determineTrainerId(userId);
+    const requestedTrainerId = parseResult.data.trainerId ?? resolvedTrainerId;
+    const { messages, metadata } = parseResult.data;
+    const persona = resolvePersona(requestedTrainerId);
     const normalizedMessages = normalizeMessages(messages);
 
     const onboardingSummary =
@@ -165,6 +198,38 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
 
 function resolvePersona(trainerId: number): TrainerPersona {
     return TRAINER_PERSONAS[String(trainerId)] ?? TRAINER_PERSONAS['0'];
+}
+
+async function determineTrainerId(userId: string): Promise<number> {
+    try {
+        const { data: userInfo, error } = await supabase
+            .from('user_info')
+            .select('trainer')
+            .eq('user_id', userId)
+            .maybeSingle();
+
+        if (!error && userInfo && typeof userInfo.trainer === 'boolean') {
+            return userInfo.trainer ? 1 : 0;
+        }
+    } catch (err) {
+        console.warn('Unable to read trainer from user_info:', err);
+    }
+
+    try {
+        const { data: userSettings, error: settingsError } = await supabase
+            .from('user_settings')
+            .select('trainer')
+            .eq('user_id', userId)
+            .maybeSingle();
+
+        if (!settingsError && userSettings && typeof userSettings.trainer === 'number') {
+            return userSettings.trainer === 1 ? 1 : 0;
+        }
+    } catch (err) {
+        console.warn('Unable to read trainer from user_settings:', err);
+    }
+
+    return 0;
 }
 
 function normalizeMessages(

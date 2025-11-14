@@ -59,6 +59,39 @@ export interface OnboardingPayload {
     gymComfortLevel?: string[] | null;
     experienceLevel?: number | null;
     trainerId?: number | null;
+    trainer?: boolean | null;
+}
+
+export interface DashboardStat {
+    current: number;
+    target: number;
+}
+
+export interface DashboardAchievement {
+    id: string;
+    title: string;
+    sub: string;
+    emoji: string;
+}
+
+export interface DashboardData {
+    firstName: string | null;
+    trainer: boolean | null;
+    goal: {
+        workoutsCompleted: DashboardStat;
+        exercisesDiscovered: DashboardStat;
+        longestStreak: DashboardStat;
+    };
+    level: {
+        label: string;
+        currentXp: number;
+        nextLevelXp: number;
+    };
+    achievements: DashboardAchievement[];
+    mood: string;
+    nextWorkout: string;
+    streakDays: number;
+    advice: string;
 }
 
 // API error
@@ -109,5 +142,14 @@ export interface ChatbotResponse {
         total_tokens?: number | null;
     } | null;
     fallback: boolean;
+}
+
+export interface ChatbotTrainerProfile {
+    trainerId: number;
+    name: string;
+    avatarKey: 'tom' | 'sarah';
+    specialties: string[];
+    tone: string;
+    voice: string;
 }
 

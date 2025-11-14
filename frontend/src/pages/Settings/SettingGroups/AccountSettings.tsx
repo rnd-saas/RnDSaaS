@@ -1,11 +1,81 @@
 ﻿import {Button} from "@/components/ui/button.tsx";
+import {logout as logoutService} from "@/lib/api/authService";
+import {clearUserId} from "@/lib/analytics";
+import {useCallback, useState} from "react";
+import {useNavigate} from "react-router-dom";
+
+const LOCAL_STORAGE_KEYS_TO_CLEAR = ["trainerId", "firstName"];
+
+const clearAllCookies = () => {
+    if (typeof document === "undefined") return;
+    document.cookie.split(";").forEach((cookie) => {
+        const [name] = cookie.split("=");
+        if (!name) return;
+        document.cookie = `${name.trim()}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+    });
+};
 
 export default function AccountSettings() {
+    const navigate = useNavigate();
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const [logoutError, setLogoutError] = useState<string | null>(null);
+
+    const clearClientState = useCallback(() => {
+        if (typeof window !== "undefined") {
+            LOCAL_STORAGE_KEYS_TO_CLEAR.forEach((key) => {
+                try {
+                    window.localStorage.removeItem(key);
+                } catch (_) {
+                    // ignore storage failures
+                }
+            });
+
+            try {
+                window.sessionStorage.clear();
+            } catch (_) {
+                // ignore session storage failures
+            }
+        }
+
+        clearAllCookies();
+        try {
+            clearUserId();
+        } catch (_) {
+            // ignore analytics failures
+        }
+    }, []);
+
+    const handleLogout = useCallback(async () => {
+        if (isLoggingOut) return;
+        setIsLoggingOut(true);
+        setLogoutError(null);
+        try {
+            await logoutService();
+        } catch (error: any) {
+            setLogoutError(error?.message || "Failed to log out. Please try again.");
+        } finally {
+            clearClientState();
+            setIsLoggingOut(false);
+            navigate("/", { replace: true });
+        }
+    }, [clearClientState, isLoggingOut, navigate]);
+
     return (
         <div className="space-y-6 w-full max-w-xl">
             {/* Logout */}
-            <div className="flex items-center justify-between w-full">
-                <Button id="logout" className="mr-4 whitespace-nowrap" variant={"link"}>Logout</Button>
+            <div className="flex flex-col gap-2 w-full">
+                {logoutError && (
+                    <p className="text-sm text-red-500">{logoutError}</p>
+                )}
+                <Button
+                    id="logout"
+                    className="mr-4 w-fit"
+                    variant={"link"}
+                    disabled={isLoggingOut}
+                    onClick={handleLogout}
+                >
+                    {isLoggingOut ? "Logging out..." : "Logout"}
+                </Button>
             </div>
             {/* Delete account */}
             <div className="flex items-center justify-between w-full">
