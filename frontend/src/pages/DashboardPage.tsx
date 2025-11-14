@@ -4,6 +4,7 @@ import {useLocation, useNavigate} from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import Achievement from "@/components/achievement.tsx";
 
 const ADVICE_TIPS: string[] = [
   "Fill half your plate with colorful vegetables.",
@@ -226,18 +227,6 @@ function GoalRow({ label, value, target }: { label: string; value: number; targe
       </div>
       <Progress value={pct} className="h-2 rounded-full" />
     </div>
-  );
-}
-
-function Achievement({ title, sub, emoji }: { title: string; sub: string; emoji: string }) {
-  return (
-    <Card className="min-w-[120px] justify-between bg-emerald-200/30 p-0 shadow-none">
-      <CardContent className="flex flex-col items-center justify-center gap-2 py-4">
-        <div className="text-4xl">{emoji}</div>
-        <div className="text-center text-sm font-medium leading-tight">{title}</div>
-        <div className="text-center text-xs text-muted-foreground -mt-1">{sub}</div>
-      </CardContent>
-    </Card>
   );
 }
 
