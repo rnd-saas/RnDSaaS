@@ -8,6 +8,7 @@ import SettingsPage from "@/pages/Settings/SettingsPage.tsx";
 import LandingPage from "@/pages/LandingPage";
 import ChatbotPage from "@/pages/Chatbot/ChatbotPage.tsx";
 import AppLayout from "@/routes/AppLayout";
+import ProfilePage from "@/pages/Profile/ProfilePage.tsx";
 
 
 export default function AppRoutes() {
@@ -27,7 +28,7 @@ export default function AppRoutes() {
                     {/* Uncomment when ready */}
                     {/* <Route path="/workout" element={<WorkoutPage />} /> */}
                     {/* <Route path="/social" element={<SocialPage />} /> */}
-                    {/* <Route path="/profile" element={<ProfilePage />} /> */}
+                     <Route path="/profile" element={<ProfilePage />} />
                 </Route>
             </Routes>
         </BrowserRouter>
