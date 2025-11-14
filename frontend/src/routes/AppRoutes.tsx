@@ -11,6 +11,7 @@ import AppLayout from "@/routes/AppLayout";
 import RestTimer from "@/pages/Workout/RestTimer";
 import WorkoutTimer from "@/pages/Workout/WorkoutTimer";
 import ProfilePage from "@/pages/Profile/ProfilePage.tsx";
+import CalendarPage from "@/pages/CalendarPage.tsx";
 
 
 export default function AppRoutes() {
@@ -25,6 +26,7 @@ export default function AppRoutes() {
                 <Route path="/chatbot" element={<ChatbotPage />} />
                 <Route path="/workout/rest" element={<RestTimer />} />
                 <Route path="/workout/exercise" element={<WorkoutTimer />} />
+                <Route path="/calendar" element={<CalendarPage />} />
                 {/* App layout with persistent bottom nav */}
                 <Route element={<AppLayout />}>
                     <Route path="/dashboard" element={<DashboardPage />} />
