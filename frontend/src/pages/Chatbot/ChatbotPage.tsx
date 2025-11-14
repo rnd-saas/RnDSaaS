@@ -76,7 +76,7 @@ export default function ChatbotPage() {
                         <div className="flex flex-col gap-0.5">
                             <h2>{trainer === 0 ? "Tom" : "Sarah"}</h2>
                             <div className="flex items-center gap-1">
-                                <div className="h-2 w-2 rounded bg-[var(--intuitive-names-app-primary)]"/>
+                                <div className="h-2 w-2 rounded bg-[var(--color-primary)]"/>
                                 <p> Always active</p>
                             </div>
                         </div>
@@ -102,7 +102,7 @@ export default function ChatbotPage() {
                             return (
                                 <div key={index} className="flex items-start gap-2">
                                     <AvatarIcon icon={avatarPlaceholder}/>
-                                    <div className="flex items-start gap-2.5 p-4 rounded-[0px_24px_24px_24px] max-w-[calc(100%-56px)] text-[var(--intuitive-names-grey-text)] bg-[var(--intuitive-names-grey-background)]">
+                                    <div className="flex items-start gap-2.5 p-4 rounded-[0px_24px_24px_24px] max-w-[calc(100%-56px)] text-[var(--color-grey-text)] bg-[var(--color-grey-background)]">
                                         <p>{message.content}</p>
                                     </div>
                                 </div>
@@ -111,7 +111,7 @@ export default function ChatbotPage() {
                         if (message.type === "user") {
                             return (
                                 <div key={index} className="flex justify-end">
-                                    <div className="inline-flex items-start gap-1 px-4 py-2.5 rounded-3xl max-w-[calc(100%-48px)] text-[var(--intuitive-names-app-background)] bg-[var(--intuitive-names-app-primary)]">
+                                    <div className="inline-flex items-start gap-1 px-4 py-2.5 rounded-3xl max-w-[calc(100%-48px)] text-[var(--color-background)] bg-[var(--color-primary)]">
                                         <p>{message.content}</p>
                                     </div>
                                 </div>

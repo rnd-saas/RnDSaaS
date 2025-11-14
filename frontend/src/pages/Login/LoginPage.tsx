@@ -30,7 +30,7 @@ function Login() {
 
             <form
                 // todo: standardise rounding and shadow
-                className="Login max-w-sm bg-[var(--intuitive-names-app-background)] p-6 rounded-lg shadow-md space-y-4"
+                className="Login max-w-sm bg-[var(--color-background)] p-6 rounded-lg shadow-md space-y-4"
                 onSubmit={handleSubmit(onSubmit)}
             >
                 <div className="flex flex-col">
@@ -58,7 +58,7 @@ function Login() {
                         <span className="text-red-500 text-sm mt-1">*Password is mandatory</span>
                     )}
                     {/*will need to implement properly with backend*/}
-                    <Link to={'/'} style={{ fontSize: "14px", display: "block", textAlign: "left", color: "var(--intuitive-names-secondary-text)" }}>Forgot password?</Link>
+                    <Link to={'/'} style={{ fontSize: "14px", display: "block", textAlign: "left", color: "var(--color-link)" }}>Forgot password?</Link>
                 </div>
                 <Button variant={"default"} type="submit">Login</Button>
             </form>

@@ -5,7 +5,7 @@ import {useNavigate} from "react-router-dom";
 export default function ChatbotButton({ variant = "primary", ...props }) {
     const colorStyle =
         variant === "primary"
-            ? {color: "var(--intuitive-names-app-background)" }
+            ? {color: "var(--color-background)" }
             : {color: "black" };
     const navigate = useNavigate();
     return (
