@@ -3,6 +3,7 @@ import {Button} from "@/components/ui/button.tsx";
 import {Link, useNavigate} from "react-router-dom";
 import { useState } from "react";
 import { authService, ApiError } from "@/lib/api";
+import { trackLogin, trackFormSubmit, trackError } from "@/lib/analytics";
 
 type Inputs = {
     email: string
@@ -28,14 +29,22 @@ function Login() {
                 password: data.password
             });
             
+            // Track successful login
+            trackLogin('email');
+            trackFormSubmit('login', true);
+            
             alert(data.email + " You Are Successfully Logged In");
             // Add navigation logic here, e.g., navigate to home page
             navigate("/dashboard");
         } catch (err) {
+            trackFormSubmit('login', false);
             if (err instanceof ApiError) {
                 setError(err.message);
+                trackError(err.message, 'LoginPage');
             } else {
-                setError("Email or Password is not matching with our record");
+                const errorMsg = "Email or Password is not matching with our record";
+                setError(errorMsg);
+                trackError(errorMsg, 'LoginPage');
             }
         } finally {
             setIsLoading(false);
