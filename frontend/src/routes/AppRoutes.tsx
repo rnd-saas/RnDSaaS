@@ -20,6 +20,11 @@ function PageViewTracker() {
 
     return null;
 }
+import AppLayout from "@/routes/AppLayout";
+import RestTimer from "@/pages/Workout/RestTimer";
+import WorkoutTimer from "@/pages/Workout/WorkoutTimer";
+import ProfilePage from "@/pages/Profile/ProfilePage.tsx";
+
 
 export default function AppRoutes() {
     return (
@@ -30,10 +35,19 @@ export default function AppRoutes() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/onboarding" element={<OnboardingManager/>}/>
-                <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/landing" element={<LandingPage />} />
                 <Route path="/chatbot" element={<ChatbotPage />} />
+                <Route path="/workout/rest" element={<RestTimer />} />
+                <Route path="/workout/exercise" element={<WorkoutTimer />} />
+                {/* App layout with persistent bottom nav */}
+                <Route element={<AppLayout />}>
+                    <Route path="/dashboard" element={<DashboardPage />} />
+                    <Route path="/settings" element={<SettingsPage />} />
+                    {/* Uncomment when ready */}
+                    {/* <Route path="/workout" element={<WorkoutPage />} /> */}
+                    {/* <Route path="/social" element={<SocialPage />} /> */}
+                     <Route path="/profile" element={<ProfilePage />} />
+                </Route>
             </Routes>
         </BrowserRouter>
     );

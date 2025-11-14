@@ -22,8 +22,8 @@ export default function SettingsPage() {
         <AvatarImage src={tomAvatar} />
                 <AvatarFallback className="text-3xl">Tom Avatar</AvatarFallback>
             </Avatar>
-            <h2 className="text-3xl font-semibold tracking-tight">{userName}!</h2>
-            <Accordion type="single" collapsible className="w-full">
+            <h2 className="text-3xl font-semibold tracking-tight">{userName}</h2>
+            <Accordion type="single" collapsible className="min-h-[75vh] w-[75vw] md:w-[50vw] lg:w-[30vw]">
                 {settingsComponents.map((g) => (
                     <AccordionItem value={g.value}>
                         <AccordionTrigger>{g.label}</AccordionTrigger>

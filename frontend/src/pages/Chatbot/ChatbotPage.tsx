@@ -209,7 +209,7 @@ export default function ChatbotPage() {
                         <div className="flex flex-col gap-0.5">
                             <h2>{trainerName}</h2>
                             <div className="flex items-center gap-1">
-                                <div className="h-2 w-2 rounded bg-[var(--intuitive-names-app-primary)]"/>
+                                <div className="h-2 w-2 rounded bg-[var(--color-primary)]"/>
                                 <p> Always active</p>
                             </div>
                         </div>

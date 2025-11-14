@@ -58,7 +58,7 @@ function Login() {
 
             <form
                 // todo: standardise rounding and shadow
-                className="Login max-w-sm bg-[var(--intuitive-names-app-background)] p-6 rounded-lg shadow-md space-y-4"
+                className="Login max-w-sm bg-[var(--color-background)] p-6 rounded-lg shadow-md space-y-4"
                 onSubmit={handleSubmit(onSubmit)}
             >
                 <div className="flex flex-col">

@@ -76,21 +76,20 @@
   --h3-font-weight: 700;
   --h3-letter-spacing: 0px;
   --h3-line-height: normal;
-  --intuitive-names-app-background: var(--basic-colours-green-50);
-  --intuitive-names-app-primary: var(--basic-colours-green-500);
-  --intuitive-names-app-secondary: var(--basic-colours-yellow-300);
-  --intuitive-names-primary-disabled: var(--basic-colours-green-100);
-  --intuitive-names-primary-hover: var(--basic-colours-green-300);
-  --intuitive-names-primary-pressed: var(--basic-colours-green-700);
-  --intuitive-names-secondary-disabled: var(--basic-colours-yellow-100);
-  --intuitive-names-secondary-hover: var(--basic-colours-yellow-200);
-  --intuitive-names-secondary-pressed: var(--basic-colours-yellow-600);
-  --intuitive-names-link: var(--basic-colours-yellow-700);
-  --intuitive-names-error-message: var(--basic-colours-yellow-800);
-  --intuitive-names-secondary-text: var(--basic-colours-yellow-950);
-  --intuitive-names-grey-background: var(--basic-colours-zinc-100);
-  --intuitive-names-grey-text: var(--basic-colours-zinc-700);
-  --intuitive-names-text: var(--basic-colours-green-950);
+  --color-background: var(--basic-colours-green-50);
+  --color-primary: var(--basic-colours-green-500);
+  --color-secondary: var(--basic-colours-yellow-300);
+  --color-primary-disabled: var(--basic-colours-green-100);
+  --color-primary-hover: var(--basic-colours-green-300);
+  --color-primary-pressed: var(--basic-colours-green-700);
+  --color-secondary-disabled: var(--basic-colours-yellow-100);
+  --color-secondary-hover: var(--basic-colours-yellow-200);
+  --color-secondary-pressed: var(--basic-colours-yellow-600);
+  --color-link: var(--basic-colours-yellow-700);
+  --color-error-message: var(--basic-colours-yellow-800);
+  --color-grey-background: var(--basic-colours-zinc-100);
+  --color-grey-text: var(--basic-colours-zinc-700);
+  --color-text: var(--basic-colours-green-950);
   --shawdow-card: 0px 4px 9.899999618530273px 0px rgba(228, 228, 231, 1);
   --typography-size-2xl: 32px;
   --typography-size-base: 14px;
@@ -109,7 +108,7 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: var(--intuitive-names-app-background);
+  background-color: var(--color-background);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;

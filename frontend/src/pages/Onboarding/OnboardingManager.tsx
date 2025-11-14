@@ -322,7 +322,7 @@ export default function OnboardingManager() {
                     </div>
                     <div className={"p-4"}>
                         {getStepErrors(formStep).map((error, i) => (
-                            <p key={i} className="text-[var(--intuitive-names-error-message)]">
+                            <p key={i} className="text-[var(--color-error-message)]">
                                 {error?.message}
                             </p>
                         ))}

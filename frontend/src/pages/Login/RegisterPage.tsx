@@ -72,12 +72,10 @@ function Register() {
 
     return (
         <>
-            {/*todo: standardise fonts*/}
             <h2 style={{ fontFamily: "var(--title-font-font-family)" }}>Registration Form</h2>
 
             <form
-                // todo: standardise rounding and shadow
-                className="Register max-w-sm bg-[var(--intuitive-names-app-background)] p-6 rounded-lg shadow-md space-y-4"
+                className="Register max-w-sm bg-[var(--color-background)] p-6 rounded-lg shadow-md space-y-4"
                 onSubmit={handleSubmit(onSubmit)}
             >
                 <div className="flex flex-col">
@@ -147,7 +145,7 @@ function Register() {
                 </Button>
             </form>
             <div className={'p-6'}>
-                <Link to={'/login'} style={{color: "var(--intuitive-names-secondary-text)"}}>Already an existing
+                <Link to={'/login'} style={{color: "var(--color-link)"}}>Already an existing
                     user?</Link>
             </div>
         </>
