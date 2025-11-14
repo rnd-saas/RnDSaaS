@@ -3,7 +3,6 @@ import {useLocation, useNavigate} from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
 import { dashboardService } from "@/lib/api";
 import type { DashboardData } from "@/lib/api/types";
 import Achievement from "@/components/achievement";
