@@ -152,11 +152,11 @@ export default function OnboardingManager() {
     const [submitError, setSubmitError] = useState<string | null>(null);
     const { isSubmitting } = methods.formState;
 
+    //defining all quiz steps
     type Step = {
         component: ComponentType;
         fields: (keyof Inputs)[];
     };
-
     const stepComponents: Step[] = [
         {
             component: Step0Welcome,
@@ -207,17 +207,16 @@ export default function OnboardingManager() {
             fields: ["comfortLevel"]
         },
     ];
-
     const totalSteps=stepComponents.length-1;
     const CurrentStep = stepComponents[formStep].component;
 
+    //button logic
     const next = async () => {
         const { fields } = stepComponents[formStep];
         const valid = await methods.trigger(fields);
         if (!valid) return;
         setStep((s) => s + 1);
     };
-
     const back = () => {
         setStep((s) => s - 1);
     };

@@ -6,10 +6,6 @@ import sarahImage from '@/assets/onboarding_welcome/onboarding-sarah.png';
 import {Controller, useFormContext} from "react-hook-form";
 import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
 
-declare module '*.png' {
-    const value: string;
-}
-
 export default function Step0Welcome() {
     const { control, trigger } = useFormContext<Inputs>();
     return (
