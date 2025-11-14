@@ -4,11 +4,14 @@ import UserSettings from "@/pages/Settings/SettingGroups/UserSettings.tsx";
 import SubscriptionSettings from "@/pages/Settings/SettingGroups/SubscriptionSettings.tsx";
 import avatarPlaceholder from '@/assets/avatar-placeholder.png';
 import {useLocation} from "react-router-dom";
+import ChatbotButton from "@/components/chatbotButton.tsx";
+import AccountSettings from "@/pages/Settings/SettingGroups/AccountSettings.tsx";
 
 export default function SettingsPage() {
     const settingsComponents = [
         { value:"user", component: UserSettings, label: "User Settings" },
         { value:"subscription", component: SubscriptionSettings, label:"Subscription settings" },
+        { value:"account", component: AccountSettings, label:"Account settings" },
     ];
     const { state } = useLocation() as { state?: { firstName?: string } };
     const userName = state?.firstName ?? localStorage.getItem("firstName") ?? "User";
@@ -30,6 +33,7 @@ export default function SettingsPage() {
                     </AccordionItem>
                 ))}
             </Accordion>
+            <ChatbotButton variant={"primary"}/>
         </div>
     )
 }

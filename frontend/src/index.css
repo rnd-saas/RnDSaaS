@@ -1,3 +1,6 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
 :root {
   /*colour definitions*/
   --basic-colours-green-100: rgba(218, 237, 231, 1);
@@ -82,8 +85,11 @@
   --intuitive-names-secondary-disabled: var(--basic-colours-yellow-100);
   --intuitive-names-secondary-hover: var(--basic-colours-yellow-200);
   --intuitive-names-secondary-pressed: var(--basic-colours-yellow-600);
+  --intuitive-names-link: var(--basic-colours-yellow-700);
   --intuitive-names-error-message: var(--basic-colours-yellow-800);
   --intuitive-names-secondary-text: var(--basic-colours-yellow-950);
+  --intuitive-names-grey-background: var(--basic-colours-zinc-100);
+  --intuitive-names-grey-text: var(--basic-colours-zinc-700);
   --intuitive-names-text: var(--basic-colours-green-950);
   --shawdow-card: 0px 4px 9.899999618530273px 0px rgba(228, 228, 231, 1);
   --typography-size-2xl: 32px;
@@ -164,42 +170,6 @@ h1 {
   font-size: 3.2em;
   line-height: 1.1;
 }
-
-/*button {*/
-/*  border-radius: 8px;*/
-/*  border: 1px solid transparent;*/
-/*  padding: 0.6em 1.2em;*/
-/*  font-size: 1em;*/
-/*  font-weight: 500;*/
-/*  font-family: inherit;*/
-/*  background-color: #1a1a1a;*/
-/*  cursor: pointer;*/
-/*  transition: border-color 0.25s;*/
-/*}*/
-/*button:hover {*/
-/*  border-color: #646cff;*/
-/*}*/
-/*button:focus,*/
-/*button:focus-visible {*/
-/*  outline: 4px auto -webkit-focus-ring-color;*/
-/*}*/
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-}
-
-@import "tailwindcss";
-
-@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 

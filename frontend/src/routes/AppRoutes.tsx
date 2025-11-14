@@ -7,6 +7,7 @@ import OnboardingManager from "@/pages/Onboarding/OnboardingManager.tsx";
 import DashboardPage from "@/pages/DashboardPage";
 import SettingsPage from "@/pages/Settings/SettingsPage.tsx";
 import LandingPage from "@/pages/LandingPage";
+import ChatbotPage from "@/pages/Chatbot/ChatbotPage.tsx";
 import { trackPageView } from "@/lib/analytics";
 
 // Component to track page views on route changes
@@ -32,6 +33,7 @@ export default function AppRoutes() {
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/landing" element={<LandingPage />} />
+                <Route path="/chatbot" element={<ChatbotPage />} />
             </Routes>
         </BrowserRouter>
     );
