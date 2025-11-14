@@ -1,6 +1,7 @@
 ﻿import {Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet} from "@/components/ui/field.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
-import {PreferredSplit} from "@/utils/InputTypes.tsx";
+import {PreferredSplitValues} from "@/utils/InputTypes.tsx";
+import type {PreferredSplit} from "@/utils/InputTypes.tsx";
 import {Controller, useFormContext} from "react-hook-form";
 import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
 
@@ -8,11 +9,11 @@ import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
 export default function Step10WorkoutType() {
     const { control } = useFormContext<Inputs>();
     const splitOptions: { value: PreferredSplit; label: string }[]  = [
-        { value: PreferredSplit.DontKnow, label: "Suggest something for me" },
-        { value: PreferredSplit.FullBody, label: "Full body" },
-        { value: PreferredSplit.UpperLower, label: "Upper-lower body" },
-        { value: PreferredSplit.PushPullLegs, label: "Push-pull-Legs" },
-        { value: PreferredSplit.Other, label: "Other" },
+        { value: PreferredSplitValues.DontKnow, label: "Suggest something for me" },
+        { value: PreferredSplitValues.FullBody, label: "Full body" },
+        { value: PreferredSplitValues.UpperLower, label: "Upper-lower body" },
+        { value: PreferredSplitValues.PushPullLegs, label: "Push-pull-Legs" },
+        { value: PreferredSplitValues.Other, label: "Other" },
     ];
     return (
         <FieldGroup>

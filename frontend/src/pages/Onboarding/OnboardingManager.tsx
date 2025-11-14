@@ -16,7 +16,7 @@ import Step3Gender from "@/pages/Onboarding/steps/Step3Gender.tsx";
 import Step2Data from "@/pages/Onboarding/steps/Step2Data.tsx";
 import Step4PrimaryGoal from "./steps/Step4PrimaryGoal.tsx";
 import type {PrimaryGoal} from "@/utils/InputTypes.tsx";
-import {Gender, GymComfortLevel, PreferredSplit} from "@/utils/InputTypes.tsx";
+import type {Gender, GymComfortLevel, PreferredSplit} from "@/utils/InputTypes.tsx";
 import Step1Nickname from "@/pages/Onboarding/steps/Step1Nickname.tsx";
 import { onboardingService } from "@/lib/api";
 import type { OnboardingPayload } from "@/lib/api";
@@ -231,6 +231,8 @@ export default function OnboardingManager() {
     const onSubmit = async (data: Inputs) => {
         setSubmitError(null);
 
+        const selectedTrainerId = Number(data.strTrainer) === 1 ? 1 : 0;
+
         const payload: OnboardingPayload = {
             preferredName: normalizeString(data.nickname),
             gender: mapGenderToDbValue(data.gender),
@@ -243,7 +245,8 @@ export default function OnboardingManager() {
             problemAreas: data.problemAreas?.length ? data.problemAreas : null,
             preferredSplit: mapPreferredSplitToDbValues(data.preferredSplit),
             gymComfortLevel: mapComfortLevelsToDbValues(data.comfortLevel),
-            experienceLevel: toNumberOrNull(data.strExperience)
+            experienceLevel: toNumberOrNull(data.strExperience),
+            trainerId: selectedTrainerId
         };
 
         try {
@@ -251,7 +254,7 @@ export default function OnboardingManager() {
             await onboardingService.saveResponses(payload);
             console.log("Onboarding payload saved");
 
-            const trainerId = Number(data.strTrainer);
+            const trainerId = selectedTrainerId;
             const firstName = normalizeString(data.nickname) ?? "Friend";
 
             try {

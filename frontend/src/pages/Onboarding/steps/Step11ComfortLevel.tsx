@@ -1,6 +1,7 @@
 ﻿import {Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet} from "@/components/ui/field.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
-import {GymComfortLevel} from "@/utils/InputTypes.tsx";
+import {GymComfortLevelValues} from "@/utils/InputTypes.tsx";
+import type {GymComfortLevel} from "@/utils/InputTypes.tsx";
 import {Controller, useFormContext} from "react-hook-form";
 import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
 
@@ -8,11 +9,11 @@ import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
 export default function Step11ComfortLevel() {
     const { control } = useFormContext<Inputs>();
     const comfortOptions: { value: GymComfortLevel; label: string }[]  = [
-        { value: GymComfortLevel.Anxious, label: "I feel anxious and insecure" },
-        { value: GymComfortLevel.Nervous, label: "I feel nervous" },
-        { value: GymComfortLevel.Fine, label: "I feel fine most of the time" },
-        { value: GymComfortLevel.Comfortable, label: "I’m comfortable" },
-        { value: GymComfortLevel.NeverBeen, label: "I have never been" },
+        { value: GymComfortLevelValues.Anxious, label: "I feel anxious and insecure" },
+        { value: GymComfortLevelValues.Nervous, label: "I feel nervous" },
+        { value: GymComfortLevelValues.Fine, label: "I feel fine most of the time" },
+        { value: GymComfortLevelValues.Comfortable, label: "I’m comfortable" },
+        { value: GymComfortLevelValues.NeverBeen, label: "I have never been" },
     ];
     return (
         <FieldGroup>

@@ -58,6 +58,7 @@ export interface OnboardingPayload {
     preferredSplit?: string[] | null;
     gymComfortLevel?: string[] | null;
     experienceLevel?: number | null;
+    trainerId?: number | null;
 }
 
 // API error
@@ -78,5 +79,35 @@ export class ApiError extends Error {
         this.code = code;
         this.details = details;
     }
+}
+
+export type ChatRole = 'user' | 'assistant';
+
+export interface ChatbotMessage {
+    role: ChatRole;
+    content: string;
+}
+
+export interface ChatbotRequest {
+    trainerId?: number;
+    messages: ChatbotMessage[];
+    metadata?: {
+        language?: string;
+        onboardingSummary?: string;
+    };
+}
+
+export interface ChatbotResponse {
+    message: {
+        role: 'assistant';
+        content: string;
+        trainerId: number;
+    };
+    usage?: {
+        prompt_tokens?: number | null;
+        completion_tokens?: number | null;
+        total_tokens?: number | null;
+    } | null;
+    fallback: boolean;
 }
 

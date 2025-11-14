@@ -21,6 +21,7 @@ interface OnboardingPayload {
     preferredSplit?: string[] | null;
     gymComfortLevel?: string[] | null;
     experienceLevel?: number | null;
+    trainerId?: number | null;
 }
 
 const sanitizeRecord = (record: Record<string, unknown>): Record<string, unknown> => {
@@ -73,6 +74,7 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
         }
 
         const payload = req.body as OnboardingPayload;
+        const trainerId = sanitizeTrainerId(payload.trainerId);
 
         const record = sanitizeRecord({
             user_id: userId,
@@ -102,6 +104,14 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
             });
         }
 
+        if (trainerId !== null) {
+            try {
+                await upsertTrainerPreference(userId, trainerId);
+            } catch (trainerError: any) {
+                console.error('Failed to save trainer preference:', trainerError.message || trainerError);
+            }
+        }
+
         return res.status(200).json({ success: true });
     } catch (err: any) {
         console.error('Unexpected error saving onboarding answers:', err);
@@ -110,5 +120,28 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
         });
     }
 });
+
+function sanitizeTrainerId(value: unknown): 0 | 1 | null {
+    if (value === 1 || value === '1') return 1;
+    if (value === 0 || value === '0') return 0;
+    return null;
+}
+
+async function upsertTrainerPreference(userId: string, trainerId: 0 | 1): Promise<void> {
+    const { error } = await supabase
+        .from('user_settings')
+        .upsert(
+            {
+                user_id: userId,
+                trainer: trainerId,
+                updated_at: new Date().toISOString()
+            },
+            { onConflict: 'user_id' }
+        );
+
+    if (error) {
+        throw error;
+    }
+}
 
 export default router;

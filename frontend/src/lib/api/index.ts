@@ -17,3 +17,7 @@ export const userService = userServiceFunctions;
 import * as onboardingServiceFunctions from './onboardingService';
 export const onboardingService = onboardingServiceFunctions;
 
+// Export chatbot service functions
+import * as chatbotServiceFunctions from './chatbotService';
+export const chatbotService = chatbotServiceFunctions;
+

@@ -40,11 +40,13 @@ try {
     const userRoutes = require('./routes/userRoutes').default;
     const debugRoutes = require('./routes/debugRoutes').default;
     const onboardingRoutes = require('./routes/onboardingRoutes').default;
+    const chatbotRoutes = require('./routes/chatbotRoutes').default;
     
     app.use('/api/auth', authRoutes);
     app.use('/api/users', userRoutes);
     app.use('/api/debug', debugRoutes);
     app.use('/api/onboarding', onboardingRoutes);
+    app.use('/api/chatbot', chatbotRoutes);
     
     console.log('✅ API routes loaded');
 } catch (error: any) {
