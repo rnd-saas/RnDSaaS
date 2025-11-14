@@ -155,7 +155,7 @@ a:hover {
 body {
   margin: 0;
   display: flex;
-  place-items: center;
+  /* place-items: center; */
   min-width: 320px;
   min-height: 100vh;
 }
@@ -184,24 +184,16 @@ h1 {
 /*  outline: 4px auto -webkit-focus-ring-color;*/
 /*}*/
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-}
 
 @import "tailwindcss";
 
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+
+@layer utilities {
+  .shadow-card { box-shadow: var(--shawdow-card); }
+}
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
