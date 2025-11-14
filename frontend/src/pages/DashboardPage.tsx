@@ -1,8 +1,63 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { RefreshCcw } from "lucide-react";
 import {useLocation, useNavigate} from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+
+const ADVICE_TIPS: string[] = [
+  "Fill half your plate with colorful vegetables.",
+  "Drink a glass of water first thing in the morning.",
+  "Take a 5-minute stretch break every hour.",
+  "Swap sugary drinks for sparkling water with lemon.",
+  "Aim for at least 7 hours of sleep tonight.",
+  "Take the stairs instead of the elevator when you can.",
+  "Add a source of protein to every meal.",
+  "Go for a 10-minute walk after eating.",
+  "Plan tomorrow’s workout before you go to bed.",
+  "Keep healthy snacks like nuts or fruit within reach.",
+  "Limit screen time 30 minutes before bedtime.",
+  "Practice 5 deep breaths when you feel stressed.",
+  "Set a small, achievable goal for today’s workout.",
+  "Prep one healthy meal in advance for tomorrow.",
+  "Write down one thing you’re grateful for today.",
+  "Include a healthy fat like avocado or olive oil in a meal.",
+  "Do a quick posture check: shoulders back, chin up.",
+  "Replace one processed snack with a whole food option.",
+  "Stand up and move for 2 minutes every 30–60 minutes.",
+  "Schedule your next workout in your calendar.",
+  "Try a new vegetable you haven’t had in a while.",
+  "Keep a reusable water bottle nearby all day.",
+  "Take your time while eating—slow down and enjoy it.",
+  "Add a serving of berries or fruit to your breakfast.",
+  "Do a short mobility routine before your workout.",
+  "Set a consistent bedtime and wake-up time this week.",
+  "Listen to music or a podcast that boosts your mood.",
+  "Stretch your hips and back for a few minutes today.",
+  "Swap white bread for whole grain at your next meal.",
+  "Take a short walk outside and get some fresh air.",
+  "Do a quick body scan and relax any tense muscles.",
+  "Add a side salad to one of your meals today.",
+  "Keep your phone away from the table when you eat.",
+  "Do a 1-minute plank at some point today.",
+  "Prepare a healthy snack before you get very hungry.",
+  "Try to include all three: protein, carbs, and fats in a meal.",
+  "Celebrate a small win from this week’s workouts.",
+  "Do 10 bodyweight squats during your next break.",
+  "Try to eat at least one home-cooked meal today.",
+  "Replace one dessert this week with fruit or yogurt.",
+  "Write down your top 3 priorities for tomorrow.",
+  "Take a few minutes to tidy your workout space.",
+  "Schedule a rest or recovery day on purpose.",
+  "Check in with how your body feels before and after a workout.",
+  "Take a deep breath before responding when stressed.",
+  "Stretch your chest and shoulders to counter sitting.",
+  "Put your next workout clothes out in advance.",
+  "Drink a glass of water with each meal.",
+  "End your day with one positive reflection.",
+  "Remind yourself why you started this journey."
+];
+
 
 /**
  * Pure UI mock: no data fetching yet.
@@ -30,7 +85,7 @@ export default function DashboardPage() {
     exercisesDiscovered: { current: 0, target: 10 },
     longestStreak: { current: 0, target: 7 },
   };
-  const level = { label: "Novice", currentXp: 500, nextLevelXp: 1200 };
+  const level = { label: "Novice", currentXp: 0, nextLevelXp: 1200 };
   const achievements = [
     { id: 1, title: "100 Workouts", sub: "Completed", emoji: "💪" },
     { id: 2, title: "7 Days", sub: "Streak", emoji: "📆" },
@@ -39,6 +94,17 @@ export default function DashboardPage() {
   // ----------------------
 
   const navigate = useNavigate();
+
+   // ---------- advice tip state ----------
+   const [tipIndex, setTipIndex] = useState(
+    () => Math.floor(Math.random() * ADVICE_TIPS.length)
+  );
+   const currentTip = ADVICE_TIPS[tipIndex];
+ 
+   const showNextTip = () => {
+     setTipIndex((prev) => (prev + 1) % ADVICE_TIPS.length);
+   };
+ 
 
 
   return (
@@ -127,23 +193,24 @@ export default function DashboardPage() {
         </section>
 
         {/* Advice */}
-        <section className="mt-6">
-          <Card className="bg-muted/40">
-            <CardHeader className="flex-row items-center justify-between">
-              <CardTitle className="text-lg">Advice</CardTitle>
-              <button
-                aria-label="More"
-                className="rounded-full p-1 text-muted-foreground hover:bg-accent"
-              >
-                •••
-              </button>
-            </CardHeader>
-            <CardContent className="text-base">
-              Fill half your plate with colorful vegetables!
-            </CardContent>
-          </Card>
-        </section>
-      </>
+      <section className="mt-6">
+        <Card className="bg-muted/40 w-full max-w-full">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-lg">Advice</CardTitle>
+            <button
+              aria-label="Next tip"
+              className="rounded-full p-1 text-muted-foreground hover:bg-accent active:rotate-90 "
+              onClick={showNextTip}
+            >
+              <RefreshCcw className="h-4 w-4" />
+            </button>
+          </CardHeader>
+          <CardContent className="text-base break-words whitespace-normal">
+            {currentTip}
+          </CardContent>
+        </Card>
+      </section>
+    </>
   );
 }
 
