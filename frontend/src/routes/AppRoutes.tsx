@@ -10,6 +10,8 @@ import ChatbotPage from "@/pages/Chatbot/ChatbotPage.tsx";
 import AppLayout from "@/routes/AppLayout";
 import RestTimer from "@/pages/Workout/RestTimer";
 import WorkoutTimer from "@/pages/Workout/WorkoutTimer";
+import ProfilePage from "@/pages/Profile/ProfilePage.tsx";
+
 
 export default function AppRoutes() {
     return (
@@ -30,7 +32,7 @@ export default function AppRoutes() {
                     {/* Uncomment when ready */}
                     {/* <Route path="/workout" element={<WorkoutPage />} /> */}
                     {/* <Route path="/social" element={<SocialPage />} /> */}
-                    {/* <Route path="/profile" element={<ProfilePage />} /> */}
+                     <Route path="/profile" element={<ProfilePage />} />
                 </Route>
             </Routes>
         </BrowserRouter>
