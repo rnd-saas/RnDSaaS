@@ -1,6 +1,6 @@
 ﻿import {useForm, FormProvider} from "react-hook-form"
 import { useNavigate } from "react-router-dom";
-import {useState, type ComponentType} from "react";
+import {useState, useEffect, type ComponentType} from "react";
 import FormProgress from "./FormProgress.tsx";
 import StepNavigator from "./StepNavigator.tsx";
 
@@ -20,6 +20,7 @@ import type {Gender, GymComfortLevel, PreferredSplit} from "@/utils/InputTypes.t
 import Step1Nickname from "@/pages/Onboarding/steps/Step1Nickname.tsx";
 import { onboardingService } from "@/lib/api";
 import type { OnboardingPayload } from "@/lib/api";
+import { trackOnboardingStep, trackOnboardingComplete, trackFormSubmit, trackError } from "@/lib/analytics";
 
 const POUNDS_TO_KG = 0.45359237;
 const STONES_TO_KG = 6.35029318;
@@ -210,12 +211,36 @@ export default function OnboardingManager() {
     const totalSteps=stepComponents.length-1;
     const CurrentStep = stepComponents[formStep].component;
 
+    // Step names for tracking
+    const stepNames = [
+        'welcome',
+        'nickname',
+        'data',
+        'gender',
+        'primary_goal',
+        'experience',
+        'days_per_week',
+        'which_days',
+        'session_length',
+        'protected_areas',
+        'workout_type',
+        'comfort_level'
+    ];
+
+    // Track step changes
+    useEffect(() => {
+        if (formStep < stepNames.length) {
+            trackOnboardingStep(formStep, stepNames[formStep]);
+        }
+    }, [formStep]);
+
     //button logic
     const next = async () => {
         const { fields } = stepComponents[formStep];
         const valid = await methods.trigger(fields);
         if (!valid) return;
-        setStep((s) => s + 1);
+        const nextStep = formStep + 1;
+        setStep(nextStep);
     };
     const back = () => {
         setStep((s) => s - 1);
@@ -257,6 +282,14 @@ export default function OnboardingManager() {
             const trainerId = selectedTrainerId;
             const firstName = normalizeString(data.nickname) ?? "Friend";
 
+            // Track successful onboarding completion
+            trackOnboardingComplete({
+                trainerId: trainerId,
+                primaryGoal: payload.primaryGoal,
+                experienceLevel: payload.experienceLevel
+            });
+            trackFormSubmit('onboarding', true);
+
             try {
                 localStorage.setItem("trainerId", String(trainerId));
                 localStorage.setItem("firstName", firstName);
@@ -267,6 +300,8 @@ export default function OnboardingManager() {
             navigate("/landing", { state: { trainerId, firstName } });
         } catch (error: any) {
             console.error("Failed to save onboarding responses", error);
+            trackFormSubmit('onboarding', false);
+            trackError(error?.message ?? "Failed to save onboarding responses", 'OnboardingManager');
             setSubmitError(error?.message ?? "Failed to save your onboarding responses. Please try again.");
         }
     };

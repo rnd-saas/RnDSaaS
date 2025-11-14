@@ -3,6 +3,7 @@ import {Button} from "@/components/ui/button.tsx";
 import {Link, useNavigate} from "react-router-dom";
 import { useState } from "react";
 import { authService, ApiError } from "@/lib/api";
+import { trackRegistration, trackFormSubmit, trackError } from "@/lib/analytics";
 
 type Inputs = {
     email: string
@@ -35,6 +36,10 @@ function Register() {
                 display_name: data.username,
             });
 
+            // Track successful registration
+            trackRegistration('email');
+            trackFormSubmit('register', true);
+
             setSuccess(true);
 
             if (response.needsEmailConfirmation) {
@@ -44,14 +49,19 @@ function Register() {
                 navigate('/onboarding');
             }
         } catch (err) {
+            trackFormSubmit('register', false);
             if (err instanceof ApiError) {
                 if (err.message.includes('already exists') || err.message.includes('already registered')) {
                     setError('Email is already registered!');
+                    trackError('Email already registered', 'RegisterPage');
                 } else {
                     setError(err.message);
+                    trackError(err.message, 'RegisterPage');
                 }
             } else {
-                setError('Registration failed. Please try again.');
+                const errorMsg = 'Registration failed. Please try again.';
+                setError(errorMsg);
+                trackError(errorMsg, 'RegisterPage');
             }
         } finally {
             setIsLoading(false);
