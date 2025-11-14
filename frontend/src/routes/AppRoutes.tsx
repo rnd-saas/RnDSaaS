@@ -11,6 +11,7 @@ import AppLayout from "@/routes/AppLayout";
 import RestTimer from "@/pages/Workout/RestTimer";
 import WorkoutTimer from "@/pages/Workout/WorkoutTimer";
 import ProfilePage from "@/pages/Profile/ProfilePage.tsx";
+import SocialPage from "@/pages/Social/SocialPage.tsx";
 
 
 export default function AppRoutes() {
@@ -31,7 +32,7 @@ export default function AppRoutes() {
                     <Route path="/settings" element={<SettingsPage />} />
                     {/* Uncomment when ready */}
                     {/* <Route path="/workout" element={<WorkoutPage />} /> */}
-                    {/* <Route path="/social" element={<SocialPage />} /> */}
+                    <Route path="/social" element={<SocialPage />} /> 
                      <Route path="/profile" element={<ProfilePage />} />
                 </Route>
             </Routes>
