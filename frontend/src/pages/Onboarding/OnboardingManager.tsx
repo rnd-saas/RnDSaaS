@@ -41,11 +41,11 @@ export default function OnboardingManager() {
     const methods = useForm<Inputs>();
     const navigate = useNavigate();
 
+    //defining all quiz steps
     type Step = {
         component: ComponentType;
         fields: (keyof Inputs)[];
     };
-
     const stepComponents: Step[] = [
         {
             component: Step0Welcome,
@@ -96,10 +96,10 @@ export default function OnboardingManager() {
             fields: ["comfortLevel"]
         },
     ];
-
     const totalSteps=stepComponents.length-1;
     const CurrentStep = stepComponents[formStep].component;
 
+    //button logic
     const next = async () => {
         const stepValues = methods.getValues();
         console.log("Saving step data:", stepValues);
@@ -108,7 +108,6 @@ export default function OnboardingManager() {
         if (!valid) return;
         setStep((s) => s + 1);
     };
-
     const back = () => {
         setStep((s) => s - 1);
     };
@@ -127,17 +126,14 @@ export default function OnboardingManager() {
         const availableDays = {availableDays: data.strAvailableDays.map(Number),};
         const sessionDuration= { sessionDuration: Number(data.strSessionDuration) };
         const trainerId = Number(data.strTrainer); // 0 = Tom, 1 = Sarah
-        const firstName = "Hugo";
+        const firstName = data.nickname;
         console.log("submit clicked", trainer, experience, daysPerWeek, availableDays, sessionDuration);
         alert("onboarding completed");
-
         try {
             localStorage.setItem("trainerId", String(trainerId)); // fallback for refresh/direct visit
             localStorage.setItem("firstName", firstName);
           } catch {}
-        
           navigate("/landing", { state: { trainerId, firstName } });
-
     }
 
     return (
