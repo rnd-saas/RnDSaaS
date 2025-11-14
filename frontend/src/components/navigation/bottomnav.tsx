@@ -9,7 +9,7 @@ type NavItem = {
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { label: "Home", to: "/", icon: "🏠", end: true },
+  { label: "Home", to: "/dashboard", icon: "🏠", end: true },
   { label: "Workout", to: "/workout", icon: "🏋️‍♀️" },
   { label: "Social", to: "/social", icon: "💬" },
   { label: "Profile", to: "/profile", icon: "👤" },
