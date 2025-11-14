@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { dashboardService } from "@/lib/api";
 import type { DashboardData } from "@/lib/api/types";
+import Achievement from "@/components/achievement";
 
 const FALLBACK_DASHBOARD: DashboardData = {
   firstName: null,

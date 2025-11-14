@@ -1,5 +1,5 @@
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar.tsx";
-import avatarPlaceholder from "@/assets/avatar-placeholder.png";
+import avatarPlaceholder from "@/assets/tom_avatar.png";
 import ChatbotButton from "@/components/chatbotButton.tsx";
 import {useLocation, useNavigate} from "react-router-dom";
 import WorkoutDisplay from "@/pages/Profile/ProfileComponents/WorkoutDisplay.tsx";
