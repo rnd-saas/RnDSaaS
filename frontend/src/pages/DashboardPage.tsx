@@ -3,7 +3,6 @@ import {useLocation, useNavigate} from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
 
 /**
  * Pure UI mock: no data fetching yet.
@@ -27,9 +26,9 @@ export default function DashboardPage() {
 
   // ----- Mock data -----
   const goal = {
-    workoutsCompleted: { current: 70, target: 100 },
-    exercisesDiscovered: { current: 30, target: 40 },
-    longestStreak: { current: 30, target: 60 },
+    workoutsCompleted: { current: 0, target: 5 },
+    exercisesDiscovered: { current: 0, target: 10 },
+    longestStreak: { current: 0, target: 7 },
   };
   const level = { label: "Novice", currentXp: 500, nextLevelXp: 1200 };
   const achievements = [
@@ -43,24 +42,23 @@ export default function DashboardPage() {
 
 
   return (
-    <div className="relative min-h-[100dvh] bg-background">
-      <div className="mx-auto w-full max-w-screen-sm px-4 pb-28 pt-6 sm:pb-8">
-        {/* Header */}
-        <header className="flex items-start justify-between">
-          <div>
-            <h1 className="text-3xl font-semibold tracking-tight">Hi, {firstName}!</h1>
-            <p className="text-sm text-muted-foreground">{today}</p>
-          </div>
-          <button
-            aria-label="Settings"
-            className="rounded-full border p-2 text-muted-foreground hover:bg-accent"
-            onClick={() => navigate("/settings")}
-          >
-            ⚙️
-          </button>
-        </header>
+    <>
+      {/* Header */}
+      <header className="flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-semibold tracking-tight">Hi, {firstName}!</h1>
+          <p className="text-sm text-muted-foreground">{today}</p>
+        </div>
+        <button
+          aria-label="Settings"
+          className="rounded-full border p-2 text-muted-foreground hover:bg-accent"
+          onClick={() => navigate("/settings")}
+        >
+          ⚙️
+        </button>
+      </header>
 
-        <Separator className="my-4" />
+      <Separator className="my-4" />
 
         {/* To your goal */}
         <section className="space-y-3">
@@ -145,11 +143,7 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </section>
-      </div>
-
-      {/* Bottom nav (fixed) */}
-      <BottomNav />
-    </div>
+      </>
   );
 }
 
@@ -187,38 +181,5 @@ function Dot({ active = false }: { active?: boolean }) {
         active ? "bg-foreground" : "bg-muted-foreground/40"
       }`}
     />
-  );
-}
-
-function BottomNav() {
-  return (
-    <nav className="fixed inset-x-0 bottom-0 z-20 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="mx-auto flex max-w-screen-sm items-center justify-around px-4 py-2 text-sm">
-        <Tab label="Home" active />
-        <Tab label="Workout" />
-        <Tab label="Social" />
-        <Tab label="Profile" />
-      </div>
-    </nav>
-  );
-}
-
-function Tab({ label, active = false }: { label: string; active?: boolean }) {
-  return (
-    <Button
-      variant={active ? "default" : "ghost"}
-      size="sm"
-      className={`flex h-10 min-w-[70px] flex-col items-center gap-1 rounded-full px-3 ${
-        active ? "" : "text-muted-foreground"
-      }`}
-    >
-      <span className="text-xl leading-none">
-        {label === "Home" && "🏠"}
-        {label === "Workout" && "🏋️‍♀️"}
-        {label === "Social" && "💬"}
-        {label === "Profile" && "👤"}
-      </span>
-      <span className="text-[11px]">{label}</span>
-    </Button>
   );
 }

@@ -7,6 +7,8 @@ import DashboardPage from "@/pages/DashboardPage";
 import SettingsPage from "@/pages/Settings/SettingsPage.tsx";
 import LandingPage from "@/pages/LandingPage";
 import ChatbotPage from "@/pages/Chatbot/ChatbotPage.tsx";
+import AppLayout from "@/routes/AppLayout";
+
 
 export default function AppRoutes() {
     return (
@@ -16,10 +18,17 @@ export default function AppRoutes() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/onboarding" element={<OnboardingManager/>}/>
-                <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/landing" element={<LandingPage />} />
                 <Route path="/chatbot" element={<ChatbotPage />} />
+                {/* App layout with persistent bottom nav */}
+                <Route element={<AppLayout />}>
+                    <Route path="/dashboard" element={<DashboardPage />} />
+                    <Route path="/settings" element={<SettingsPage />} />
+                    {/* Uncomment when ready */}
+                    {/* <Route path="/workout" element={<WorkoutPage />} /> */}
+                    {/* <Route path="/social" element={<SocialPage />} /> */}
+                    {/* <Route path="/profile" element={<ProfilePage />} /> */}
+                </Route>
             </Routes>
         </BrowserRouter>
     );
