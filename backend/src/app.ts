@@ -13,6 +13,28 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Basic request logging to help diagnose hanging requests in deployments
+app.use((req, res, next) => {
+    const start = Date.now();
+    const requestId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    console.log(`➡️  [${requestId}] ${req.method} ${req.originalUrl}`);
+
+    const logResponse = () => {
+        const duration = Date.now() - start;
+        console.log(`⬅️  [${requestId}] ${req.method} ${req.originalUrl} -> ${res.statusCode} (${duration}ms)`);
+    };
+
+    res.on('finish', logResponse);
+    res.on('close', () => {
+        if (!res.writableEnded) {
+            console.warn(`⚠️  [${requestId}] ${req.method} ${req.originalUrl} connection closed before completing.`);
+        }
+        logResponse();
+    });
+
+    next();
+});
+
 // Health check endpoint
 app.get('/', (_req: Request, res: Response) => {
     res.json({ 
