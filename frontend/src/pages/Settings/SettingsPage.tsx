@@ -23,7 +23,7 @@ export default function SettingsPage() {
                 <AvatarFallback className="text-3xl">CN</AvatarFallback>
             </Avatar>
             <h2 className="text-3xl font-semibold tracking-tight">{userName}!</h2>
-            <Accordion type="single" collapsible className="w-full max-w-md min-h-[75vh] min-w-[30vw]">
+            <Accordion type="single" collapsible className="min-h-[75vh] w-[75vw] md:w-[50vw] lg:w-[30vw]">
                 {settingsComponents.map((g) => (
                     <AccordionItem value={g.value}>
                         <AccordionTrigger>{g.label}</AccordionTrigger>
