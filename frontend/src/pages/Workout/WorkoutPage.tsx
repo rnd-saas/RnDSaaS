@@ -10,6 +10,7 @@ export default function WorkoutPage() {
       <ExerciseItem> </ExerciseItem>
       <ExerciseItem> </ExerciseItem>
       <Button variant="default">Complete Workout</Button>
+      <Button size="icon" variant="default"></Button>
     </div>
   );
 }
