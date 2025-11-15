@@ -36,7 +36,7 @@
   --basic-colours-zinc-950: rgba(9, 9, 11, 1);
 
   /*color design tokens*/
-  --color-background: var(--basic-colours-green-50);
+  --color-background: var(--basic-colours-zinc-50);
   --color-primary: var(--basic-colours-green-500);
   --color-secondary: var(--basic-colours-yellow-300);
   --color-primary-disabled: var(--basic-colours-green-300);
