@@ -20,7 +20,7 @@ const workoutData = [
 export default function WorkoutList() {
   return (
     <>
-      <Table className="mb-2 [&_td]:text-sm [&_th]:h3-styles [&_th]:border-b-1 [&_th]:border-zinc-200">
+      <Table className="mb-2 [&_td]:body-styles md:[&_td]:text-lg [&_th]:h3-styles md:[&_th]:text-xl [&_th]:border-b-1 [&_th]:border-zinc-200">
         <TableHeader>
           <TableRow>
             <TableHead className="w-1/3 text-center h3-styles p-3">
@@ -29,7 +29,7 @@ export default function WorkoutList() {
             <TableHead className="w-1/3 text-center h3-styles p-3">
               Reps
             </TableHead>
-            <TableHead className="w-1/3 text-center font-(family-name:--h3-font-family) font-(--h3-font-weight) text-intuitive-names-text text-(length:--h3-font-size) p-3">
+            <TableHead className="w-1/3 text-center h3-styles p-3">
               Kg
             </TableHead>
           </TableRow>
@@ -37,13 +37,13 @@ export default function WorkoutList() {
         <TableBody>
           {workoutData.map((workout) => (
             <TableRow key={workout.set}>
-              <TableCell className="w-1/3 font-body p-3 text-center">
+              <TableCell className="w-1/3 body-styles p-3 text-center!">
                 {workout.set}
               </TableCell>
-              <TableCell className="w-1/3 font-body text-center p-3 ">
+              <TableCell className="w-1/3 body-styles text-center p-3!">
                 {workout.reps}
               </TableCell>
-              <TableCell className="w-1/3 font-body text-center p-3 ">
+              <TableCell className="w-1/3 body-styles text-center p-3!">
                 {workout.kg}
               </TableCell>
             </TableRow>

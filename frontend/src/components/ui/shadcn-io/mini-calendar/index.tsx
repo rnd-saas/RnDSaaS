@@ -114,7 +114,7 @@ export const MiniCalendar = ({
     <MiniCalendarContext.Provider value={contextValue}>
       <div
         className={cn(
-          "flex items-center gap-0 rounded-lg border bg-background md:p-2",
+          "flex items-center gap-0 rounded-lg border bg-background",
           className
         )}
         {...props}
@@ -218,7 +218,7 @@ export const MiniCalendarDay = ({
     >
       <span
         className={cn(
-          "font-medium text-sm text-text/70 md:text-sm lg:text-xs",
+          "font-medium text-sm text-text/70 md:text-md",
           isSelected && "text-primary-foreground/70"
         )}
       >
@@ -226,9 +226,7 @@ export const MiniCalendarDay = ({
           weekday: "short",
         })}
       </span>
-      <span className="font-semibold text-sm md:text-base lg:text-sm">
-        {day}
-      </span>
+      <span className="font-semibold text-lg">{day}</span>
     </Button>
   );
 };

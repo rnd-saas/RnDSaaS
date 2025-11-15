@@ -23,10 +23,10 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-2 hover:underline hover:text-primary-hover active:text-primary-pressed disabled:text-primary-disabled",
       },
       size: {
-        default: "h-[50px] px-5 has-[>svg]:px-3",
+        default: "h-[48px] md:h-[64px] px-5 has-[>svg]:px-3",
         sm: "h-8 gap-1.5 px-3 has-[>svg]:px-2.5",
         lg: "h-10 px-6 has-[>svg]:px-4",
-        icon: "size-[50px]",
+        icon: "size-[48px] md:size-[64px]",
         "icon-sm": "size-8",
         "icon-lg": "size-10",
       },

@@ -11,7 +11,7 @@ export default function ExerciseItem() {
   return (
     <>
       <Card
-        className={`w-4/5 max-w-[420px] p-0 rounded-lg shadow-card shadow border-0 transform-all duration-300 ease-in-out ${
+        className={`w-4/5 max-w-[728px] p-0 rounded-lg shadow-card shadow border-0 transform-all duration-300 ease-in-out ${
           isOpen
             ? "bg-white"
             : "bg-(--basic-colours-green-50) hover:bg-(--basic-colours-green-100) hover:scale-102"
@@ -27,7 +27,7 @@ export default function ExerciseItem() {
               />
 
               <div className="flex items-center gap-[5px]">
-                <h3 className="text-(length:--h3-font-size) font-(--h3-font-weight) text-(--intuitive-names-text) flex-1 min-w-0">
+                <h3 className="h3-styles md:text-xl font-bold flex-1 min-w-0">
                   Bench Press
                 </h3>
 

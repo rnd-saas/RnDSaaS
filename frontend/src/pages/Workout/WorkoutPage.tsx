@@ -19,7 +19,7 @@ export default function WorkoutPage() {
     <div className="w-full min-h-screen flex flex-col bg-(--basic-colours-zinc-50)">
       <div className="flex-1 flex flex-col gap-[30px] items-center">
         <div className="flex flex-col gap-2 items-center mt-4 min-w-[60%]">
-          <h3 className="h3-styles">
+          <h3 className="h3-styles text-base font-bold">
             {selectedDate?.toLocaleDateString("en-US", {
               weekday: "short",
               day: "numeric",
@@ -28,7 +28,7 @@ export default function WorkoutPage() {
             })}
           </h3>
           <MiniCalendar
-            className="border-0 bg-background my-0 md:my-1"
+            className="border-0 bg-background my-0"
             onValueChange={setSelectedDate}
             value={selectedDate}
             defaultStartDate={startOfWeek(selectedDate!, { weekStartsOn: 1 })}
@@ -48,7 +48,7 @@ export default function WorkoutPage() {
             <MiniCalendarNavigation direction="next" className="gap-0" />
           </MiniCalendar>
         </div>
-        <div className="flex flex-col items-center justify-center flex-1 gap-5 w-full">
+        <div className="flex flex-col items-center justify-start flex-1 gap-5 md:gap-[30px] w-full">
           <ExerciseItem> </ExerciseItem>
           <ExerciseItem> </ExerciseItem>
           <ExerciseItem> </ExerciseItem>
@@ -56,9 +56,9 @@ export default function WorkoutPage() {
           <ExerciseItem> </ExerciseItem>
         </div>
       </div>
-      <div className="sticky bottom-0 w-full bg-transparent py-4 flex justify-center">
-        <div className="flex w-4/5 max-w-[420px] gap-4">
-          <Button variant="default" className="flex-1">
+      <div className="sticky bottom-0 w-full bg-background/50 py-4 flex justify-center px-4">
+        <div className="mx-auto w-4/5 flex items-center justify-center gap-4 max-w-[728px]">
+          <Button variant="default" className="flex-1 text-lg ">
             Start Workout
           </Button>
           <Button size="icon" variant="default">
