@@ -40,7 +40,7 @@ export default function ExerciseItem() {
             />
           </div>
           <div
-            className={`mb-4 overflow-hidden w-full pl-4 pr-4 transition-all duration-300 ease-in ${
+            className={`overflow-hidden w-full pl-4 pr-4 transition-all duration-300 ease-in ${
               isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
             }`}
           >
