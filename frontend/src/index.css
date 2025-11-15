@@ -6,6 +6,7 @@
   --basic-colours-green-400: rgba(93, 164, 147, 1);
   --basic-colours-green-50: rgba(244, 249, 247, 1);
   --basic-colours-green-500: rgba(67, 137, 121, 1);
+  --basic-colours-green-50-90: rgba(67, 137, 121, 0.9);
   --basic-colours-green-600: rgba(52, 109, 98, 1);
   --basic-colours-green-700: rgba(49, 97, 88, 1);
   --basic-colours-green-800: rgba(39, 72, 66, 1);
@@ -39,7 +40,7 @@
   --color-primary: var(--basic-colours-green-500);
   --color-secondary: var(--basic-colours-yellow-300);
   --color-primary-disabled: var(--basic-colours-green-300);
-  --color-primary-hover: var(--basic-colours-green-300);
+  --color-primary-hover: rgba(67, 137, 121, 0.9);
   --color-primary-pressed: var(--basic-colours-green-700);
   --color-secondary-disabled: var(--basic-colours-yellow-200);
   --color-secondary-hover: var(--basic-colours-yellow-200);
@@ -273,7 +274,7 @@
   --popover: oklch(0.269 0 0);
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+  --primary-foreground: rgba(250, 250, 250, 1);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);

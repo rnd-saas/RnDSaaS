@@ -1,4 +1,4 @@
-import { Card, CardContent } from "../../../components/card";
+import { Card, CardContent } from "../card";
 import { ChevronDown, HelpCircle } from "lucide-react";
 import React from "react";
 import bench from "@/assets/icons/bench.svg";
@@ -12,7 +12,9 @@ export default function ExerciseItem() {
     <>
       <Card
         className={`w-4/5 max-w-[420px] p-0 rounded-lg shadow-card shadow border-0 transform-all duration-300 ease-in-out ${
-          isOpen ? "bg-white" : "bg-(--basic-colours-green-50)"
+          isOpen
+            ? "bg-white"
+            : "bg-(--basic-colours-green-50) hover:bg-(--basic-colours-green-100) hover:scale-102"
         }`}
         onClick={() => setIsOpen(!isOpen)}
       >

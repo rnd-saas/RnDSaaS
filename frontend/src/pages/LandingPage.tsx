@@ -9,17 +9,22 @@ import sarahImage from "@/assets/onboarding_welcome/onboarding-sarah.png";
 
 export default function LandingPage() {
   const navigate = useNavigate();
-  const { state } = useLocation() as { state?: { trainerId?: number; firstName?: string } };
+  const { state } = useLocation() as {
+    state?: { trainerId?: number; firstName?: string };
+  };
 
   console.log("LandingPage state:", state);
-console.log("LandingPage localStorage.firstName:", localStorage.getItem("firstName"));
+  console.log(
+    "LandingPage localStorage.firstName:",
+    localStorage.getItem("firstName")
+  );
 
   // Prefer router state; fall back to localStorage; default to Tom (0)
   const trainerId =
-        state?.trainerId ??
-        (Number(localStorage.getItem("trainerId")) || 0);
+    state?.trainerId ?? (Number(localStorage.getItem("trainerId")) || 0);
 
-    const firstName = state?.firstName ?? localStorage.getItem("firstName") ?? "Friend";
+  const firstName =
+    state?.firstName ?? localStorage.getItem("firstName") ?? "Friend";
 
   const avatarSrc = trainerId === 1 ? sarahImage : tomImage;
   const name = trainerId === 1 ? "Sarah" : "Tom";
@@ -29,7 +34,9 @@ console.log("LandingPage localStorage.firstName:", localStorage.getItem("firstNa
       {/* Top greeting */}
       <header className="mt-4 text-center">
         <h1 className="text-4xl font-bold tracking-tight">Hi, {firstName} !</h1>
-        <p className="mt-2 text-lg text-muted-foreground">Great to see you back</p>
+        <p className="mt-2 text-lg text-muted-foreground">
+          Great to see you back
+        </p>
       </header>
 
       {/* Avatar */}
@@ -52,7 +59,9 @@ console.log("LandingPage localStorage.firstName:", localStorage.getItem("firstNa
         <button
           type="button"
           className="w-full h-10 text-base text-muted-foreground"
-          onClick={() => navigate("/dashboard",  { state: { firstName, trainerId } })}
+          onClick={() =>
+            navigate("/dashboard", { state: { firstName, trainerId } })
+          }
         >
           Not now, I need a sec
         </button>

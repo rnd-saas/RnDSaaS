@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import {useLocation, useNavigate} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
@@ -41,14 +41,15 @@ export default function DashboardPage() {
 
   const navigate = useNavigate();
 
-
   return (
     <div className="relative min-h-[100dvh] bg-background">
       <div className="mx-auto w-full max-w-screen-sm px-4 pb-28 pt-6 sm:pb-8">
         {/* Header */}
         <header className="flex items-start justify-between">
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight">Hi, {firstName}!</h1>
+            <h1 className="text-3xl font-semibold tracking-tight">
+              Hi, {firstName}!
+            </h1>
             <p className="text-sm text-muted-foreground">{today}</p>
           </div>
           <button
@@ -65,9 +66,21 @@ export default function DashboardPage() {
         {/* To your goal */}
         <section className="space-y-3">
           <h2 className="text-xl font-semibold">To your goal:</h2>
-          <GoalRow label="Workouts completed" value={goal.workoutsCompleted.current} target={goal.workoutsCompleted.target} />
-          <GoalRow label="New exercises discovered" value={goal.exercisesDiscovered.current} target={goal.exercisesDiscovered.target} />
-          <GoalRow label="Longest streak" value={goal.longestStreak.current} target={goal.longestStreak.target} />
+          <GoalRow
+            label="Workouts completed"
+            value={goal.workoutsCompleted.current}
+            target={goal.workoutsCompleted.target}
+          />
+          <GoalRow
+            label="New exercises discovered"
+            value={goal.exercisesDiscovered.current}
+            target={goal.exercisesDiscovered.target}
+          />
+          <GoalRow
+            label="Longest streak"
+            value={goal.longestStreak.current}
+            target={goal.longestStreak.target}
+          />
         </section>
 
         {/* Mood + Next workout */}
@@ -91,14 +104,18 @@ export default function DashboardPage() {
           </Card>
         </section>
 
-        <p className="mt-3 text-[15px] text-amber-600">Need help calming down?</p>
+        <p className="mt-3 text-[15px] text-amber-600">
+          Need help calming down?
+        </p>
 
         {/* Streak + Level */}
         <section className="mt-6 space-y-3">
           <h2 className="text-3xl font-semibold">Streak: 20 days</h2>
 
           <div className="flex items-center gap-2">
-            <span className="text-base text-muted-foreground">Current level:</span>
+            <span className="text-base text-muted-foreground">
+              Current level:
+            </span>
             <span className="text-base font-medium">{level.label}</span>
           </div>
 
@@ -155,12 +172,22 @@ export default function DashboardPage() {
 
 /* ---------- Small bits ---------- */
 
-function GoalRow({ label, value, target }: { label: string; value: number; target: number }) {
+function GoalRow({
+  label,
+  value,
+  target,
+}: {
+  label: string;
+  value: number;
+  target: number;
+}) {
   const pct = Math.max(0, Math.min(100, (value / target) * 100));
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between text-[15px]">
-        <span className="list-item ml-6 list-disc marker:text-foreground/80">{label}:</span>
+        <span className="list-item ml-6 list-disc marker:text-foreground/80">
+          {label}:
+        </span>
         <span className="tabular-nums">{value}</span>
       </div>
       <Progress value={pct} className="h-2 rounded-full" />
@@ -168,13 +195,25 @@ function GoalRow({ label, value, target }: { label: string; value: number; targe
   );
 }
 
-function Achievement({ title, sub, emoji }: { title: string; sub: string; emoji: string }) {
+function Achievement({
+  title,
+  sub,
+  emoji,
+}: {
+  title: string;
+  sub: string;
+  emoji: string;
+}) {
   return (
     <Card className="min-w-[120px] justify-between bg-emerald-200/30 p-0 shadow-none">
       <CardContent className="flex flex-col items-center justify-center gap-2 py-4">
         <div className="text-4xl">{emoji}</div>
-        <div className="text-center text-sm font-medium leading-tight">{title}</div>
-        <div className="text-center text-xs text-muted-foreground -mt-1">{sub}</div>
+        <div className="text-center text-sm font-medium leading-tight">
+          {title}
+        </div>
+        <div className="text-center text-xs text-muted-foreground -mt-1">
+          {sub}
+        </div>
       </CardContent>
     </Card>
   );
