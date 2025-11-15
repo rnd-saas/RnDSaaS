@@ -17,8 +17,8 @@ export default function WorkoutPage() {
 
   return (
     <div className="w-full min-h-screen flex flex-col bg-(--basic-colours-zinc-50)">
-      <div className="flex-1 flex flex-col gap-8 items-center">
-        <div className="flex flex-col gap-2 items-center mt-4">
+      <div className="flex-1 flex flex-col gap-[30px] items-center">
+        <div className="flex flex-col gap-2 items-center mt-4 min-w-[60%]">
           <h3 className="h3-styles">
             {selectedDate?.toLocaleDateString("en-US", {
               weekday: "short",
@@ -28,10 +28,10 @@ export default function WorkoutPage() {
             })}
           </h3>
           <MiniCalendar
-            className="border-0 bg-background my-0"
+            className="border-0 bg-background my-0 md:my-1"
             onValueChange={setSelectedDate}
             value={selectedDate}
-            defaultStartDate={startOfWeek(selectedDate, { weekStartsOn: 1 })}
+            defaultStartDate={startOfWeek(selectedDate!, { weekStartsOn: 1 })}
             days={7}
           >
             {/* note: if you need manage state of startDate too, add the state here! */}
@@ -41,24 +41,25 @@ export default function WorkoutPage() {
                 <MiniCalendarDay
                   date={date}
                   key={date.toISOString()}
-                  className="p-1"
+                  className="p-1 ml-0.5 mr-0.5"
                 />
               )}
             </MiniCalendarDays>
-            <MiniCalendarNavigation direction="next" />
+            <MiniCalendarNavigation direction="next" className="gap-0" />
           </MiniCalendar>
         </div>
-
-        <ExerciseItem> </ExerciseItem>
-        <ExerciseItem> </ExerciseItem>
-        <ExerciseItem> </ExerciseItem>
-        <ExerciseItem> </ExerciseItem>
-        <ExerciseItem> </ExerciseItem>
+        <div className="flex flex-col items-center justify-center flex-1 gap-5 w-full">
+          <ExerciseItem> </ExerciseItem>
+          <ExerciseItem> </ExerciseItem>
+          <ExerciseItem> </ExerciseItem>
+          <ExerciseItem> </ExerciseItem>
+          <ExerciseItem> </ExerciseItem>
+        </div>
       </div>
       <div className="sticky bottom-0 w-full bg-transparent py-4 flex justify-center">
         <div className="flex w-4/5 max-w-[420px] gap-4">
           <Button variant="default" className="flex-1">
-            Complete Workout
+            Start Workout
           </Button>
           <Button size="icon" variant="default">
             <MessageSquareMore size={24} />

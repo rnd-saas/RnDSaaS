@@ -63,7 +63,7 @@ function Register() {
             placeholder="Enter your email"
           />
           {errors.email && (
-            <span className="text-red-500 text-sm mt-1">
+            <span className="text-red-500 text-xs mt-1">
               *Email is mandatory
             </span>
           )}
@@ -80,7 +80,7 @@ function Register() {
             placeholder="Enter your username"
           />
           {errors.email && (
-            <span className="text-red-500 text-sm mt-1">
+            <span className="text-red-500 text-xs mt-1">
               *Username is mandatory
             </span>
           )}
@@ -97,7 +97,7 @@ function Register() {
             placeholder="Enter your password"
           />
           {errors.password && (
-            <span className="text-red-500 text-sm mt-1">
+            <span className="text-red-500 text-xs mt-1">
               *Password is mandatory
             </span>
           )}
@@ -121,7 +121,7 @@ function Register() {
             placeholder="Repeat your password"
           />
           {errors.passwordConfirmation && (
-            <span className="text-red-500 text-sm mt-1">
+            <span className="text-red-500 text-xs mt-1">
               *Passwords should match
             </span>
           )}

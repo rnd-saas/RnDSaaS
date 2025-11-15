@@ -46,7 +46,7 @@ function Login() {
             placeholder="Enter your email"
           />
           {errors.email && (
-            <span className="text-red-500 text-sm mt-1">
+            <span className="text-red-500 text-xs mt-1">
               *Email is mandatory
             </span>
           )}
@@ -63,7 +63,7 @@ function Login() {
             placeholder="Enter your password"
           />
           {errors.password && (
-            <span className="text-red-500 text-sm mt-1">
+            <span className="text-red-500 text-xs mt-1">
               *Password is mandatory
             </span>
           )}

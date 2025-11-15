@@ -20,7 +20,7 @@ const workoutData = [
 export default function WorkoutList() {
   return (
     <>
-      <Table className="mb-2 [&_td]:text-base [&_th]:h3-styles [&_th]:border-b-1 [&_th]:border-zinc-200">
+      <Table className="mb-2 [&_td]:text-sm [&_th]:h3-styles [&_th]:border-b-1 [&_th]:border-zinc-200">
         <TableHeader>
           <TableRow>
             <TableHead className="w-1/3 text-center h3-styles p-3">

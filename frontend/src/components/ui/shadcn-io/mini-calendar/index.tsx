@@ -114,7 +114,7 @@ export const MiniCalendar = ({
     <MiniCalendarContext.Provider value={contextValue}>
       <div
         className={cn(
-          "flex items-center rounded-lg border bg-background",
+          "flex items-center gap-0 rounded-lg border bg-background md:p-2",
           className
         )}
         {...props}
@@ -183,7 +183,7 @@ export const MiniCalendarDays = ({
   const days = getDays(startDate, dayCount);
 
   return (
-    <div className={cn("flex items-center", className)} {...props}>
+    <div className={cn("flex items-center md:gap-1", className)} {...props}>
       {days.map((date) => children(date))}
     </div>
   );
@@ -206,8 +206,8 @@ export const MiniCalendarDay = ({
   return (
     <Button
       className={cn(
-        "h-auto min-w-[2.5rem] flex-col gap-0 p-2 text-xs",
-        isTodayDate && !isSelected && "bg-accent",
+        "h-auto min-w-[2.5rem] md:min-w-[3rem] flex-col gap-0 md:p-2 text-xs",
+        isTodayDate && !isSelected && "bg-primary/10",
         className
       )}
       onClick={() => onDateSelect(date)}
@@ -218,7 +218,7 @@ export const MiniCalendarDay = ({
     >
       <span
         className={cn(
-          "font-medium text-base text-muted-foreground",
+          "font-medium text-sm text-text/70 md:text-sm lg:text-xs",
           isSelected && "text-primary-foreground/70"
         )}
       >
@@ -226,7 +226,9 @@ export const MiniCalendarDay = ({
           weekday: "short",
         })}
       </span>
-      <span className="font-semibold text-base">{day}</span>
+      <span className="font-semibold text-sm md:text-base lg:text-sm">
+        {day}
+      </span>
     </Button>
   );
 };

@@ -75,8 +75,9 @@
   --h3-font-family: var(--font-primary  );
   --h3-font-size: 20px;
   --h3-font-weight: 700;
-  --font-size-small: 12px;
-  --font-size-base: 14px;
+  --font-size-xsmall: 12px;
+  --font-size-small: 14px;
+  --font-size-base: 16px;
   --font-size-large: 20px;
   --font-size-xl: 24px;
   --font-size-2xl: 32px;
@@ -99,7 +100,7 @@
   --primary-foreground: oklch(0.9851 0 0);
   --secondary: oklch(0.8908 0.1571 94.7591);
   --secondary-foreground: oklch(0.2069 0.0098 285.5081);
-  --muted: oklch(0.9778 0.0059 170.4498);
+  --muted: oklch(12.159% 0.01996 169.365);
   --muted-foreground: oklch(0.2069 0.0098 285.5081);
   --accent: oklch(0.5798 0.0755 176.6243);
   --accent-foreground: oklch(0.9851 0 0);
@@ -251,6 +252,7 @@
   --font-h2: var(--h2-font-family);
   --font-h3: var(--h3-font-family);
 
+  --text-xs: var(--font-size-xsmall);
   --text-sm: var(--font-size-small);
   --text-base: var(--font-size-base);
   --text-lg: var(--font-size-large);
@@ -262,9 +264,6 @@
   --font-weight-b: var(--font-weight-bold);
 }
 
-:root {
-
-}
 
 .dark {
   --background: oklch(0.145 0 0);

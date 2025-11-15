@@ -50,7 +50,7 @@ export default function DashboardPage() {
             <h1 className="text-3xl font-semibold tracking-tight">
               Hi, {firstName}!
             </h1>
-            <p className="text-sm text-muted-foreground">{today}</p>
+            <p className="text-xs text-muted-foreground">{today}</p>
           </div>
           <button
             aria-label="Settings"
@@ -113,10 +113,10 @@ export default function DashboardPage() {
           <h2 className="text-3xl font-semibold">Streak: 20 days</h2>
 
           <div className="flex items-center gap-2">
-            <span className="text-base text-muted-foreground">
+            <span className="text-sm text-muted-foreground">
               Current level:
             </span>
-            <span className="text-base font-medium">{level.label}</span>
+            <span className="text-sm font-medium">{level.label}</span>
           </div>
 
           <div className="flex items-center gap-3">
@@ -124,7 +124,7 @@ export default function DashboardPage() {
               value={(level.currentXp / level.nextLevelXp) * 100}
               className="h-4 flex-1 rounded-full"
             />
-            <span className="w-24 text-right text-sm text-muted-foreground">
+            <span className="w-24 text-right text-xs text-muted-foreground">
               {level.currentXp}/{level.nextLevelXp}
             </span>
           </div>
@@ -157,7 +157,7 @@ export default function DashboardPage() {
                 •••
               </button>
             </CardHeader>
-            <CardContent className="text-base">
+            <CardContent className="text-sm">
               Fill half your plate with colorful vegetables!
             </CardContent>
           </Card>
@@ -208,7 +208,7 @@ function Achievement({
     <Card className="min-w-[120px] justify-between bg-emerald-200/30 p-0 shadow-none">
       <CardContent className="flex flex-col items-center justify-center gap-2 py-4">
         <div className="text-4xl">{emoji}</div>
-        <div className="text-center text-sm font-medium leading-tight">
+        <div className="text-center text-xs font-medium leading-tight">
           {title}
         </div>
         <div className="text-center text-xs text-muted-foreground -mt-1">
@@ -232,7 +232,7 @@ function Dot({ active = false }: { active?: boolean }) {
 function BottomNav() {
   return (
     <nav className="fixed inset-x-0 bottom-0 z-20 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="mx-auto flex max-w-screen-sm items-center justify-around px-4 py-2 text-sm">
+      <div className="mx-auto flex max-w-screen-sm items-center justify-around px-4 py-2 text-xs">
         <Tab label="Home" active />
         <Tab label="Workout" />
         <Tab label="Social" />
