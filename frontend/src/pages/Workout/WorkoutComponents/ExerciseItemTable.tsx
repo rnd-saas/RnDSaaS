@@ -19,35 +19,37 @@ const workoutData = [
 
 export default function WorkoutList() {
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="font-h3 font-(--h3-font-weight) text-(length:--h3-font-size) p-3">
-            Set
-          </TableHead>
-          <TableHead className="font-h3 font-(--h3-font-weight) text-(length:--h3-font-size) p-3">
-            Reps
-          </TableHead>
-          <TableHead className="font-h3 font-(--h3-font-weight) text-intuitive-names-text text-(length:--h3-font-size p-3">
-            Kg
-          </TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {workoutData.map((workout) => (
-          <TableRow key={workout.set}>
-            <TableCell className="font-body font-(--body-font-weight) text-(length:--body-font-size) p-3">
-              {workout.set}
-            </TableCell>
-            <TableCell className="font-body font-(--body-font-weight) text-(length:--body-font-size) p-3">
-              {workout.reps}
-            </TableCell>
-            <TableCell className="font-body font-(--body-font-weight) text-(length:--body-font-size) p-3">
-              {workout.kg}
-            </TableCell>
+    <>
+      <Table className="mb-2 [&_td]:text-base [&_th]:h3-styles [&_th]:border-b-1 [&_th]:border-zinc-200">
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-1/3 text-center h3-styles p-3">
+              Set
+            </TableHead>
+            <TableHead className="w-1/3 text-center h3-styles p-3">
+              Reps
+            </TableHead>
+            <TableHead className="w-1/3 text-center font-(family-name:--h3-font-family) font-(--h3-font-weight) text-intuitive-names-text text-(length:--h3-font-size) p-3">
+              Kg
+            </TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {workoutData.map((workout) => (
+            <TableRow key={workout.set}>
+              <TableCell className="w-1/3 font-body p-3 text-center">
+                {workout.set}
+              </TableCell>
+              <TableCell className="w-1/3 font-body text-center p-3 ">
+                {workout.reps}
+              </TableCell>
+              <TableCell className="w-1/3 font-body text-center p-3 ">
+                {workout.kg}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </>
   );
 }

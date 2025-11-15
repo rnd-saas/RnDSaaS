@@ -1,29 +1,23 @@
-import * as React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
+import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive " +
-    "font-[var(--button-font-weight)] text-[var(--button-font-size)] font-[var(--button-font-family)] leading-[var(--button-line-height)] tracking-[var(--button-letter-spacing)]",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md transition-all disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive " +
+    "button-styles",
   {
     variants: {
       variant: {
         default:
-          "bg-[var(--intuitive-names-app-primary)] text-[var(--intuitive-names-app-background)] hover:bg-[var(--intuitive-names-primary-hover)] active:bg-[var(--intuitive-names-primary-pressed)] disabled:bg-[var(--intuitive-names-primary-disabled)]",
-        destructive:
-          "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
-        outline:
-          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
+          "bg-primary text-background hover:bg-primary-hover active:bg-primary-pressed active:ring-4 active:ring-primary/10 transition-shadow duration-100 disabled:bg-primary-disabled disabled:text-background/50",
         secondary:
-            "bg-[var(--intuitive-names-app-secondary)] text-[var(--intuitive-names-secondary-text)] hover:bg-[var(--intuitive-names-secondary-hover)] active:bg-[var(--intuitive-names-secondary-pressed)] disabled:bg-[var(--intuitive-names-secondary-disabled)] disabled:text-[var(--intuitive-names-app-background)]",
-        ghost:
-          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-        link: "text-primary underline-offset-4 hover:underline",
+          "bg-secondary text-text hover:bg-secondary-hover active:bg-secondary-pressed disabled:bg-secondary-disabled disabled:text-text/50 active:ring-4 active:ring-primary/10 transition-shadow duration-100",
+        link: "text-primary underline-offset-2 hover:underline hover:text-primary-hover active:text-primary-pressed disabled:text-primary-disabled",
       },
       size: {
-        default: "h-9 px-4 py-2 has-[>svg]:px-3",
+        default: "h-[50px] px-5 has-[>svg]:px-3",
         sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
         lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
         icon: "size-9",
@@ -36,7 +30,7 @@ const buttonVariants = cva(
       size: "default",
     },
   }
-)
+);
 
 function Button({
   className,
@@ -46,9 +40,9 @@ function Button({
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
-    asChild?: boolean
+    asChild?: boolean;
   }) {
-  const Comp = asChild ? Slot : "button"
+  const Comp = asChild ? Slot : "button";
 
   return (
     <Comp
@@ -56,7 +50,7 @@ function Button({
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     />
-  )
+  );
 }
 
-export { Button, buttonVariants }
+export { Button, buttonVariants };
