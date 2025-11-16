@@ -32,17 +32,32 @@ async function getApp() {
 const createHandler = () => {
     return async (req: VercelRequest, res: VercelResponse) => {
         const startTime = Date.now();
+        const requestId =
+            (req.headers['x-vercel-id'] as string) ||
+            (req.headers['x-request-id'] as string) ||
+            `${Date.now()}-${Math.random().toString(16).slice(2)}`;
         
         try {
             const urlPath = (req.url || '').split('?')[0];
+            console.log('[api:index] request start', {
+                requestId,
+                method: req.method,
+                path: urlPath,
+                region: process.env.VERCEL_REGION,
+                nodeEnv: process.env.NODE_ENV,
+                hasSupabaseUrl: !!process.env.SUPABASE_URL,
+                hasSupabaseKey: !!(process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY)
+            });
 
             if (urlPath === '/favicon.ico') {
+                console.log('[api:index] favicon request bypassed', { requestId });
                 res.status(204).end();
                 return;
             }
 
             if ((req.method === 'GET' || req.method === 'HEAD') &&
                 (urlPath === '/' || urlPath === '/api' || urlPath === '/api/index')) {
+                console.log('[api:index] health request handled directly', { requestId, method: req.method, path: urlPath });
                 const payload = {
                     message: 'Backend is running!',
                     version: '1.0.0',
@@ -57,16 +72,22 @@ const createHandler = () => {
                 return;
             }
 
+            console.log('[api:index] loading express app', { requestId });
             const expressApp = await getApp();
             const handler = serverless(expressApp);
-            
-            const loadTime = Date.now() - startTime;
-            console.log(`Request processed in ${loadTime}ms`);
-            
-            return handler(req, res);
+
+            console.log('[api:index] forwarding to express handler', { requestId });
+            const handlerStart = Date.now();
+            const result = await handler(req, res);
+            console.log('[api:index] handler completed', {
+                requestId,
+                durationMs: Date.now() - handlerStart,
+                totalMs: Date.now() - startTime
+            });
+            return result;
             
         } catch (error) {
-            console.error('Handler error:', error);
+            console.error('[api:index] handler error', { requestId, error });
             
             // 如果应用加载失败，返回降级响应
             res.status(500).json({
