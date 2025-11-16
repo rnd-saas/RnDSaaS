@@ -1,5 +1,4 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import serverless from 'serverless-http';
 
 // 延迟加载 Express 应用，避免冷启动时的阻塞
 let app: any = null;
@@ -74,17 +73,47 @@ const createHandler = () => {
 
             console.log('[api:index] loading express app', { requestId });
             const expressApp = await getApp();
-            const handler = serverless(expressApp);
 
             console.log('[api:index] forwarding to express handler', { requestId });
             const handlerStart = Date.now();
-            const result = await handler(req, res);
+            await new Promise<void>((resolve, reject) => {
+                const cleanup = () => {
+                    res.off('finish', onFinish);
+                    res.off('close', onClose);
+                    res.off('error', onError);
+                };
+
+                const onFinish = () => {
+                    cleanup();
+                    resolve();
+                };
+                const onClose = () => {
+                    cleanup();
+                    resolve();
+                };
+                const onError = (err: Error) => {
+                    cleanup();
+                    reject(err);
+                };
+
+                res.on('finish', onFinish);
+                res.on('close', onClose);
+                res.on('error', onError);
+
+                try {
+                    expressApp(req, res);
+                } catch (err) {
+                    cleanup();
+                    reject(err as Error);
+                }
+            });
+
             console.log('[api:index] handler completed', {
                 requestId,
                 durationMs: Date.now() - handlerStart,
                 totalMs: Date.now() - startTime
             });
-            return result;
+            return;
             
         } catch (error) {
             console.error('[api:index] handler error', { requestId, error });
