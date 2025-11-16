@@ -15,16 +15,28 @@ const router = Router();
  */
 router.post('/login', async (req, res) => {
     try {
+        const requestId = (req.headers['x-vercel-id'] as string) || (req.headers['x-request-id'] as string) || `${Date.now()}`;
+        console.log('[auth:login] request received', {
+            requestId,
+            path: req.path,
+            hasBody: !!req.body,
+            bodyKeys: Object.keys(req.body || {}),
+            region: process.env.VERCEL_REGION,
+            hasSupabaseUrl: !!process.env.SUPABASE_URL,
+            hasSupabaseKey: !!(process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY)
+        });
+
         const { email, password } = req.body;
 
         if (!email || !password) {
+            console.warn('[auth:login] missing credentials', { requestId, hasEmail: !!email, hasPassword: !!password });
             return res.status(400).json({ 
                 error: { message: 'Email and password are required' } 
             });
         }
 
         // Authenticate user using Supabase Auth
-        console.log('[auth:login] signInWithPassword start', { email });
+    console.log('[auth:login] signInWithPassword start', { requestId, email });
         const signInStart = Date.now();
         let authData: any = null;
         let authError: any = null;
@@ -43,13 +55,13 @@ router.post('/login', async (req, res) => {
             authData = result.data;
             authError = result.error;
         } catch (err: any) {
-            console.error('[auth:login] signInWithPassword error or timeout', err?.message || err);
+            console.error('[auth:login] signInWithPassword error or timeout', { requestId, message: err?.message || err });
             return res.status(502).json({ error: { message: 'Authentication upstream failed or timed out' } });
         }
-        console.log('[auth:login] signInWithPassword completed', Date.now() - signInStart, 'ms');
+        console.log('[auth:login] signInWithPassword completed', { requestId, durationMs: Date.now() - signInStart, hasSession: !!authData?.session });
 
         if (authError) {
-            console.error('Login auth error:', authError);
+            console.error('[auth:login] auth error returned', { requestId, message: authError.message, status: authError.status, name: authError.name });
             // Check if email is not confirmed
             if (authError.message?.includes('Email not confirmed') || authError.message?.includes('email_not_confirmed')) {
                 return res.status(401).json({ 
@@ -68,6 +80,7 @@ router.post('/login', async (req, res) => {
         }
 
         if (!authData.user) {
+            console.warn('[auth:login] authData missing user', { requestId });
             return res.status(401).json({ 
                 error: { message: 'Authentication failed' } 
             });
@@ -77,6 +90,7 @@ router.post('/login', async (req, res) => {
 
         // Check if user email is verified
         if (!authData.user.email_confirmed_at && authData.user.email_confirmed_at === null) {
+            console.warn('[auth:login] email not confirmed', { requestId, userId: authData.user.id });
             return res.status(401).json({ 
                 error: { 
                     message: 'Please verify your email before logging in. Check your inbox for a confirmation email.',
@@ -86,7 +100,7 @@ router.post('/login', async (req, res) => {
         }
 
         // Get user details from users table
-        console.log('[auth:login] query users table start', { userId: authData.user?.id });
+        console.log('[auth:login] query users table start', { requestId, userId: authData.user?.id });
         const userQueryStart = Date.now();
         let userData: any = null;
         let userError: any = null;
@@ -105,16 +119,16 @@ router.post('/login', async (req, res) => {
             userData = result.data;
             userError = result.error;
         } catch (err: any) {
-            console.error('[auth:login] users table query error or timeout', err?.message || err);
+            console.error('[auth:login] users table query error or timeout', { requestId, message: err?.message || err });
             // fallback to creating a user record below if needed
             userData = null;
             userError = { message: 'users query failed or timed out' };
         }
-        console.log('[auth:login] users query completed', Date.now() - userQueryStart, 'ms');
+        console.log('[auth:login] users query completed', { requestId, durationMs: Date.now() - userQueryStart, found: !!userData });
 
         if (userError || !userData) {
             // Create a record in users table if it doesn't exist
-            console.log('[auth:login] creating users record start', { userId: authData.user.id });
+            console.log('[auth:login] creating users record start', { requestId, userId: authData.user.id });
             const createStart = Date.now();
             let newUser: any = null;
             let createError: any = null;
@@ -137,17 +151,19 @@ router.post('/login', async (req, res) => {
                 newUser = result.data;
                 createError = result.error;
             } catch (err: any) {
-                console.error('[auth:login] create users record error or timeout', err?.message || err);
+                console.error('[auth:login] create users record error or timeout', { requestId, message: err?.message || err });
                 createError = { message: 'create users failed or timed out' };
             }
-            console.log('[auth:login] creating users record completed', Date.now() - createStart, 'ms');
+            console.log('[auth:login] creating users record completed', { requestId, durationMs: Date.now() - createStart, success: !!newUser });
 
             if (createError || !newUser) {
+                console.error('[auth:login] failed to create fallback user record', { requestId, createError });
                 return res.status(500).json({ 
                     error: { message: 'Failed to create user profile' } 
                 });
             }
 
+            console.log('[auth:login] returning success after create', { requestId, userId: newUser.id });
             return res.json({
                 user: newUser,
                 token: session?.access_token,
@@ -157,6 +173,7 @@ router.post('/login', async (req, res) => {
             });
         }
 
+        console.log('[auth:login] returning success with existing user', { requestId, userId: userData.id });
         res.json({
             user: userData,
             token: session?.access_token,
@@ -166,7 +183,7 @@ router.post('/login', async (req, res) => {
         });
 
     } catch (error: any) {
-        console.error('Login error:', error);
+        console.error('[auth:login] unexpected error', { message: error?.message, stack: error?.stack });
         res.status(500).json({ 
             error: { message: 'Internal server error' } 
         });
