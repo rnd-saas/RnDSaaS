@@ -27,7 +27,7 @@ export default function ExerciseItem() {
               />
 
               <div className="flex items-center gap-[5px]">
-                <h3 className="h3-styles md:text-xl font-bold flex-1 min-w-0">
+                <h3 className="h3-styles md:text-xl lg:text-lg font-bold flex-1 min-w-0">
                   Bench Press
                 </h3>
 

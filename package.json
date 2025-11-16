@@ -1,6 +1,10 @@
 {
   "dependencies": {
+    "@tanstack/react-query": "^4.42.0",
     "lucide-react": "^0.553.0",
     "vite-plugin-pwa": "^1.1.0"
+  },
+  "devDependencies": {
+    "@tanstack/eslint-plugin-query": "^4.39.1"
   }
 }
