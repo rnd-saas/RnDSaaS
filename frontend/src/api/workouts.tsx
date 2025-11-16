@@ -1,6 +1,6 @@
 import { dummyPlannedWorkout } from "@/lib/data/dummyPlannedWorkout";
-import { PlannedWorkout } from "@/lib/types/Workout";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import type { PlannedWorkout } from "@/lib/types/Workout";
+import { useQuery } from "@tanstack/react-query";
 
 /**
  * Simulated API call to fetch planned workout for a specific date and user
@@ -22,7 +22,8 @@ async function fetchPlannedWorkout(
 
 export function usePlannedWorkout(date: Date, userId: string) {
   return useQuery<PlannedWorkout>({
-    queryKey: ["plannedWorkout", date],
+    queryKey: ["plannedWorkout", date?.toISOString().slice(0, 10), userId],
     queryFn: () => fetchPlannedWorkout(date, userId),
+    gcTime: 60000,
   });
 }

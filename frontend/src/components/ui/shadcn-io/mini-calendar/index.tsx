@@ -226,7 +226,7 @@ export const MiniCalendarDay = ({
           weekday: "short",
         })}
       </span>
-      <span className="font-semibold text-lg lg:text-base">{day}</span>
+      <span className="font-semibold text-base lg:text-base">{day}</span>
     </Button>
   );
 };

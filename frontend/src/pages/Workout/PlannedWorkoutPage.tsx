@@ -1,4 +1,4 @@
-import ExerciseItem from "@/components/WorkoutComponents/ExerciseItem";
+import PlannedExerciseItem from "@/components/WorkoutComponents/PlannedExerciseItem";
 import { Button } from "@/components/WorkoutComponents/button";
 import { MessageSquareMore } from "lucide-react";
 import {
@@ -8,22 +8,50 @@ import {
   MiniCalendarNavigation,
 } from "@/components/ui/shadcn-io/mini-calendar";
 import { useState } from "react";
-import { addDays, startOfWeek } from "date-fns";
+import { startOfWeek } from "date-fns";
 import { usePlannedWorkout } from "@/api/workouts";
+import type { PlannedExercise, PlannedWorkout } from "@/lib/types/Workout";
 
 export default function WorkoutPage() {
-  const plannedWorkout = usePlannedWorkout(new Date(), "user_123");
-  console.log(plannedWorkout);
   const isLarge = window.matchMedia("(min-width: 1024px)").matches;
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
     new Date()
   );
+  const { data, isLoading, error } = usePlannedWorkout(
+    selectedDate,
+    "user_123"
+  );
+
+  const plannedWorkout: PlannedWorkout | undefined = data;
+  let workoutContentBlock;
+
+  if (isLoading) {
+    workoutContentBlock = <div className="p-4 text-sm">Loading workout...</div>;
+  } else if (error) {
+    workoutContentBlock = (
+      <div className="p-4 text-sm text-red-600">Failed to load workout.</div>
+    );
+  } else if (!plannedWorkout || !plannedWorkout.exercises?.length) {
+    workoutContentBlock = (
+      <div className="p-4 text-sm text-muted-foreground">
+        No workout planned for this day.
+      </div>
+    );
+  } else {
+    workoutContentBlock = (
+      <div className="flex flex-col items-center justify-start flex-1 gap-5 md:gap-[30px] w-full">
+        {plannedWorkout.exercises.map((exercise: PlannedExercise) => (
+          <PlannedExerciseItem key={exercise.exercise_id} exercise={exercise} />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="w-full min-h-screen flex flex-col bg-(--basic-colours-zinc-50)">
       <div className="flex-1 flex flex-col gap-[30px] items-center">
         <div className="sticky top-0 z-20 w-full bg-(--basic-colours-zinc-50)/95 backdrop-blur supports-[backdrop-filter]:bg-(--basic-colours-zinc-50)/80">
-          <div className="flex flex-col gap-2 items-center mt-4 min-w-[60%]">
+          <div className="flex flex-col gap-2 lg:gap-0 items-center mt-4 min-w-[60%]">
             <h3 className="h3-styles text-base font-bold">
               {selectedDate?.toLocaleDateString("en-US", {
                 weekday: "short",
@@ -33,7 +61,7 @@ export default function WorkoutPage() {
               })}
             </h3>
             <MiniCalendar
-              className="border-0 bg-background my-0 md:p-4 py-2"
+              className="border-0 bg-background my-0 md:p-4 lg:py-1 py-2"
               onValueChange={setSelectedDate}
               value={selectedDate}
               defaultStartDate={startOfWeek(selectedDate!, { weekStartsOn: 1 })}
@@ -54,26 +82,20 @@ export default function WorkoutPage() {
             </MiniCalendar>
           </div>
         </div>
-        <div className="flex flex-col items-center justify-start flex-1 gap-5 md:gap-[30px] w-full">
-          <ExerciseItem> </ExerciseItem>
-          <ExerciseItem> </ExerciseItem>
-          <ExerciseItem> </ExerciseItem>
-          <ExerciseItem> </ExerciseItem>
-          <ExerciseItem> </ExerciseItem>
-        </div>
+        {workoutContentBlock}
       </div>
       <div className="sticky bottom-0 w-full bg-background/50 py-4 flex justify-center">
         <div className="mx-auto w-4/5 flex items-center justify-center gap-4 max-w-[728px]">
-          <Button variant="default" className="flex-1 text-lg lg:hidden ">
+          <Button variant="default" className="flex-1 text-base lg:hidden ">
             Start Workout
           </Button>
           <Button
             size={isLarge ? "default" : "icon"}
             variant="default"
-            className="lg:flex-1"
+            className="lg:flex-1 lg:h-9"
           >
             <MessageSquareMore size={isLarge ? 32 : 24} />
-            <p className="lg:inline hidden button-styles text-lg">
+            <p className="lg:inline hidden button-styles text-base">
               Chat with workout agent
             </p>
           </Button>

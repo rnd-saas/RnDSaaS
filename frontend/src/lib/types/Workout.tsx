@@ -2,10 +2,10 @@
  * Workout that is planned (only by AI for now) for a specific date
  */
 export interface PlannedWorkout {
-  workout_id: string;
+  workoutId: string;
   date: Date; //date of the planned workout
   exercises: PlannedExercise[];
-  muscle_groups: string[]; //muscle groups targeted in the workout
+  muscleGroups: string[]; //muscle groups targeted in the workout
 }
 
 // later expansion to create exercises manually. now only via DB!
@@ -13,19 +13,19 @@ export interface PlannedWorkout {
  * Planned exercise within a workout
  */
 export interface PlannedExercise {
-  exercise_id: string;
+  exerciseId: string;
   sets: TargetSet[]; //array of sets for the exercise
-  rest_time_seconds: number; //rest time between sets in seconds
-  image_url?: string; //optional image URL for the exercise
-  exercise_info: ExerciseInformation;
+  restTimeSeconds: number; //rest time between sets in seconds
+  imageUrl?: string; //optional image URL for the exercise
+  exerciseInfo: ExerciseInformation;
 }
 
 export interface LoggedWorkout {
-  workout_id: string;
+  workoutId: string;
   date: Date; //date of the logged workout
   exercises: LoggedExercise[];
-  start_datetime: Date; //start date and time of the workout
-  end_datetime: Date; //end date and time of the workout
+  startDatetime: Date; //start date and time of the workout
+  endDatetime: Date; //end date and time of the workout
   notes?: string; //optional notes for the workout
 }
 
@@ -33,9 +33,9 @@ export interface LoggedWorkout {
  * Exercise logged within a workout session
  */
 export interface LoggedExercise {
-  exercise_id: string;
+  exerciseId: string;
   sets: LoggedSet[]; //array of logged sets for the exercise
-  rest_time_seconds: number; //rest time between sets in seconds
+  restTimeSeconds: number; //rest time between sets in seconds
   notes?: string; //optional notes for the exercise
 }
 
@@ -47,19 +47,19 @@ export interface ExerciseInformation {
   name: string;
   description: string;
   slug: string; //URL friendly name
-  tutorial_url?: string; //optional tutorial video URL for the exercise
-  difficulty_level: "Beginner" | "Intermediate" | "Advanced";
-  log_mode:
+  tutorialUrl?: string; //optional tutorial video URL for the exercise
+  difficultyLevel: "Beginner" | "Intermediate" | "Advanced";
+  logMode:
     | "reps_weight"
     | "reps"
     | "time"
     | "time_weight"
     | "distance"
     | "distance_weight";
-  muscle_groups: MuscleGroup[]; //muscle groups targeted
+  muscleGroups: MuscleGroup[]; //muscle groups targeted
   equipment?: string[]; //equipment needed for the exercise
-  created_at: Date;
-  updated_at: Date;
+  createdAt: Date;
+  updatedAt: Date;
 
   // is_public and created_by for future expansion with user generated content
 }
@@ -68,22 +68,22 @@ export interface ExerciseInformation {
  * Set target within an exercise in a planned workout
  */
 export interface TargetSet {
-  set_number: number;
-  target_reps?: number; //optional target reps for the set
-  target_weight_kg?: number; //optional target weight for the set
-  target_time_seconds?: number; //optional target time for the set
-  target_distance_meters?: number; //optional target distance for the set
+  setNumber: number;
+  targetReps?: number; //optional target reps for the set
+  targetWeightKg?: number; //optional target weight for the set
+  targetTimeSeconds?: number; //optional target time for the set
+  targetDistanceMeters?: number; //optional target distance for the set
 }
 
 /**
  * Set logged within an exercise during a workout session
  */
 export interface LoggedSet {
-  set_number: number;
-  actual_reps?: number; //optional actual reps performed
-  actual_weight_kg?: number; //optional actual weight used
-  actual_time_seconds?: number; //optional actual time taken
-  actual_distance_meters?: number; //optional actual distance covered
+  setNumber: number;
+  actualReps?: number; //optional actual reps performed
+  actualWeightKg?: number; //optional actual weight used
+  actualTimeSeconds?: number; //optional actual time taken
+  actualDistanceMeters?: number; //optional actual distance covered
   completed: boolean; //whether the set was completed
 }
 
@@ -91,10 +91,10 @@ export interface LoggedSet {
  * Evaluation at end of workout session
  */
 export interface WorkoutEvaluation {
-  workout_id: string; // same as in LoggedWorkout
-  feedback_ai: string; //AI generated feedback on the workout
-  comfort_rating: number; //between 1 and 5.
-  difficulty_rating: number; //between 1 and 5.
+  workoutId: string; // same as in LoggedWorkout
+  feedbackAi: string; //AI generated feedback on the workout
+  comfortRating: number; //between 1 and 5.
+  difficultyRating: number; //between 1 and 5.
 }
 
 export type MuscleGroup =
@@ -120,7 +120,7 @@ export type MuscleGroup =
   | "Hamstrings"
   | "Calves"
   | "Glutes"
-  | "Abdominals"
+  | "Abs"
   | "Upper Abs"
   | "Lower Abs"
   | "Obliques"

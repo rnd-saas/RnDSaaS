@@ -11,8 +11,9 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AppRoutes />;
+      <AppRoutes />
     </QueryClientProvider>
+  );
 }
 
 export default App;
