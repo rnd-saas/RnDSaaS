@@ -5,6 +5,7 @@
 
 import { Router } from 'express';
 import { supabase } from '../db/supabase';
+import withTimeout from '../utils/withTimeout';
 
 const router = Router();
 
@@ -23,10 +24,29 @@ router.post('/login', async (req, res) => {
         }
 
         // Authenticate user using Supabase Auth
-        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
+        console.log('[auth:login] signInWithPassword start', { email });
+        const signInStart = Date.now();
+        let authData: any = null;
+        let authError: any = null;
+        try {
+            const result = await withTimeout(
+                new Promise<any>(async (resolve, reject) => {
+                    try {
+                        const r = await supabase.auth.signInWithPassword({ email, password });
+                        resolve(r);
+                    } catch (e) {
+                        reject(e);
+                    }
+                }),
+                8000
+            );
+            authData = result.data;
+            authError = result.error;
+        } catch (err: any) {
+            console.error('[auth:login] signInWithPassword error or timeout', err?.message || err);
+            return res.status(502).json({ error: { message: 'Authentication upstream failed or timed out' } });
+        }
+        console.log('[auth:login] signInWithPassword completed', Date.now() - signInStart, 'ms');
 
         if (authError) {
             console.error('Login auth error:', authError);
@@ -66,23 +86,61 @@ router.post('/login', async (req, res) => {
         }
 
         // Get user details from users table
-        const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', authData.user.id)
-            .single();
+        console.log('[auth:login] query users table start', { userId: authData.user?.id });
+        const userQueryStart = Date.now();
+        let userData: any = null;
+        let userError: any = null;
+        try {
+            const result = await withTimeout(
+                new Promise<any>(async (resolve, reject) => {
+                    try {
+                        const r = await supabase.from('users').select('*').eq('id', authData.user.id).single();
+                        resolve(r);
+                    } catch (e) {
+                        reject(e);
+                    }
+                }),
+                6000
+            );
+            userData = result.data;
+            userError = result.error;
+        } catch (err: any) {
+            console.error('[auth:login] users table query error or timeout', err?.message || err);
+            // fallback to creating a user record below if needed
+            userData = null;
+            userError = { message: 'users query failed or timed out' };
+        }
+        console.log('[auth:login] users query completed', Date.now() - userQueryStart, 'ms');
 
         if (userError || !userData) {
             // Create a record in users table if it doesn't exist
-            const { data: newUser, error: createError } = await supabase
-                .from('users')
-                .insert([{
-                    id: authData.user.id,
-                    username: authData.user.email?.split('@')[0] || 'user',
-                    display_name: authData.user.user_metadata?.display_name || authData.user.email || 'User'
-                }])
-                .select()
-                .single();
+            console.log('[auth:login] creating users record start', { userId: authData.user.id });
+            const createStart = Date.now();
+            let newUser: any = null;
+            let createError: any = null;
+            try {
+                const result = await withTimeout(
+                    new Promise<any>(async (resolve, reject) => {
+                        try {
+                            const r = await supabase.from('users').insert([{
+                                id: authData.user.id,
+                                username: authData.user.email?.split('@')[0] || 'user',
+                                display_name: authData.user.user_metadata?.display_name || authData.user.email || 'User'
+                            }]).select().single();
+                            resolve(r);
+                        } catch (e) {
+                            reject(e);
+                        }
+                    }),
+                    6000
+                );
+                newUser = result.data;
+                createError = result.error;
+            } catch (err: any) {
+                console.error('[auth:login] create users record error or timeout', err?.message || err);
+                createError = { message: 'create users failed or timed out' };
+            }
+            console.log('[auth:login] creating users record completed', Date.now() - createStart, 'ms');
 
             if (createError || !newUser) {
                 return res.status(500).json({ 
