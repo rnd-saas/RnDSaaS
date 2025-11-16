@@ -56,7 +56,7 @@ export default function WorkoutList({
                 </TableCell>
               ))}
               <TableCell className="w-1/3 body-styles text-center">
-                test
+                checbox
               </TableCell>
             </TableRow>
           ))}
