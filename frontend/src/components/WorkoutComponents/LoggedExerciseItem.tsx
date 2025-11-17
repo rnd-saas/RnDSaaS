@@ -26,9 +26,9 @@ export default function LoggedExerciseItem({
   const [isOpen, setIsOpen] = useState(false);
   const [restTimeSeconds, setRestTimeSeconds] = useState<string>("0");
   const restTimeOptions: number[] = calculateRestTimeOptions(5, 300);
-  console.log(restTimeOptions);
+  // console.log(restTimeOptions);
 
-  console.log(exercise);
+  // console.log(exercise);
 
   return (
     <>
@@ -78,7 +78,10 @@ export default function LoggedExerciseItem({
                 >
                   <Timer color="#52525C" className="" />
                   <span className="body-styles">
-                    Rest Time: {formatRestTime(parseInt(restTimeSeconds))}
+                    Rest Time:{" "}
+                    {restTimeSeconds == "0"
+                      ? "OFF"
+                      : formatRestTime(parseInt(restTimeSeconds))}
                   </span>
                 </Button>
               </DropdownMenuTrigger>
