@@ -1,136 +1,292 @@
 import type { PlannedWorkout } from "@/lib/types/Workout";
 
-export const dummyPlannedWorkout: PlannedWorkout = {
-  workoutId: "workout_push_001",
-  date: new Date("2025-11-16"),
-
-  muscleGroups: ["Chest", "Shoulders", "Triceps"],
-
-  exercises: [
-    // ----- EXERCISE 1 -----
-    {
-      exerciseId: "bench_press_001",
-      restTimeSeconds: 120,
-      imageUrl: "https://example.com/images/bench-press.png",
-
-      sets: [
-        { setNumber: 1, targetReps: 8, targetWeightKg: 60 },
-        { setNumber: 2, targetReps: 8, targetWeightKg: 60 },
-        { setNumber: 3, targetReps: 6, targetWeightKg: 60 },
-      ],
-
-      exerciseInfo: {
-        name: "Barbell Bench Press",
-        description:
-          "A compound chest exercise targeting the pectorals, anterior delts, and triceps.",
-        slug: "barbell-bench-press",
-        tutorialUrl: "https://www.youtube.com/watch?v=gRVjAtPip0Y",
-        difficultyLevel: "Intermediate",
-        logMode: "reps_weight",
-        muscleGroups: ["Chest", "Triceps", "Front Delts"],
-        equipment: ["Barbell", "Bench"],
-        createdAt: new Date("2025-01-01"),
-        updatedAt: new Date("2025-10-10"),
+export const dummyPlannedWorkouts: PlannedWorkout[] = [
+  {
+    workoutId: "workout_push_001",
+    date: new Date("2025-11-17"),
+    muscleGroups: ["Chest", "Shoulders", "Triceps"],
+    exercises: [
+      {
+        exerciseId: "bench_press_001",
+        restTimeSeconds: 120,
+        imageUrl: "https://example.com/images/bench-press.png",
+        sets: [
+          { setNumber: 1, targetReps: 8, targetWeightKg: 60 },
+          { setNumber: 2, targetReps: 8, targetWeightKg: 60 },
+          { setNumber: 3, targetReps: 6, targetWeightKg: 60 },
+        ],
+        exerciseInfo: {
+          name: "Barbell Bench Press",
+          description:
+            "A compound chest exercise targeting the pectorals, anterior delts, and triceps.",
+          slug: "barbell-bench-press",
+          tutorialUrl: "https://www.youtube.com/watch?v=gRVjAtPip0Y",
+          difficultyLevel: "Intermediate",
+          logMode: "reps_weight",
+          muscleGroups: ["Chest", "Triceps", "Front Delts"],
+          equipment: ["Barbell", "Bench"],
+          createdAt: new Date("2025-01-01"),
+          updatedAt: new Date("2025-10-10"),
+        },
       },
-    },
-
-    // ----- EXERCISE 2 -----
-    {
-      exerciseId: "incline_dumbbell_press_002",
-      restTimeSeconds: 90,
-      imageUrl: "https://example.com/images/incline-db-press.png",
-
-      sets: [
-        { setNumber: 1, targetReps: 10, targetWeightKg: 22 },
-        { setNumber: 2, targetReps: 10, targetWeightKg: 22 },
-        { setNumber: 3, targetReps: 8, targetWeightKg: 22 },
-      ],
-
-      exerciseInfo: {
-        name: "Incline Dumbbell Press",
-        description:
-          "Targets the upper chest and anterior deltoids with a deep stretch.",
-        slug: "incline-dumbbell-press",
-        difficultyLevel: "Intermediate",
-        logMode: "reps_weight",
-        muscleGroups: ["Upper Chest", "Front Delts", "Triceps"],
-        equipment: ["Dumbbells", "Bench"],
-        createdAt: new Date("2025-02-01"),
-        updatedAt: new Date("2025-09-12"),
+      {
+        exerciseId: "incline_dumbbell_press_002",
+        restTimeSeconds: 90,
+        imageUrl: "https://example.com/images/incline-db-press.png",
+        sets: [
+          { setNumber: 1, targetReps: 10, targetWeightKg: 22 },
+          { setNumber: 2, targetReps: 10, targetWeightKg: 22 },
+          { setNumber: 3, targetReps: 8, targetWeightKg: 22 },
+        ],
+        exerciseInfo: {
+          name: "Incline Dumbbell Press",
+          description:
+            "Targets the upper chest and anterior deltoids with a deep stretch.",
+          slug: "incline-dumbbell-press",
+          difficultyLevel: "Intermediate",
+          logMode: "reps_weight",
+          muscleGroups: ["Upper Chest", "Front Delts", "Triceps"],
+          equipment: ["Dumbbells", "Bench"],
+          createdAt: new Date("2025-02-01"),
+          updatedAt: new Date("2025-09-12"),
+        },
       },
-    },
-
-    // ----- EXERCISE 3 -----
-    {
-      exerciseId: "lateral_raise_003",
-      restTimeSeconds: 60,
-
-      sets: [
-        { setNumber: 1, targetReps: 15, targetWeightKg: 8 },
-        { setNumber: 2, targetReps: 15, targetWeightKg: 8 },
-        { setNumber: 3, targetReps: 12, targetWeightKg: 8 },
-      ],
-
-      exerciseInfo: {
-        name: "Dumbbell Lateral Raise",
-        description: "Isolation exercise for the side delts.",
-        slug: "dumbbell-lateral-raise",
-        difficultyLevel: "Beginner",
-        logMode: "reps_weight",
-        muscleGroups: ["Side Delts"],
-        equipment: ["Dumbbells"],
-        createdAt: new Date("2025-03-11"),
-        updatedAt: new Date("2025-09-20"),
+      {
+        exerciseId: "lateral_raise_003",
+        restTimeSeconds: 60,
+        sets: [
+          { setNumber: 1, targetReps: 15, targetWeightKg: 8 },
+          { setNumber: 2, targetReps: 15, targetWeightKg: 8 },
+          { setNumber: 3, targetReps: 12, targetWeightKg: 8 },
+        ],
+        exerciseInfo: {
+          name: "Dumbbell Lateral Raise",
+          description: "Isolation exercise for the side delts.",
+          slug: "dumbbell-lateral-raise",
+          difficultyLevel: "Beginner",
+          logMode: "reps_weight",
+          muscleGroups: ["Side Delts"],
+          equipment: ["Dumbbells"],
+          createdAt: new Date("2025-03-11"),
+          updatedAt: new Date("2025-09-20"),
+        },
       },
-    },
-
-    // ----- EXERCISE 4 -----
-    {
-      exerciseId: "tricep_pushdown_004",
-      restTimeSeconds: 90,
-
-      sets: [
-        { setNumber: 1, targetReps: 12, targetWeightKg: 25 },
-        { setNumber: 2, targetReps: 12, targetWeightKg: 25 },
-        { setNumber: 3, targetReps: 10, targetWeightKg: 25 },
-      ],
-
-      exerciseInfo: {
-        name: "Cable Tricep Pushdown",
-        description: "Isolation movement focusing on the triceps long head.",
-        slug: "cable-tricep-pushdown",
-        difficultyLevel: "Beginner",
-        logMode: "reps_weight",
-        muscleGroups: ["Triceps"],
-        equipment: ["Cable Machine"],
-        createdAt: new Date("2025-05-01"),
-        updatedAt: new Date("2025-09-29"),
+      {
+        exerciseId: "tricep_pushdown_004",
+        restTimeSeconds: 90,
+        sets: [
+          { setNumber: 1, targetReps: 12, targetWeightKg: 25 },
+          { setNumber: 2, targetReps: 12, targetWeightKg: 25 },
+          { setNumber: 3, targetReps: 10, targetWeightKg: 25 },
+        ],
+        exerciseInfo: {
+          name: "Cable Tricep Pushdown",
+          description: "Isolation movement focusing on the triceps long head.",
+          slug: "cable-tricep-pushdown",
+          difficultyLevel: "Beginner",
+          logMode: "reps_weight",
+          muscleGroups: ["Triceps"],
+          equipment: ["Cable Machine"],
+          createdAt: new Date("2025-05-01"),
+          updatedAt: new Date("2025-09-29"),
+        },
       },
-    },
-
-    // ----- EXERCISE 5 -----
-    {
-      exerciseId: "plank_hold_005",
-      restTimeSeconds: 60,
-
-      sets: [
-        { setNumber: 1, targetTimeSeconds: 60 },
-        { setNumber: 2, targetTimeSeconds: 60 },
-        { setNumber: 3, targetTimeSeconds: 45 },
-      ],
-
-      exerciseInfo: {
-        name: "Plank Hold",
-        description:
-          "Isometric core exercise emphasizing stability and endurance.",
-        slug: "plank-hold",
-        difficultyLevel: "Beginner",
-        logMode: "time",
-        muscleGroups: ["Abs"],
-        equipment: ["Bodyweight"],
-        createdAt: new Date("2025-06-15"),
-        updatedAt: new Date("2025-10-05"),
+      {
+        exerciseId: "plank_hold_005",
+        restTimeSeconds: 60,
+        sets: [
+          { setNumber: 1, targetTimeSeconds: 60 },
+          { setNumber: 2, targetTimeSeconds: 60 },
+          { setNumber: 3, targetTimeSeconds: 45 },
+        ],
+        exerciseInfo: {
+          name: "Plank Hold",
+          description:
+            "Isometric core exercise emphasizing stability and endurance.",
+          slug: "plank-hold",
+          difficultyLevel: "Beginner",
+          logMode: "time",
+          muscleGroups: ["Abs"],
+          equipment: ["Bodyweight"],
+          createdAt: new Date("2025-06-15"),
+          updatedAt: new Date("2025-10-05"),
+        },
       },
-    },
-  ],
-};
+    ],
+  },
+  {
+    workoutId: "workout_pull_002",
+    date: new Date("2025-11-18"),
+    muscleGroups: ["Back", "Rear Delts", "Biceps"],
+    exercises: [
+      {
+        exerciseId: "deadlift_101",
+        restTimeSeconds: 150,
+        sets: [
+          { setNumber: 1, targetReps: 5, targetWeightKg: 100 },
+          { setNumber: 2, targetReps: 5, targetWeightKg: 100 },
+          { setNumber: 3, targetReps: 5, targetWeightKg: 100 },
+        ],
+        exerciseInfo: {
+          name: "Conventional Deadlift",
+          description: "Full posterior-chain compound lift.",
+          slug: "conventional-deadlift",
+          tutorialUrl: "https://www.youtube.com/watch?v=ytGaGIn3SjE",
+          difficultyLevel: "Advanced",
+          logMode: "reps_weight",
+          muscleGroups: ["Back", "Glutes", "Hamstrings"],
+          equipment: ["Barbell"],
+          createdAt: new Date("2025-01-15"),
+          updatedAt: new Date("2025-10-01"),
+        },
+      },
+      {
+        exerciseId: "pullup_102",
+        restTimeSeconds: 120,
+        sets: [
+          { setNumber: 1, targetReps: 10 },
+          { setNumber: 2, targetReps: 8 },
+          { setNumber: 3, targetReps: 6 },
+        ],
+        exerciseInfo: {
+          name: "Bodyweight Pull-up",
+          description: "Vertical pull emphasizing lats and biceps.",
+          slug: "pull-up",
+          difficultyLevel: "Intermediate",
+          logMode: "reps_only",
+          muscleGroups: ["Lats", "Biceps"],
+          equipment: ["Pull-up Bar"],
+          createdAt: new Date("2025-03-10"),
+          updatedAt: new Date("2025-09-05"),
+        },
+      },
+      {
+        exerciseId: "face_pull_103",
+        restTimeSeconds: 75,
+        sets: [
+          { setNumber: 1, targetReps: 15, targetWeightKg: 18 },
+          { setNumber: 2, targetReps: 15, targetWeightKg: 18 },
+          { setNumber: 3, targetReps: 15, targetWeightKg: 18 },
+        ],
+        exerciseInfo: {
+          name: "Cable Face Pull",
+          description: "Rear delt and upper back activation.",
+          slug: "cable-face-pull",
+          difficultyLevel: "Beginner",
+          logMode: "reps_weight",
+          muscleGroups: ["Rear Delts", "Upper Back"],
+          equipment: ["Cable Machine"],
+          createdAt: new Date("2025-04-05"),
+          updatedAt: new Date("2025-09-25"),
+        },
+      },
+      {
+        exerciseId: "ez_bar_curl_104",
+        restTimeSeconds: 60,
+        sets: [
+          { setNumber: 1, targetReps: 12, targetWeightKg: 30 },
+          { setNumber: 2, targetReps: 12, targetWeightKg: 30 },
+          { setNumber: 3, targetReps: 10, targetWeightKg: 30 },
+        ],
+        exerciseInfo: {
+          name: "EZ-Bar Curl",
+          description: "Biceps isolation using EZ bar.",
+          slug: "ez-bar-curl",
+          difficultyLevel: "Beginner",
+          logMode: "reps_weight",
+          muscleGroups: ["Biceps"],
+          equipment: ["EZ Bar"],
+          createdAt: new Date("2025-05-12"),
+          updatedAt: new Date("2025-10-02"),
+        },
+      },
+    ],
+  },
+  {
+    workoutId: "workout_legs_003",
+    date: new Date("2025-11-20"),
+    muscleGroups: ["Quads", "Hamstrings", "Glutes", "Calves"],
+    exercises: [
+      {
+        exerciseId: "back_squat_201",
+        restTimeSeconds: 150,
+        sets: [
+          { setNumber: 1, targetReps: 6, targetWeightKg: 90 },
+          { setNumber: 2, targetReps: 6, targetWeightKg: 90 },
+          { setNumber: 3, targetReps: 6, targetWeightKg: 90 },
+        ],
+        exerciseInfo: {
+          name: "Back Squat",
+          description: "Compound lift for lower body strength.",
+          slug: "back-squat",
+          difficultyLevel: "Intermediate",
+          logMode: "reps_weight",
+          muscleGroups: ["Quads", "Glutes", "Hamstrings"],
+          equipment: ["Barbell", "Rack"],
+          createdAt: new Date("2025-01-20"),
+          updatedAt: new Date("2025-10-08"),
+        },
+      },
+      {
+        exerciseId: "romanian_deadlift_202",
+        restTimeSeconds: 120,
+        sets: [
+          { setNumber: 1, targetReps: 10, targetWeightKg: 70 },
+          { setNumber: 2, targetReps: 10, targetWeightKg: 70 },
+          { setNumber: 3, targetReps: 8, targetWeightKg: 70 },
+        ],
+        exerciseInfo: {
+          name: "Romanian Deadlift",
+          description: "Hip hinge emphasizing hamstrings and glutes.",
+          slug: "romanian-deadlift",
+          difficultyLevel: "Intermediate",
+          logMode: "reps_weight",
+          muscleGroups: ["Hamstrings", "Glutes"],
+          equipment: ["Barbell"],
+          createdAt: new Date("2025-02-18"),
+          updatedAt: new Date("2025-09-30"),
+        },
+      },
+      {
+        exerciseId: "leg_press_203",
+        restTimeSeconds: 90,
+        sets: [
+          { setNumber: 1, targetReps: 12, targetWeightKg: 140 },
+          { setNumber: 2, targetReps: 12, targetWeightKg: 140 },
+          { setNumber: 3, targetReps: 10, targetWeightKg: 140 },
+        ],
+        exerciseInfo: {
+          name: "Leg Press",
+          description: "Machine-based compound for quads and glutes.",
+          slug: "leg-press",
+          difficultyLevel: "Beginner",
+          logMode: "reps_weight",
+          muscleGroups: ["Quads", "Glutes"],
+          equipment: ["Leg Press"],
+          createdAt: new Date("2025-03-22"),
+          updatedAt: new Date("2025-09-18"),
+        },
+      },
+      {
+        exerciseId: "seated_calf_raise_204",
+        restTimeSeconds: 45,
+        sets: [
+          { setNumber: 1, targetReps: 15, targetWeightKg: 40 },
+          { setNumber: 2, targetReps: 15, targetWeightKg: 40 },
+          { setNumber: 3, targetReps: 12, targetWeightKg: 40 },
+        ],
+        exerciseInfo: {
+          name: "Seated Calf Raise",
+          description: "Isolation for soleus and gastrocnemius.",
+          slug: "seated-calf-raise",
+          difficultyLevel: "Beginner",
+          logMode: "reps_weight",
+          muscleGroups: ["Calves"],
+          equipment: ["Machine"],
+          createdAt: new Date("2025-04-28"),
+          updatedAt: new Date("2025-10-04"),
+        },
+      },
+    ],
+  },
+];

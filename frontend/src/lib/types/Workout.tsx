@@ -26,7 +26,6 @@ export interface LoggedWorkout {
   exercises: LoggedExercise[];
   startDatetime: Date; //start date and time of the workout
   endDatetime: Date; //end date and time of the workout
-  notes?: string; //optional notes for the workout
 }
 
 /**
@@ -95,6 +94,7 @@ export interface WorkoutEvaluation {
   feedbackAi: string; //AI generated feedback on the workout
   comfortRating: number; //between 1 and 5.
   difficultyRating: number; //between 1 and 5.
+  notes?: string; //optional notes for the workout
 }
 
 export type MuscleGroup =

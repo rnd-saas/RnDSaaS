@@ -11,20 +11,32 @@ import { useState } from "react";
 import { startOfWeek } from "date-fns";
 import { usePlannedWorkout } from "@/api/workouts";
 import type { PlannedExercise, PlannedWorkout } from "@/lib/types/Workout";
+import { useNavigate } from "react-router-dom";
 
 export default function WorkoutPage() {
   const isLarge = window.matchMedia("(min-width: 1024px)").matches;
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    new Date()
-  );
-  const { data, isLoading, error } = usePlannedWorkout(
-    selectedDate,
-    "user_123"
-  );
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const { data, isLoading, error } = usePlannedWorkout(selectedDate);
+  const navigate = useNavigate();
 
-  const plannedWorkout: PlannedWorkout | undefined = data;
+  const plannedWorkout: PlannedWorkout | null = data;
+  // Store today's ID for when user clicks on "Start Workout"
+  const [todayWorkoutId, setTodayWorkoutId] = useState<string | null>(null);
+  if (
+    !todayWorkoutId &&
+    plannedWorkout &&
+    plannedWorkout.date.toDateString() === new Date().toDateString()
+  ) {
+    setTodayWorkoutId(plannedWorkout.workoutId);
+    console.log("Today's workout ID set to:", plannedWorkout.workoutId);
+  }
+  console.error("id stored", todayWorkoutId);
+
+  const handleWorkoutStart = () => {
+    navigate(`/active-workout/${todayWorkoutId}`);
+  };
+
   let workoutContentBlock;
-
   if (isLoading) {
     workoutContentBlock = <div className="p-4 text-sm">Loading workout...</div>;
   } else if (error) {
@@ -86,7 +98,14 @@ export default function WorkoutPage() {
       </div>
       <div className="sticky bottom-0 w-full bg-background/50 py-4 flex justify-center">
         <div className="mx-auto w-4/5 flex items-center justify-center gap-4 max-w-[728px]">
-          <Button variant="default" className="flex-1 text-base lg:hidden ">
+          {/* IMPORTANT: BUTTON WILL ONLY START TODAY'S WORKOUT... TODO: IF TODAY DOESN'T HAVE A WORKOUT, NOTHING WILL HAPPEN...!  */}
+          <Button
+            variant="default"
+            className={`flex-1 text-base lg:hidden ${
+              !todayWorkoutId && "pointer-events-none opacity-50"
+            }`}
+            onClick={handleWorkoutStart}
+          >
             Start Workout
           </Button>
           <Button
