@@ -7,6 +7,9 @@ import {
   TableRow,
 } from "@/components/table";
 import type { TargetSet, ExerciseInformation } from "@/lib/types/Workout";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Check } from "lucide-react";
 
 // const workoutData = [
 //   { set: 1, reps: 12, kg: 60 },
@@ -27,36 +30,55 @@ export default function WorkoutList({
 
   setTableHeadersByLogMode(tableHeaders, logMode);
   setTableRowsByLogMode(tableRows, logMode, sets);
+  const headerCount = tableHeaders.length;
 
   return (
     <>
-      <Table className="mb-2 [&_td]:body-styles [&_td]:text-sm md:[&_td]:text-base lg:[&_td]:text-sm [&_th]:text-base lg:[&_th]:text-base md:[&_th]:text-lg [&_th]:border-b-1 [&_th]:border-zinc-200">
+      <Table className="mb-2 [&_td]:body-styles [&_td]:text-sm md:[&_td]:text-base lg:[&_td]:text-sm [&_th]:text-base lg:[&_th]:text-base md:[&_th]:text-lg">
         <TableHeader>
-          <TableRow>
-            {tableHeaders.map((header: string) => (
+          <TableRow className="flex items-center justify-center border-zinc-300! hover:bg-yellow-50">
+            {tableHeaders.map((header: string, idx: number) => (
               <TableHead
                 key={header}
-                className="w-1/3  h3-styles h-auto pb-0.5 text-[var(--basic-colours-zinc-700)]"
+                className={`${
+                  idx == 0 ? "flex-1" : "flex-1 text-center"
+                } h3-styles h-auto text-zinc-700 text-center`}
               >
                 {header}
               </TableHead>
             ))}
-            <TableHead>Extra</TableHead>
+            <TableHead className="flex-1 h3-styles h-auto text-zinc-700 pt-2 pb-2 flex items-center justify-center">
+              <Check color="#52525C" />
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {tableRows.map((rowData: number[]) => (
-            <TableRow key={`${rowData[0]}-${rowData.join("-")}`}>
+            <TableRow
+              key={`${rowData[0]}-${rowData.join("-")}`}
+              className="flex items-center justify-center hover:bg-yellow-50"
+            >
               {rowData.map((cellData: number, cellIndex: number) => (
                 <TableCell
                   key={`${rowData[0]}-${cellIndex}`}
-                  className="w-1/3 body-styles"
+                  className={`${
+                    cellIndex == 0 ? "flex-1" : "flex-1"
+                  } body-styles text-zinc-700 focus:text-left text-center transition-all duration-150 ease-in-out 
+    !pl-3 focus-within:!pl-2`}
                 >
-                  {cellData}
+                  {cellIndex == 0 ? (
+                    cellData
+                  ) : (
+                    <Input
+                      type="number"
+                      placeholder={`${cellData}`}
+                      className="border-0 shadow-none focus:ring-0! p-0 placeholder:text-zinc-300 focus:text-left text-center focus:pl-4"
+                    />
+                  )}
                 </TableCell>
               ))}
-              <TableCell className="w-1/3 body-styles text-center">
-                checbox
+              <TableCell className="flex-1 body-styles pr-2! text-center">
+                <Checkbox className="bg-300 border-text data-[state=unchecked]:text-white data-[state=checked]:bg-zinc-700 data-[state=checked]:border-green-500 data-[state=checked]:text-white" />
               </TableCell>
             </TableRow>
           ))}

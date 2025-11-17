@@ -5,6 +5,17 @@ import LoggedExerciseItemTable from "@/components/WorkoutComponents/LoggedExerci
 import { useState } from "react";
 import type { PlannedExercise } from "@/lib/types/Workout";
 import { ExerciseNote } from "@/components/WorkoutComponents/ExerciseNote";
+import { Timer } from "lucide-react";
+import { Button } from "@/components/WorkoutComponents/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function LoggedExerciseItem({
   exercise,
@@ -12,6 +23,9 @@ export default function LoggedExerciseItem({
   exercise: PlannedExercise;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [restTimeSeconds, setRestTimeSeconds] = useState<string>("0");
+  const restTimeOptions: number[] = calculateRestTimeOptions(5, 300);
+  console.log(restTimeOptions);
 
   console.log(exercise);
 
@@ -36,11 +50,11 @@ export default function LoggedExerciseItem({
               />
 
               <div className="flex-1 flex items-center justify-between md:justify-start  gap-1 md:gap-2">
-                <h3 className="flex-1h3-styles text-base md:text-xl lg:text-base font-bold min-w-0">
+                <h3 className="flex-1 h3-styles text-base md:text-xl lg:text-base font-bold min-w-0">
                   {exercise.exerciseInfo.name}
                 </h3>
 
-                <HelpCircle className="flex-shrink-0 w-4 h-4" />
+                <HelpCircle className="shrink-0 w-4 h-4" />
               </div>
             </div>
 
@@ -51,11 +65,47 @@ export default function LoggedExerciseItem({
             />
           </div>
           <div
-            className={`overflow-hidden w-full pl-2 pr-2 md:pl-4 md:pr-4 transition-all duration-300 ease-in ${
+            className={`flex flex-col gap-2 overflow-hidden w-full pl-2 pr-2 md:pl-4 md:pr-4 transition-all duration-300 ease-in ${
               isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
             }`}
           >
-            <div className="w-full md:w-3/4 mb-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="link"
+                  className="flex justify-start items-center gap-1 px-0! focus:ring-0!"
+                >
+                  <Timer color="#52525C" className="" />
+                  <span className="body-styles">
+                    Rest Time: {formatRestTime(parseInt(restTimeSeconds))}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-auto outline-none border-0 shadow-card">
+                <DropdownMenuLabel>Set Rest Time</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuRadioGroup
+                  defaultValue="OFF"
+                  className="text-center flex flex-col items-center justify-center"
+                  value={restTimeSeconds.toString()}
+                  onValueChange={setRestTimeSeconds}
+                >
+                  <DropdownMenuRadioItem key={0} value={"0"}>
+                    OFF
+                  </DropdownMenuRadioItem>
+                  {restTimeOptions.map((restTimeOption: number) => (
+                    <DropdownMenuRadioItem
+                      key={restTimeOption}
+                      value={restTimeOption.toString()}
+                    >
+                      {formatRestTime(restTimeOption)}
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <div className="w-full md:w-3/4 mb-2">
               <ExerciseNote bgColor="bg-white " />
             </div>
             <LoggedExerciseItemTable
@@ -67,4 +117,24 @@ export default function LoggedExerciseItem({
       </Card>
     </>
   );
+}
+
+/** helper function to calculate rest times from 5 s to 5 minutes*/
+function calculateRestTimeOptions(
+  startTime: number,
+  endTime: number
+): number[] {
+  const options: number[] = [];
+  for (let i = startTime; i <= endTime; i += 5) {
+    options.push(i);
+  }
+  return options;
+}
+
+/** helper function to convert time in seconds to format "xm ys" */
+function formatRestTime(seconds: number): string {
+  if (seconds == 0) return "OFF";
+  const minutes = Math.floor(seconds / 60);
+  const sec = seconds % 60;
+  return minutes > 0 ? `${minutes}m ${sec}s` : `${sec}s`;
 }

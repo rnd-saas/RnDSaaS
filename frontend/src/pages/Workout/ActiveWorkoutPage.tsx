@@ -37,7 +37,7 @@ export default function ActiveWorkoutPage() {
     <div className="w-full min-h-screen flex flex-col bg-(--basic-colours-zinc-50)">
       <div className="flex-1 flex flex-col gap-[30px] items-center">
         <div className="sticky top-0 z-20 w-full bg-(--basic-colours-zinc-50)/95 backdrop-blur supports-[backdrop-filter]:bg-(--basic-colours-zinc-50)/80">
-          <div className="flex flex-col gap-2 lg:gap-0 items-center mt-4 min-w-[60%]">
+          <div className="flex flex-col gap-2 lg:gap-2 items-center mt-2 min-w-[60%]">
             <h3 className="h3-styles text-base font-bold">
               {new Date().toLocaleDateString("en-US", {
                 weekday: "short",
@@ -46,6 +46,28 @@ export default function ActiveWorkoutPage() {
                 year: "numeric",
               })}
             </h3>
+            <div className="max-w-[728px] w-4/5 flex justify-bewteem items-center gap-5 md:gap-0 md:justify-evenly mb-2">
+              <div>
+                <span className="text-zinc-700 block font-primary text-sm">
+                  Duration:
+                </span>
+                <span className="text-yellow-600 block text-base font-bold">
+                  5min 30s
+                </span>
+              </div>
+              <div>
+                <span className="text-zinc-700 block font-primary text-sm">
+                  Volume:
+                </span>
+                <span className="text-zinc-400 block text-base ">100 kg</span>
+              </div>
+              <div>
+                <span className="text-zinc-700 block font-primary text-sm">
+                  Sets Finished:
+                </span>
+                <span className="text-zinc-400 block text-base ">2</span>
+              </div>
+            </div>
           </div>
         </div>
         {workoutContentBlock}

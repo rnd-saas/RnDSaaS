@@ -55,7 +55,7 @@ export default function PlannedExerciseItem({
               isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
             }`}
           >
-            <div className="w-full md:w-3/4 mb-4">
+            <div className="w-full md:w-3/4 mb-2">
               <ExerciseNote />
             </div>
             <PlannedExerciseItemTable
