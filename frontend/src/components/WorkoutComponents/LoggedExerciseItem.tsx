@@ -16,6 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { calculateRestTimeOptions, formatRestTime } from "@/lib/utils/time.ts";
 
 export default function LoggedExerciseItem({
   exercise,
@@ -117,24 +118,4 @@ export default function LoggedExerciseItem({
       </Card>
     </>
   );
-}
-
-/** helper function to calculate rest times from 5 s to 5 minutes*/
-function calculateRestTimeOptions(
-  startTime: number,
-  endTime: number
-): number[] {
-  const options: number[] = [];
-  for (let i = startTime; i <= endTime; i += 5) {
-    options.push(i);
-  }
-  return options;
-}
-
-/** helper function to convert time in seconds to format "xm ys" */
-function formatRestTime(seconds: number): string {
-  if (seconds == 0) return "OFF";
-  const minutes = Math.floor(seconds / 60);
-  const sec = seconds % 60;
-  return minutes > 0 ? `${minutes}m ${sec}s` : `${sec}s`;
 }

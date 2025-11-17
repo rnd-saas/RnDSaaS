@@ -1,16 +1,39 @@
 import LoggedExerciseItem from "@/components/WorkoutComponents/LoggedExerciseItem";
 import { Button } from "@/components/WorkoutComponents/button";
 import { MessageSquareMore } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePlannedWorkout } from "@/api/workouts";
 import type { PlannedExercise, PlannedWorkout } from "@/lib/types/Workout";
+import { useWorkoutStore } from "@/lib/state/workoutStore";
+import { useParams } from "react-router-dom";
+import { formatRestTime } from "@/lib/utils/time.ts";
 
 export default function ActiveWorkoutPage() {
-  const { data, isLoading, error } = usePlannedWorkout(new Date(), "user_123");
+  const { id } = useParams();
+  const elapsedTimeSeconds = useWorkoutStore(
+    (state) => state.elapsedTimeSeconds
+  );
+  const isRunning = useWorkoutStore((state) => state.isRunning);
+  const startWorkout = useWorkoutStore((state) => state.startWorkout);
+  const resetTimer = useWorkoutStore((state) => state.resetTimer);
 
-  const plannedWorkout: PlannedWorkout | undefined = data;
+  // Start the workout when the component mounts
+  useEffect(() => {
+    if (!isRunning) {
+      startWorkout(id!);
+    }
+
+    return () => {
+      resetTimer();
+    };
+  }, []);
+
+  // fetch the planned workout data for today
+  const { data, isLoading, error } = usePlannedWorkout(new Date());
+  const plannedWorkout: PlannedWorkout | null | undefined = data;
   let workoutContentBlock;
 
+  // handle different states: loading, error, no workout, display workout
   if (isLoading) {
     workoutContentBlock = <div className="p-4 text-sm">Loading workout...</div>;
   } else if (error) {
@@ -52,7 +75,7 @@ export default function ActiveWorkoutPage() {
                   Duration:
                 </span>
                 <span className="text-yellow-600 block text-base font-bold">
-                  5min 30s
+                  {formatRestTime(elapsedTimeSeconds)}
                 </span>
               </div>
               <div>

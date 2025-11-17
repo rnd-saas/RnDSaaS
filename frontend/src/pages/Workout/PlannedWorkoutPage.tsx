@@ -28,9 +28,7 @@ export default function WorkoutPage() {
     plannedWorkout.date.toDateString() === new Date().toDateString()
   ) {
     setTodayWorkoutId(plannedWorkout.workoutId);
-    console.log("Today's workout ID set to:", plannedWorkout.workoutId);
   }
-  console.error("id stored", todayWorkoutId);
 
   const handleWorkoutStart = () => {
     navigate(`/active-workout/${todayWorkoutId}`);

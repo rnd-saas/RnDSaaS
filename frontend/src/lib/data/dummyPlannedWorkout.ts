@@ -153,7 +153,7 @@ export const dummyPlannedWorkouts: PlannedWorkout[] = [
           description: "Vertical pull emphasizing lats and biceps.",
           slug: "pull-up",
           difficultyLevel: "Intermediate",
-          logMode: "reps_only",
+          logMode: "reps",
           muscleGroups: ["Lats", "Biceps"],
           equipment: ["Pull-up Bar"],
           createdAt: new Date("2025-03-10"),
