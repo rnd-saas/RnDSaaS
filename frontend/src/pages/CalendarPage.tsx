@@ -2,12 +2,10 @@ import BackButton from "@/components/backButton.tsx";
 import {Calendar, CalendarDayButton} from "@/components/ui/calendar.tsx";
 import {useMemo, useState} from "react";
 import {Card, CardContent, CardFooter} from "@/components/card.tsx";
-import {PlusIcon} from "lucide-react";
-import {Button} from "@/components/ui/button.tsx";
 
 export default function CalendarPage(){
     const [date, setDate] = useState<Date | undefined>(new Date())
-    const workouts = [
+    const workouts = [ //todo: get from backend
         {
             title: "Simple legs",
             from: "2025-11-02T09:00:00",
@@ -39,6 +37,8 @@ export default function CalendarPage(){
         );
     }, [date, workouts]);
 
+    // const createNewWorkout=() => alert('Tried to make new workout');
+
     return(
         <div>
             <header className="px-6 pt-11 pb-4">
@@ -48,11 +48,7 @@ export default function CalendarPage(){
             </header>
             <Card className="w-fit py-4">
                 <CardContent className="px-4">
-                    <Calendar
-                        mode="single"
-                        defaultMonth={date}
-                        selected={date}
-                        onSelect={setDate}
+                    <Calendar mode="single" defaultMonth={date} selected={date} onSelect={setDate}
                         className="rounded-lg border shadow-sm [--cell-size:--spacing(11)] md:[--cell-size:--spacing(12)]"
                         components={{
                             DayButton: ({ children, modifiers, day, ...props }) => {
@@ -71,12 +67,12 @@ export default function CalendarPage(){
                     />
                 </CardContent>
                 <CardFooter className="flex flex-col items-start gap-3 border-t px-4 !pt-4">
-                    <div className="flex w-full items-center justify-between px-1">
-                        <Button variant="ghost" size="icon" className="size-6" title="Add Event">
-                            <PlusIcon />
-                            <span className="sr-only">Add Event</span>
-                        </Button>
-                    </div>
+                    {/*<div className="flex w-full items-center justify-between px-1">*/}
+                    {/*    <Button variant="ghost" size="icon" className="size-6" title="Add Event" onClick={createNewWorkout}>*/}
+                    {/*        <PlusIcon />*/}
+                    {/*        <span className="sr-only">Add Event</span>*/}
+                    {/*    </Button>*/}
+                    {/*</div>*/}
                     <div className="flex w-full flex-col gap-2">
                         {selectedDateWorkouts.length > 0 ? (
                             selectedDateWorkouts.map((event) => (
