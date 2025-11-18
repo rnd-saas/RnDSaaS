@@ -1,8 +1,8 @@
 ﻿import {Button} from "@/components/ui/button.tsx";
-import {ArrowLeft, MoreVertical, Send} from "lucide-react";
+import {MoreVertical, Send} from "lucide-react";
 import avatarPlaceholder from "@/assets/avatar-placeholder.png";
 import {Input} from "@/components/ui/input.tsx";
-import {useLocation, useNavigate} from "react-router-dom";
+import {useLocation} from "react-router-dom";
 import AvatarIcon from "@/components/avatarIcon.tsx";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu.tsx";
 import {useEffect, useRef, useState} from "react";
