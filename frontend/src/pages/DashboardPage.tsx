@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { dashboardService } from "@/lib/api";
+import { dashboardService, settingsService } from "@/lib/api";
 import type { DashboardData } from "@/lib/api/types";
 import Achievement from "@/components/achievement";
 
@@ -29,10 +29,29 @@ const FALLBACK_DASHBOARD: DashboardData = {
 };
 
 export default function DashboardPage() {
-  const { state } = useLocation() as { state?: { firstName?: string } };
+  const location = useLocation();
+  const { state } = location as { state?: { firstName?: string } };
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [streakDisplay, setStreakDisplay] = useState<boolean>(true); // Default to true
+
+  // Load user settings to check streak_display
+  const loadSettings = async () => {
+    try {
+      const settings = await settingsService.getSettings();
+      setStreakDisplay(settings.streak_display);
+    } catch (error: any) {
+      // If settings fail to load, default to showing streak
+      console.warn("Failed to load settings, defaulting to show streak:", error);
+      setStreakDisplay(true);
+    }
+  };
+
+  // Load settings on mount and when location changes (user returns from settings)
+  useEffect(() => {
+    loadSettings();
+  }, [location.pathname]);
 
   useEffect(() => {
     let active = true;
@@ -153,10 +172,15 @@ export default function DashboardPage() {
 
         <p className="mt-3 text-[15px] text-amber-600">Need help calming down?</p>
 
-        {/* Streak + Level */}
-        <section className="mt-6 space-y-3">
-          <h2 className="text-3xl font-semibold">Streak: {streakDays} days</h2>
+        {/* Streak - Only show if streak_display is enabled */}
+        {streakDisplay && (
+          <section className="mt-6 space-y-3">
+            <h2 className="text-3xl font-semibold">Streak: {streakDays} days</h2>
+          </section>
+        )}
 
+        {/* Level - Always show */}
+        <section className="mt-6 space-y-3">
           <div className="flex items-center gap-2">
             <span className="text-base text-muted-foreground">Current level:</span>
             <span className="text-base font-medium">{level.label}</span>
