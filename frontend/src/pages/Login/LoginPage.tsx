@@ -1,6 +1,7 @@
 ﻿import { useForm } from "react-hook-form";
 import {Button} from "@/components/ui/button.tsx";
 import {Link, useNavigate} from "react-router-dom";
+import {DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog.tsx";
 
 type Inputs = {
     email: string
@@ -18,18 +19,19 @@ function Login() {
         const userData = {email:'sample@sample.com',password:'sample'};//should get from backend
         if (userData && userData.password === data.password) {
             alert(userData.email + " You Are Successfully Logged In");
+            navigate("/dashboard")
         } else {
             alert("Email or Password is not matching with our record");
         }
     };
 
     return (
-        <>
-            {/*todo: standardise fonts*/}
-            <h2 style={{ fontFamily: "var(--title-font-font-family)" }}>Login Form</h2>
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Login Form</DialogTitle>
+            </DialogHeader>
 
             <form
-                // todo: standardise rounding and shadow
                 className="Login max-w-sm bg-[var(--color-background)] p-6 rounded-lg shadow-md space-y-4"
                 onSubmit={handleSubmit(onSubmit)}
             >
@@ -62,11 +64,11 @@ function Login() {
                 </div>
                 <Button variant={"default"} type="submit">Login</Button>
             </form>
-            <div className={'p-6'}>
+            <DialogFooter className={'p-6'}>
                 <p>Don't have an account yet?</p>
                 <Button variant={"secondary"} onClick={() => navigate("/register")}>Register</Button>
-            </div>
-        </>
+            </DialogFooter>
+        </DialogContent>
     );
 }
 

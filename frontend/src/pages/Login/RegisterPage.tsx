@@ -1,6 +1,7 @@
 ﻿import { useForm } from "react-hook-form";
 import {Button} from "@/components/ui/button.tsx";
 import {Link} from "react-router-dom";
+import {DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog.tsx";
 
 type Inputs = {
     email: string
@@ -29,9 +30,10 @@ function Register() {
     const password = watch("password");
 
     return (
-        <>
-            <h2 style={{ fontFamily: "var(--title-font-font-family)" }}>Registration Form</h2>
-
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Registration Form</DialogTitle>
+            </DialogHeader>
             <form
                 className="Register max-w-sm bg-[var(--color-background)] p-6 rounded-lg shadow-md space-y-4"
                 onSubmit={handleSubmit(onSubmit)}
@@ -94,11 +96,11 @@ function Register() {
                 </div>
                 <Button variant={"default"} type="submit">Register</Button>
             </form>
-            <div className={'p-6'}>
+            <DialogFooter className={'p-6'}>
                 <Link to={'/login'} style={{color: "var(--color-link)"}}>Already an existing
                     user?</Link>
-            </div>
-        </>
+            </DialogFooter>
+        </DialogContent>
     );
 }
 
