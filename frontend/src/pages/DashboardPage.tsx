@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import Achievement from "@/components/achievement.tsx";
+import type {AchievementType} from "@/utils/AchievementType.tsx";
 
 /**
  * Pure UI mock: no data fetching yet.
@@ -32,10 +33,10 @@ export default function DashboardPage() {
     longestStreak: { current: 0, target: 7 },
   };
   const level = { label: "Novice", currentXp: 500, nextLevelXp: 1200 };
-  const achievements = [
-    { id: 1, title: "100 Workouts", sub: "Completed", emoji: "💪" },
-    { id: 2, title: "7 Days", sub: "Streak", emoji: "📆" },
-    { id: 3, title: "Consecutive", sub: "Workout 12", emoji: "🔥" },
+  const achievements: AchievementType[] = [
+    { id: 1, title: "100 Workouts", sub: "Completed", image: "💪", obtained:true },
+    { id: 2, title: "7 Days", sub: "Streak", image: "📆", obtained: true },
+    { id: 3, title: "Consecutive", sub: "Workout 12", image: "🔥", obtained:true },
   ];
   // ----------------------
 
