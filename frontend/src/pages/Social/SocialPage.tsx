@@ -2,8 +2,12 @@ import { useMemo, useState, useEffect } from "react";
 import SocialSearchBar from "@/components/ui/searchbar";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
-import { Heart, PlusSquare } from "lucide-react";
+import { Heart, PlusSquare, UserPlus } from "lucide-react";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
+
+
 
 // Mock users
 const MOCK_USERS = [
@@ -96,38 +100,60 @@ export default function SocialPage() {
           <p className="text-xs text-muted-foreground mt-2">Users</p>
         )}
 
-        {filteredUsers.map((user) => (
-          <button
-            key={user.id}
-            type="button"
-            className="flex w-full items-center gap-3 rounded-2xl bg-white px-4 py-3 shadow-sm hover:bg-accent/40 transition-colors text-left"
-          >
-            <Avatar className="h-10 w-10">
-              <AvatarFallback>
-                {user.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")
-                  .slice(0, 2)
-                  .toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
+{filteredUsers.map((user) => (
+  <div
+    key={user.id}
+    className="flex w-full items-center justify-between rounded-2xl bg-white px-4 py-3 shadow-sm hover:bg-accent/40 transition-colors"
+  >
+    {/* Left side: avatar + text */}
+    <div className="flex items-center gap-3 text-left">
+      <Avatar className="h-10 w-10">
+        <AvatarFallback>
+          {user.name
+            .split(" ")
+            .map((n) => n[0])
+            .join("")
+            .slice(0, 2)
+            .toUpperCase()}
+        </AvatarFallback>
+      </Avatar>
 
-            <div className="flex flex-col">
-              <span className="text-sm font-medium leading-tight">
-                {user.name}
-              </span>
-              <span className="text-xs text-muted-foreground">
-                @{user.username}
-              </span>
-              {user.status && (
-                <span className="mt-0.5 text-xs text-muted-foreground">
-                  {user.status}
-                </span>
-              )}
-            </div>
-          </button>
-        ))}
+      <div className="flex flex-col">
+        <span className="text-sm font-medium leading-tight">
+          {user.name}
+        </span>
+        <span className="text-xs text-muted-foreground">
+          @{user.username}
+        </span>
+        {user.status && (
+          <span className="mt-0.5 text-xs text-muted-foreground">
+            {user.status}
+          </span>
+        )}
+      </div>
+    </div>
+
+    {/* Right side: add friend button */}
+    <Button
+      type="button"
+      variant="secondary"
+      size="icon"
+      className="rounded-xl shrink-0"
+      onClick={() => {
+        console.log("Add friend:", user.username);
+
+        toast.success("Friend request sent ✅", {
+          description: `You sent a friend request to ${user.name}.`,
+        });
+      }}
+      aria-label={`Add ${user.name} as friend`}
+      title="Add friend"
+    >
+      <UserPlus className="h-5 w-5" />
+    </Button>
+
+  </div>
+))}
 
         {filteredUsers.length > 0 && <div className="h-3" />}
       </div>
