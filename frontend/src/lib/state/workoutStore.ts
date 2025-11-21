@@ -27,7 +27,8 @@ interface ActiveWorkoutState {
     exerciseId: string,
     newValue: Partial<LoggedExercise>
   ) => void;
-  CalculateTotalVolume: () => number; // total volume that you lifted this workout.
+  calculateTotalVolume: () => number; // total volume that you lifted this workout.
+  calculateTotalSetsFinished: () => number; // total sets completed in the workout.
 }
 
 export const useWorkoutStore = create<ActiveWorkoutState>()(
@@ -143,7 +144,7 @@ export const useWorkoutStore = create<ActiveWorkoutState>()(
           };
         });
       },
-      CalculateTotalVolume: () => {
+      calculateTotalVolume: () => {
         const exercises = get().loggedWorkout?.exercises;
         if (!exercises) return 0;
 
@@ -159,6 +160,17 @@ export const useWorkoutStore = create<ActiveWorkoutState>()(
         }, 0);
 
         return totalVolume;
+      },
+      calculateTotalSetsFinished: () => {
+        const exercises = get().loggedWorkout?.exercises;
+        if (!exercises) return 0;
+
+        const totalSets = exercises.reduce((exerciseSetSum, ex) => {
+          const completedSets = ex.sets.filter((set) => set.completed).length;
+          return exerciseSetSum + completedSets;
+        }, 0);
+
+        return totalSets;
       },
     }),
     { name: "workout-storage" }

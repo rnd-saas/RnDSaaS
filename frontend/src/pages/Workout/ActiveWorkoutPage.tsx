@@ -22,8 +22,11 @@ export default function ActiveWorkoutPage() {
   const startWorkout = useWorkoutStore((state) => state.startWorkout);
   const loggedWorkout = useWorkoutStore((state) => state.loggedWorkout);
   const updateWorkout = useWorkoutStore((state) => state.updateWorkout);
-  const CalculateTotalVolume = useWorkoutStore(
-    (state) => state.CalculateTotalVolume
+  const calculateTotalVolume = useWorkoutStore(
+    (state) => state.calculateTotalVolume
+  );
+  const calculateTotalSetsFinished = useWorkoutStore(
+    (state) => state.calculateTotalSetsFinished
   );
 
   // fetch the planned workout data for today
@@ -134,14 +137,16 @@ export default function ActiveWorkoutPage() {
                   Volume:
                 </span>
                 <span className="text-zinc-400 block text-base ">
-                  {CalculateTotalVolume()}
+                  {calculateTotalVolume()}
                 </span>
               </div>
               <div>
                 <span className="text-zinc-700 block font-primary text-sm">
                   Sets Finished:
                 </span>
-                <span className="text-zinc-400 block text-base ">2</span>
+                <span className="text-zinc-400 block text-base ">
+                  {calculateTotalSetsFinished()}
+                </span>
               </div>
             </div>
           </div>
