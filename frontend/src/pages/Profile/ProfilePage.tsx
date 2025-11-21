@@ -18,12 +18,15 @@ export default function ProfilePage() {
 
     const fallbackName = state?.firstName ?? localStorage.getItem("firstName") ?? "User";
 
+    const location = useLocation();
+
     useEffect(() => {
         let active = true;
 
         const loadProfile = async () => {
             try {
                 setError(null);
+                setIsLoading(true);
                 const data = await profileService.getProfile();
                 if (!active) return;
                 setProfile(data);
@@ -46,7 +49,7 @@ export default function ProfilePage() {
         return () => {
             active = false;
         };
-    }, []);
+    }, [location.pathname]); // Reload when route changes (e.g., after login)
 
     const displayName = profile?.user.preferredName ?? fallbackName;
 

@@ -37,6 +37,8 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
             });
         }
 
+        console.log(`[Profile] Fetching profile data for user: ${userId}`);
+        
         const [profileResult, usersResult, userAchievementsResult, workoutsResult] = await Promise.all([
             supabase
                 .from('user_info')
@@ -53,7 +55,7 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
                 .select('id, achievement_id, unlocked_at')
                 .eq('user_id', userId)
                 .order('unlocked_at', { ascending: false })
-                .limit(3),
+                .limit(20), // Query more records to ensure we get 3 unique achievements after deduplication
             supabase
                 .from('workouts')
                 .select('id, started_at')
@@ -61,6 +63,12 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
                 .order('started_at', { ascending: false })
                 .limit(100)  // Increased from 42 to 100 to ensure we cover all workouts in the last 21 days
         ]);
+
+        console.log(`[Profile] Query results:`, {
+            userAchievementsCount: userAchievementsResult.data?.length ?? 0,
+            userAchievementsError: userAchievementsResult.error?.message,
+            userAchievementsData: userAchievementsResult.data?.map(r => ({ id: r.id, achievement_id: r.achievement_id, unlocked_at: r.unlocked_at }))
+        });
 
         if (profileResult.error) {
             console.warn('Failed to read profile info:', profileResult.error.message);
@@ -71,15 +79,25 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
         }
 
         if (userAchievementsResult.error) {
-            console.warn('Failed to read profile achievements:', userAchievementsResult.error.message);
+            console.error('Failed to read profile achievements:', {
+                error: userAchievementsResult.error.message,
+                code: userAchievementsResult.error.code,
+                details: userAchievementsResult.error.details,
+                hint: userAchievementsResult.error.hint,
+                userId: userId
+            });
+            // Continue with empty data rather than failing completely
         }
 
         if (workoutsResult.error) {
             console.warn('Failed to read workout history:', workoutsResult.error.message);
         }
 
-        const achievements = await buildAchievements(userAchievementsResult.data);
-        const { workoutGrid, streak } = buildWorkoutGrid(workoutsResult.data);
+        // Use data even if there was an error (data might still be available)
+        // Supabase sometimes returns data even when there's an error, so prioritize data
+        const achievementsData = userAchievementsResult.data ?? (userAchievementsResult.error ? null : null);
+        const achievements = await buildAchievements(achievementsData);
+        const { workoutGrid, streak } = buildWorkoutGrid(workoutsResult.error ? null : workoutsResult.data);
 
         const preferredName =
             profileResult.data?.preferred_name ??
@@ -87,9 +105,10 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
             null;
 
         // Ensure we return exactly 3 achievements for the profile page
+        // Only use DEFAULT_ACHIEVEMENTS if we truly have no achievements (not just due to a query error)
         const displayAchievements = achievements.length > 0 
             ? achievements.slice(0, 3) 
-            : DEFAULT_ACHIEVEMENTS;
+            : (userAchievementsResult.error ? [] : DEFAULT_ACHIEVEMENTS); // Return empty array on error, not fallback
 
         return res.json({
             user: {
@@ -127,6 +146,7 @@ async function buildAchievements(
     );
 
     if (achievementIds.length === 0) {
+        console.warn('buildAchievements: No valid achievement IDs found in rows');
         return [];
     }
 
@@ -135,8 +155,19 @@ async function buildAchievements(
         .select('id, name, description, icon')
         .in('id', achievementIds);
 
-    if (error || !data) {
-        console.warn('Failed to load achievements metadata:', error?.message || error);
+    if (error) {
+        console.error('Failed to load achievements metadata:', {
+            error: error.message,
+            code: error.code,
+            details: error.details,
+            hint: error.hint,
+            achievementIds: achievementIds
+        });
+        return [];
+    }
+
+    if (!data || data.length === 0) {
+        console.warn('buildAchievements: No achievement metadata found for IDs:', achievementIds);
         return [];
     }
 
@@ -148,6 +179,12 @@ async function buildAchievements(
             icon: record.icon ?? '🏆'
         });
     });
+
+    // Check for missing metadata
+    const missingIds = achievementIds.filter(id => !meta.has(id));
+    if (missingIds.length > 0) {
+        console.warn('buildAchievements: Missing metadata for achievement IDs:', missingIds);
+    }
 
     // Build achievements, keeping the order from rows (most recent first)
     // Use a Set to track which achievement_ids we've already added (to avoid duplicates)
@@ -166,6 +203,7 @@ async function buildAchievements(
 
         const record = meta.get(row.achievement_id);
         if (!record) {
+            console.warn(`buildAchievements: Skipping row with missing metadata for achievement_id: ${row.achievement_id}, row.id: ${row.id}`);
             continue;
         }
 
@@ -178,6 +216,7 @@ async function buildAchievements(
         });
     }
 
+    console.log(`buildAchievements: Built ${result.length} achievements from ${rows.length} rows (${achievementIds.length} unique achievement IDs)`);
     return result;
 }
 
@@ -357,18 +396,44 @@ router.get('/achievements', requireAuth, async (req: AuthedRequest, res) => {
             });
         }
 
-        const { data: userAchievementsResult, error } = await supabase
-            .from('user_achievements')
-            .select('id, achievement_id, unlocked_at')
-            .eq('user_id', userId)
-            .order('unlocked_at', { ascending: false })
-            .limit(1000); // Explicitly set a high limit to ensure we get all achievements
+        // Fetch all user achievements using pagination to ensure we get all records
+        // Supabase has a default limit of 1000, so we need to paginate if there are more
+        let userAchievementsResult: Array<{ id: string; achievement_id: string | null; unlocked_at: string | null }> = [];
+        let from = 0;
+        const pageSize = 1000;
+        let hasMore = true;
 
-        if (error) {
-            console.warn('Failed to read user achievements:', error.message);
-            return res.status(500).json({
-                error: { message: 'Failed to load achievements' }
-            });
+        while (hasMore) {
+            const { data, error } = await supabase
+                .from('user_achievements')
+                .select('id, achievement_id, unlocked_at')
+                .eq('user_id', userId)
+                .order('unlocked_at', { ascending: false })
+                .range(from, from + pageSize - 1);
+
+            if (error) {
+                console.error('Failed to read user achievements:', {
+                    error: error.message,
+                    code: error.code,
+                    details: error.details,
+                    hint: error.hint,
+                    userId: userId,
+                    from: from,
+                    pageSize: pageSize
+                });
+                return res.status(500).json({
+                    error: { message: 'Failed to load achievements' }
+                });
+            }
+
+            if (data && data.length > 0) {
+                userAchievementsResult = userAchievementsResult.concat(data);
+                // If we got fewer records than pageSize, we've reached the end
+                hasMore = data.length === pageSize;
+                from += pageSize;
+            } else {
+                hasMore = false;
+            }
         }
 
         // Use buildAllAchievements to show all achievements without deduplication

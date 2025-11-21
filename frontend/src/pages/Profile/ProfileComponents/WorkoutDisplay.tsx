@@ -73,8 +73,8 @@ export default function WorkoutDisplay({ weeks, isLoading }: WorkoutDisplayProps
                 <>
                     {/* Labels */}
                     <div className="grid grid-cols-7 text-xs gap-2 font-semibold text-[var(--color-text)] mb-1">
-                        {["M", "T", "W", "T", "F", "S", "S"].map(d => (
-                            <div key={d} className="text-left p-2">{d}</div>
+                        {["M", "T", "W", "T", "F", "S", "S"].map((d, index) => (
+                            <div key={`weekday-${index}`} className="text-left p-2">{d}</div>
                         ))}
                     </div>
 

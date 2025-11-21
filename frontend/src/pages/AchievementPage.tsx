@@ -3,8 +3,10 @@ import Achievement from "@/components/achievement.tsx";
 import BackButton from "@/components/backButton.tsx";
 import { Card } from "@/components/card.tsx";
 import { profileService, type ProfileAchievement, ApiError } from "@/lib/api";
+import { useLocation } from "react-router-dom";
 
 export default function AchievementPage() {
+    const location = useLocation();
     const [achievements, setAchievements] = useState<ProfileAchievement[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -38,7 +40,7 @@ export default function AchievementPage() {
         return () => {
             active = false;
         };
-    }, []);
+    }, [location.pathname]); // Reload when route changes (e.g., after login)
 
     return (
         <div>
