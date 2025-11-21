@@ -4,7 +4,7 @@ import bench from "@/assets/icons/bench.svg";
 import LoggedExerciseItemTable from "@/components/WorkoutComponents/LoggedExerciseItemTable";
 import { useState } from "react";
 import type { PlannedExercise } from "@/lib/types/Workout";
-import { ExerciseNote } from "@/components/WorkoutComponents/ExerciseNote";
+import { LoggedExerciseNote } from "@/components/WorkoutComponents/LoggedExerciseNote";
 import { Timer } from "lucide-react";
 import { Button } from "@/components/WorkoutComponents/button";
 import {
@@ -121,7 +121,7 @@ export default function LoggedExerciseItem({
             </DropdownMenu>
 
             <div className="w-full md:w-3/4 mb-2">
-              <ExerciseNote
+              <LoggedExerciseNote
                 bgColor="bg-white "
                 exerciseId={plannedExerciseId}
               />

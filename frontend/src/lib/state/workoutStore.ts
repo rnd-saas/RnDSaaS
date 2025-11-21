@@ -149,6 +149,7 @@ export const useWorkoutStore = create<ActiveWorkoutState>()(
 
         const totalVolume = exercises.reduce((exerciseSum, ex) => {
           const exerciseVolume = ex.sets.reduce((setSum, set) => {
+            if (set.completed === false) return setSum;
             const reps = set.actualReps || 0;
             const weight = set.actualWeightKg || 0;
             return setSum + reps * weight;

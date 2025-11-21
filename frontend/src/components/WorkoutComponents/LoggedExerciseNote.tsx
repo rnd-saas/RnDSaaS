@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { useWorkoutStore } from "@/lib/state/workoutStore";
 
-export function ExerciseNote({
+export function LoggedExerciseNote({
   bgColor,
   exerciseId,
 }: {
@@ -51,4 +51,4 @@ export function ExerciseNote({
     />
   );
 }
-export default ExerciseNote;
+export default LoggedExerciseNote;

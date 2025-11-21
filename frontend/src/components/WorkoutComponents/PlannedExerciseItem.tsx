@@ -4,7 +4,7 @@ import bench from "@/assets/icons/bench.svg";
 import PlannedExerciseItemTable from "@/components/WorkoutComponents/PlannedExerciseItemTable";
 import { useState } from "react";
 import type { PlannedExercise } from "@/lib/types/Workout";
-import { ExerciseNote } from "@/components/WorkoutComponents/ExerciseNote";
+import { PlannedExerciseNote } from "@/components/WorkoutComponents/PlannedExerciseNote";
 
 export default function PlannedExerciseItem({
   exercise,
@@ -56,7 +56,7 @@ export default function PlannedExerciseItem({
             }`}
           >
             <div className="w-full md:w-3/4 mb-2">
-              <ExerciseNote />
+              <PlannedExerciseNote />
             </div>
             <PlannedExerciseItemTable
               sets={exercise.sets}

@@ -22,6 +22,9 @@ export default function ActiveWorkoutPage() {
   const startWorkout = useWorkoutStore((state) => state.startWorkout);
   const loggedWorkout = useWorkoutStore((state) => state.loggedWorkout);
   const updateWorkout = useWorkoutStore((state) => state.updateWorkout);
+  const CalculateTotalVolume = useWorkoutStore(
+    (state) => state.CalculateTotalVolume
+  );
 
   // fetch the planned workout data for today
   const { data, isLoading, error } = usePlannedWorkout(new Date()); // this or use the plannedworwkout id to fetch it?
@@ -130,7 +133,9 @@ export default function ActiveWorkoutPage() {
                 <span className="text-zinc-700 block font-primary text-sm">
                   Volume:
                 </span>
-                <span className="text-zinc-400 block text-base ">100 kg</span>
+                <span className="text-zinc-400 block text-base ">
+                  {CalculateTotalVolume()}
+                </span>
               </div>
               <div>
                 <span className="text-zinc-700 block font-primary text-sm">
