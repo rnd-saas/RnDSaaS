@@ -11,7 +11,7 @@ import Step7WhichDays from "@/pages/Onboarding/steps/Step7WhichDays.tsx";
 import Step8SessionLength from "@/pages/Onboarding/steps/Step8SessionLength.tsx";
 import Step9ProtectedAreas from "@/pages/Onboarding/steps/Step9ProtectedAreas.tsx";
 import Step10WorkoutType from "@/pages/Onboarding/steps/Step10WorkoutType.tsx";
-import Step11ComfortLevel from "@/pages/Onboarding/steps/Step11ComfortLevel.tsx";
+import Step11Emotions from "@/pages/Onboarding/steps/Step11Emotions.tsx";
 import Step3Gender from "@/pages/Onboarding/steps/Step3Gender.tsx";
 import Step2Data from "@/pages/Onboarding/steps/Step2Data.tsx";
 import Step4PrimaryGoal from "./steps/Step4PrimaryGoal.tsx";
@@ -116,8 +116,12 @@ const mapSelectionArrayToEnums = (values: string[] | undefined): string[] | null
     return mapped.length ? mapped : null;
 };
 
-const mapComfortLevelsToDbValues = (comfortLevels: GymComfortLevel[] | undefined): string[] | null => {
-    return mapSelectionArrayToEnums(comfortLevels);
+const mapComfortLevelsToDbValues = (
+    comfortLevels: GymComfortLevel | GymComfortLevel[] | undefined
+): string[] | null => {
+    if (!comfortLevels) return null;
+    const values = Array.isArray(comfortLevels) ? comfortLevels : [comfortLevels];
+    return mapSelectionArrayToEnums(values);
 };
 
 const mapPrimaryGoalToDbValues = (goal: PrimaryGoal | undefined): string[] | null => {
@@ -125,10 +129,13 @@ const mapPrimaryGoalToDbValues = (goal: PrimaryGoal | undefined): string[] | nul
     return normalized ? [normalized] : null;
 };
 
-const mapPreferredSplitToDbValues = (split: PreferredSplit[] | undefined): string[] | null => {
-    return mapSelectionArrayToEnums(split);
+const mapPreferredSplitToDbValues = (
+    split: PreferredSplit | PreferredSplit[] | undefined
+): string[] | null => {
+    if (!split) return null;
+    const values = Array.isArray(split) ? split : [split];
+    return mapSelectionArrayToEnums(values);
 };
-import Step11Emotions from "@/pages/Onboarding/steps/Step11Emotions.tsx";
 
 export type Inputs = {
     strTrainer:string,
@@ -230,7 +237,7 @@ export default function OnboardingManager() {
         'session_length',
         'protected_areas',
         'workout_type',
-        'comfort_level'
+        'emotions'
     ];
 
     // Track step changes

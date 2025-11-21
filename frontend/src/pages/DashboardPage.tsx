@@ -1,11 +1,12 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { RefreshCcw } from "lucide-react";
-import {useLocation, useNavigate} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import Achievement from "@/components/achievement.tsx";
-import type {AchievementType} from "@/utils/AchievementType.tsx";
+import { dashboardService } from "@/lib/api";
+import type { DashboardData } from "@/lib/api/types";
 
 const ADVICE_TIPS: string[] = [
   "Fill half your plate with colorful vegetables.",
@@ -70,6 +71,26 @@ const MOODS = {
 };
 
 type MoodKey = keyof typeof MOODS;
+
+const FALLBACK_DASHBOARD: DashboardData = {
+  firstName: null,
+  trainer: null,
+  goal: {
+    workoutsCompleted: { current: 70, target: 100 },
+    exercisesDiscovered: { current: 30, target: 40 },
+    longestStreak: { current: 30, target: 60 },
+  },
+  level: { label: "Novice", currentXp: 500, nextLevelXp: 1200 },
+  achievements: [
+    { id: "workouts-100", title: "100 Workouts", sub: "Completed", emoji: "💪" },
+    { id: "streak-7", title: "7 Days", sub: "Streak", emoji: "📆" },
+    { id: "consecutive-12", title: "Consecutive", sub: "Workout 12", emoji: "🔥" },
+  ],
+  mood: "😣",
+  nextWorkout: "🏋️‍♂️",
+  streakDays: 20,
+  advice: ADVICE_TIPS[0],
+};
 
 
 
@@ -136,9 +157,6 @@ export default function DashboardPage() {
   const level = resolvedData.level;
   const achievements = resolvedData.achievements;
   const streakDays = resolvedData.streakDays;
-  const advice = resolvedData.advice;
-  const moodEmoji = resolvedData.mood;
-  const nextWorkoutEmoji = resolvedData.nextWorkout;
 
   const navigate = useNavigate();
 
@@ -254,8 +272,14 @@ export default function DashboardPage() {
         <section className="mt-5">
           <h3 className="mb-3 text-lg font-semibold">Achievements:</h3>
           <div className="flex items-stretch gap-3 overflow-x-auto pb-1">
-            {achievements.map((a) => (
-              <Achievement key={a.id} {...a} />
+            {achievements.map((a, index) => (
+              <Achievement
+                key={a.id ?? index}
+                title={a.title}
+                sub={a.sub}
+                image={a.emoji}
+                obtained
+              />
             ))}
           </div>
           <div className="mt-2 flex items-center justify-center gap-2">
