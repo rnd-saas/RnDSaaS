@@ -143,8 +143,18 @@ export default function SocialPage() {
             <Card key={post.id} className="bg-white shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between py-3">
                 <div className="flex items-center gap-3">
-                  <div className="text-3xl">{post.emoji}</div>
-                  <CardTitle className="text-base">{post.user}</CardTitle>
+                <Avatar className="h-10 w-10">
+                <AvatarFallback>
+                  {post.user
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .slice(0, 2)
+                    .toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+            <CardTitle className="text-base">{post.user}</CardTitle>
+
                 </div>
 
                 {/* Private like button (only visible to you) */}

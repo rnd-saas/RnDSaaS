@@ -1,24 +1,29 @@
 import { NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
+// SVGs as React components (Vite + svgr)
+import HomeIcon from "@/components/navigation/home-icon.svg?react";
+import WorkoutIcon from "@/components/navigation/workout-icon.svg?react";
+import FriendsIcon from "@/components/navigation/social-icon.svg?react";
+import ProfileIcon from "@/components/navigation/profile-icon.svg?react";
+
 type NavItem = {
-  label: "Home" | "Workout" | "Social" | "Profile";
   to: string;
-  icon: string; // keeping your emoji icons
-  end?: boolean; // for exact matching on root paths
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  end?: boolean;
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { label: "Home", to: "/dashboard", icon: "🏠", end: true },
-  { label: "Workout", to: "/workout", icon: "🏋️‍♀️" },
-  { label: "Social", to: "/social", icon: "💬" },
-  { label: "Profile", to: "/profile", icon: "👤" },
+  { to: "/dashboard", icon: HomeIcon, end: true },
+  { to: "/workout", icon: WorkoutIcon },
+  { to: "/social", icon: FriendsIcon },
+  { to: "/profile", icon: ProfileIcon },
 ];
 
 export function BottomNav() {
   return (
     <nav className="fixed inset-x-0 bottom-0 z-20 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="mx-auto flex max-w-screen-sm items-center justify-around px-4 py-2 text-sm">
+      <div className="mx-auto flex max-w-screen-sm items-center justify-around px-6 py-3">
         {NAV_ITEMS.map((item) => (
           <NavTab key={item.to} {...item} />
         ))}
@@ -27,20 +32,19 @@ export function BottomNav() {
   );
 }
 
-function NavTab({ label, to, icon, end }: NavItem) {
+function NavTab({ to, icon: Icon, end }: NavItem) {
   return (
     <NavLink to={to} end={end} className="contents">
       {({ isActive }) => (
         <Button
           variant={isActive ? "default" : "ghost"}
-          size="sm"
-          className={`flex h-10 min-w-[70px] flex-col items-center gap-1 rounded-full px-3 ${
+          size="icon"
+          className={`h-12 w-12 rounded-full flex items-center justify-center ${
             isActive ? "" : "text-muted-foreground"
           }`}
           aria-current={isActive ? "page" : undefined}
         >
-          <span className="text-xl leading-none">{icon}</span>
-          <span className="text-[11px]">{label}</span>
+          <Icon className="h-9 w-9" />
         </Button>
       )}
     </NavLink>

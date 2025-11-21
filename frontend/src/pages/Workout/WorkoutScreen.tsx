@@ -1,5 +1,7 @@
+///src/pages/Workout/WorkoutScreen.tsx
 import workoutImg from "@/assets/workout/workout-image.png";
 import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 type ExerciseScreenProps = {
   timeLabel: string;
@@ -20,14 +22,17 @@ export default function ExerciseScreen({
     <>
       {/* Top arrow – optional back to rest or workout list */}
       <div className="mb-4 flex justify-start">
-        <button
-          type="button"
-          onClick={onSwitchToRest}
-          className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-amber-500 text-amber-500"
-          aria-label="Go to rest"
-        >
-          ˅
-        </button>
+      <button
+        onClick={() => window.history.back()}
+        aria-label="Go back"
+        className="
+          absolute left-4 top-4 z-10 
+          rounded-full p-2 bg-white shadow 
+          hover:bg-accent transition
+        "
+      >
+        <ArrowLeft className="h-5 w-5" />
+      </button>
       </div>
 
       <div className="flex flex-col items-center gap-6">
@@ -55,6 +60,8 @@ export default function ExerciseScreen({
         >
           {pauseLabel}
         </Button>
+
+        
       </div>
     </>
   );
