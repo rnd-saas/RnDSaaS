@@ -23,6 +23,10 @@ interface ActiveWorkoutState {
     newValue: Partial<LoggedSet>
   ) => void;
   updateWorkout: (newValue: Partial<LoggedWorkout>) => void;
+  updateExercise: (
+    exerciseId: string,
+    newValue: Partial<LoggedExercise>
+  ) => void;
 }
 
 export const useWorkoutStore = create<ActiveWorkoutState>()(
@@ -114,7 +118,28 @@ export const useWorkoutStore = create<ActiveWorkoutState>()(
           if (!state.loggedWorkout) {
             return state;
           }
+          console.log("updating workout with new value: ", newValue);
           return { loggedWorkout: { ...state.loggedWorkout, ...newValue } };
+        });
+      },
+      updateExercise: (
+        exerciseId: string,
+        newValue: Partial<LoggedExercise>
+      ) => {
+        set((state) => {
+          if (!state.loggedWorkout || !state.loggedWorkout.exercises) {
+            return state;
+          }
+          const updatedExercises = state.loggedWorkout.exercises.map((ex) => {
+            if (ex.exerciseInfo.exerciseId !== exerciseId) return ex;
+            return { ...ex, ...newValue };
+          });
+          return {
+            loggedWorkout: {
+              ...state.loggedWorkout,
+              exercises: updatedExercises,
+            },
+          };
         });
       },
     }),

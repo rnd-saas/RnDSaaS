@@ -121,7 +121,10 @@ export default function LoggedExerciseItem({
             </DropdownMenu>
 
             <div className="w-full md:w-3/4 mb-2">
-              <ExerciseNote bgColor="bg-white " />
+              <ExerciseNote
+                bgColor="bg-white "
+                exerciseId={plannedExerciseId}
+              />
             </div>
             <LoggedExerciseItemTable
               exerciseId={plannedExercise.exerciseInfo.exerciseId}

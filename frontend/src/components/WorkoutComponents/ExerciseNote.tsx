@@ -1,7 +1,15 @@
 import { useRef } from "react";
+import { useWorkoutStore } from "@/lib/state/workoutStore";
 
-export function ExerciseNote({ bgColor }: { bgColor?: string }): JSX.Element {
+export function ExerciseNote({
+  bgColor,
+  exerciseId,
+}: {
+  bgColor?: string;
+  exerciseId: string;
+}): JSX.Element {
   const ref = useRef<HTMLTextAreaElement>(null);
+  const updateExercise = useWorkoutStore((state) => state.updateExercise);
 
   const autoGrow = () => {
     const el = ref.current;
@@ -37,6 +45,9 @@ export function ExerciseNote({ bgColor }: { bgColor?: string }): JSX.Element {
       className={`placeholder:text-muted-foreground dark:bg-input/30 border-input w-full min-w-0 rounded-md ${
         bgColor ?? "bg-[--var(basic-colours-green-50)]"
       } px-3 py-2 text-sm shadow-card outline-none resize-none overflow-hidden`}
+      onBlur={(e) => {
+        updateExercise(exerciseId, { notes: e.target.value });
+      }}
     />
   );
 }
