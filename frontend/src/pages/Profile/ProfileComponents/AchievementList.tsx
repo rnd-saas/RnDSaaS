@@ -1,16 +1,37 @@
 import Achievement from "@/components/achievement.tsx";
+import type { ProfileAchievement } from "@/lib/api";
 
-export default function AchievementList() {
+type AchievementListProps = {
+    achievements: ProfileAchievement[];
+    isLoading?: boolean;
+};
 
-    const recentAchievements = [
-        { id: 1, title: "100 Workouts", sub: "Completed", emoji: "💪" },
-        { id: 2, title: "7 Days", sub: "Streak", emoji: "📆" },
-        { id: 3, title: "Consecutive", sub: "Workout 12", emoji: "🔥" },
-    ];
+const FALLBACK_ACHIEVEMENTS: ProfileAchievement[] = [
+    { id: "fallback-1", title: "100 Workouts", sub: "Completed", emoji: "💪" },
+    { id: "fallback-2", title: "7 Days", sub: "Streak", emoji: "📆" },
+    { id: "fallback-3", title: "Consecutive", sub: "Workout 12", emoji: "🔥" },
+];
+
+export default function AchievementList({ achievements, isLoading }: AchievementListProps) {
+    const displayAchievements =
+        achievements && achievements.length > 0 ? achievements : FALLBACK_ACHIEVEMENTS;
+
+    if (isLoading && achievements.length === 0) {
+        return (
+            <div className="flex items-stretch gap-3 overflow-x-auto justify-center pb-1">
+                {Array.from({ length: 3 }).map((_, idx) => (
+                    <div
+                        key={idx}
+                        className="h-24 w-24 rounded-xl bg-muted animate-pulse"
+                    />
+                ))}
+            </div>
+        );
+    }
 
     return (
         <div className="flex items-stretch gap-3 overflow-x-auto justify-center pb-1">
-            {recentAchievements.map((a) => (
+            {displayAchievements.map((a) => (
                 <Achievement key={a.id} {...a} />
             ))}
         </div>

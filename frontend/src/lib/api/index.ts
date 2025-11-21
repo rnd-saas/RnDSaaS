@@ -29,3 +29,7 @@ export const dashboardService = dashboardServiceFunctions;
 import * as settingsServiceFunctions from './settingsService';
 export const settingsService = settingsServiceFunctions;
 
+// Export profile service functions
+import * as profileServiceFunctions from './profileService';
+export const profileService = profileServiceFunctions;
+
