@@ -18,6 +18,7 @@ import Step4PrimaryGoal from "./steps/Step4PrimaryGoal.tsx";
 import type {PrimaryGoal} from "@/utils/InputTypes.tsx";
 import {Gender, GymComfortLevel, PreferredSplit} from "@/utils/InputTypes.tsx";
 import Step1Nickname from "@/pages/Onboarding/steps/Step1Nickname.tsx";
+import Step11Emotions from "@/pages/Onboarding/steps/Step11Emotions.tsx";
 
 export type Inputs = {
     strTrainer:string,
@@ -35,6 +36,7 @@ export type Inputs = {
     problemAreas:string[],
     preferredSplit:PreferredSplit,
     comfortLevel:GymComfortLevel,
+    emotions:string[],
 }
 export default function OnboardingManager() {
     const [formStep, setStep] = useState(0);
@@ -91,9 +93,13 @@ export default function OnboardingManager() {
             component: Step10WorkoutType,
             fields: ["preferredSplit"]
         },
+        // {
+        //     component: Step11ComfortLevel,
+        //     fields: ["comfortLevel"]
+        // },
         {
-            component: Step11ComfortLevel,
-            fields: ["comfortLevel"]
+            component: Step11Emotions,
+            fields: ["emotions"]
         },
     ];
     const totalSteps=stepComponents.length-1;
