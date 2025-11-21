@@ -15,29 +15,14 @@ const router = Router();
  */
 router.post('/login', async (req, res) => {
     try {
-        const requestId = (req.headers['x-vercel-id'] as string) || (req.headers['x-request-id'] as string) || `${Date.now()}`;
-        console.log('[auth:login] request received', {
-            requestId,
-            path: req.path,
-            hasBody: !!req.body,
-            bodyKeys: Object.keys(req.body || {}),
-            region: process.env.VERCEL_REGION,
-            hasSupabaseUrl: !!process.env.SUPABASE_URL,
-            hasSupabaseKey: !!(process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY)
-        });
-
         const { email, password } = req.body;
 
         if (!email || !password) {
-            console.warn('[auth:login] missing credentials', { requestId, hasEmail: !!email, hasPassword: !!password });
             return res.status(400).json({ 
                 error: { message: 'Email and password are required' } 
             });
         }
 
-        // Authenticate user using Supabase Auth
-    console.log('[auth:login] signInWithPassword start', { requestId, email });
-        const signInStart = Date.now();
         let authData: any = null;
         let authError: any = null;
         try {
@@ -55,13 +40,12 @@ router.post('/login', async (req, res) => {
             authData = result.data;
             authError = result.error;
         } catch (err: any) {
-            console.error('[auth:login] signInWithPassword error or timeout', { requestId, message: err?.message || err });
+            console.error('[auth:login] signInWithPassword error or timeout', err?.message || err);
             return res.status(502).json({ error: { message: 'Authentication upstream failed or timed out' } });
         }
-        console.log('[auth:login] signInWithPassword completed', { requestId, durationMs: Date.now() - signInStart, hasSession: !!authData?.session });
 
         if (authError) {
-            console.error('[auth:login] auth error returned', { requestId, message: authError.message, status: authError.status, name: authError.name });
+            console.error('Login auth error:', authError);
             // Check if email is not confirmed
             if (authError.message?.includes('Email not confirmed') || authError.message?.includes('email_not_confirmed')) {
                 return res.status(401).json({ 
@@ -80,7 +64,6 @@ router.post('/login', async (req, res) => {
         }
 
         if (!authData.user) {
-            console.warn('[auth:login] authData missing user', { requestId });
             return res.status(401).json({ 
                 error: { message: 'Authentication failed' } 
             });
@@ -90,7 +73,6 @@ router.post('/login', async (req, res) => {
 
         // Check if user email is verified
         if (!authData.user.email_confirmed_at && authData.user.email_confirmed_at === null) {
-            console.warn('[auth:login] email not confirmed', { requestId, userId: authData.user.id });
             return res.status(401).json({ 
                 error: { 
                     message: 'Please verify your email before logging in. Check your inbox for a confirmation email.',
@@ -100,8 +82,6 @@ router.post('/login', async (req, res) => {
         }
 
         // Get user details from users table
-        console.log('[auth:login] query users table start', { requestId, userId: authData.user?.id });
-        const userQueryStart = Date.now();
         let userData: any = null;
         let userError: any = null;
         try {
@@ -119,17 +99,14 @@ router.post('/login', async (req, res) => {
             userData = result.data;
             userError = result.error;
         } catch (err: any) {
-            console.error('[auth:login] users table query error or timeout', { requestId, message: err?.message || err });
+            console.error('[auth:login] users table query error or timeout', err?.message || err);
             // fallback to creating a user record below if needed
             userData = null;
             userError = { message: 'users query failed or timed out' };
         }
-        console.log('[auth:login] users query completed', { requestId, durationMs: Date.now() - userQueryStart, found: !!userData });
 
         if (userError || !userData) {
             // Create a record in users table if it doesn't exist
-            console.log('[auth:login] creating users record start', { requestId, userId: authData.user.id });
-            const createStart = Date.now();
             let newUser: any = null;
             let createError: any = null;
             try {
@@ -151,19 +128,17 @@ router.post('/login', async (req, res) => {
                 newUser = result.data;
                 createError = result.error;
             } catch (err: any) {
-                console.error('[auth:login] create users record error or timeout', { requestId, message: err?.message || err });
+                console.error('[auth:login] create users record error or timeout', err?.message || err);
                 createError = { message: 'create users failed or timed out' };
             }
-            console.log('[auth:login] creating users record completed', { requestId, durationMs: Date.now() - createStart, success: !!newUser });
 
             if (createError || !newUser) {
-                console.error('[auth:login] failed to create fallback user record', { requestId, createError });
+                console.error('[auth:login] failed to create fallback user record', createError);
                 return res.status(500).json({ 
                     error: { message: 'Failed to create user profile' } 
                 });
             }
 
-            console.log('[auth:login] returning success after create', { requestId, userId: newUser.id });
             return res.json({
                 user: newUser,
                 token: session?.access_token,
@@ -173,7 +148,6 @@ router.post('/login', async (req, res) => {
             });
         }
 
-        console.log('[auth:login] returning success with existing user', { requestId, userId: userData.id });
         res.json({
             user: userData,
             token: session?.access_token,
@@ -183,7 +157,7 @@ router.post('/login', async (req, res) => {
         });
 
     } catch (error: any) {
-        console.error('[auth:login] unexpected error', { message: error?.message, stack: error?.stack });
+        console.error('Login error:', error);
         res.status(500).json({ 
             error: { message: 'Internal server error' } 
         });
@@ -196,17 +170,14 @@ router.post('/login', async (req, res) => {
  */
 router.post('/register', async (req, res) => {
     try {
-        console.log('📝 Registration request received');
         const { email, password, username, display_name } = req.body;
 
         if (!email || !password) {
-            console.log('❌ Missing email or password');
             return res.status(400).json({ 
                 error: { message: 'Email and password are required' } 
             });
         }
 
-        console.log('🔐 Attempting to create user with Supabase Auth...');
         // Create user using Supabase Auth
         // Note: If email confirmation is enabled in Supabase, users need to verify their email before logging in
         const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -243,12 +214,9 @@ router.post('/register', async (req, res) => {
             });
         }
 
-    console.log('✅ User created in Supabase Auth:', authData.user.id);
-
-    const session = authData.session;
+        const session = authData.session;
 
         // Create user record in users table
-        console.log('📊 Creating user profile in database...');
         const { data: userData, error: userError } = await supabase
             .from('users')
             .insert([{
@@ -281,8 +249,6 @@ router.post('/register', async (req, res) => {
                 message: 'Registration successful (profile creation pending)'
             });
         }
-
-        console.log('✅ User profile created successfully');
 
         // Check if email confirmation is needed
         const needsEmailConfirmation = !authData.session && authData.user && !authData.user.email_confirmed_at;
