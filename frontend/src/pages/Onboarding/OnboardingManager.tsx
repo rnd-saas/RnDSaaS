@@ -128,6 +128,7 @@ const mapPrimaryGoalToDbValues = (goal: PrimaryGoal | undefined): string[] | nul
 const mapPreferredSplitToDbValues = (split: PreferredSplit[] | undefined): string[] | null => {
     return mapSelectionArrayToEnums(split);
 };
+import Step11Emotions from "@/pages/Onboarding/steps/Step11Emotions.tsx";
 
 export type Inputs = {
     strTrainer:string,
@@ -142,9 +143,10 @@ export type Inputs = {
     strDaysPerWeek:string,
     strAvailableDays:string[],
     strSessionDuration:string,
-        problemAreas:string[],
-        preferredSplit:PreferredSplit[],
-        comfortLevel:GymComfortLevel[],
+    problemAreas:string[],
+    preferredSplit:PreferredSplit,
+    comfortLevel:GymComfortLevel,
+    emotions:string[],
 }
 export default function OnboardingManager() {
     const [formStep, setStep] = useState(0);
@@ -203,9 +205,13 @@ export default function OnboardingManager() {
             component: Step10WorkoutType,
             fields: ["preferredSplit"]
         },
+        // {
+        //     component: Step11ComfortLevel,
+        //     fields: ["comfortLevel"]
+        // },
         {
-            component: Step11ComfortLevel,
-            fields: ["comfortLevel"]
+            component: Step11Emotions,
+            fields: ["emotions"]
         },
     ];
     const totalSteps=stepComponents.length-1;

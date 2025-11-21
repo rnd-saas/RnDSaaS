@@ -24,6 +24,10 @@ import AppLayout from "@/routes/AppLayout";
 import RestTimer from "@/pages/Workout/RestTimer";
 import WorkoutTimer from "@/pages/Workout/WorkoutTimer";
 import ProfilePage from "@/pages/Profile/ProfilePage.tsx";
+import SocialPage from "@/pages/Social/SocialPage.tsx";
+import MoodPage from "@/pages/Mood/MoodPage";
+import CalendarPage from "@/pages/CalendarPage.tsx";
+import AchievementPage from "@/pages/AchievementPage.tsx";
 
 
 export default function AppRoutes() {
@@ -39,13 +43,17 @@ export default function AppRoutes() {
                 <Route path="/chatbot" element={<ChatbotPage />} />
                 <Route path="/workout/rest" element={<RestTimer />} />
                 <Route path="/workout/exercise" element={<WorkoutTimer />} />
+                <Route path="/mood" element={<MoodPage />} />
+
+                <Route path="/calendar" element={<CalendarPage />} />
+                <Route path="/achievements" element={<AchievementPage />} />
                 {/* App layout with persistent bottom nav */}
                 <Route element={<AppLayout />}>
                     <Route path="/dashboard" element={<DashboardPage />} />
                     <Route path="/settings" element={<SettingsPage />} />
                     {/* Uncomment when ready */}
                     {/* <Route path="/workout" element={<WorkoutPage />} /> */}
-                    {/* <Route path="/social" element={<SocialPage />} /> */}
+                    <Route path="/social" element={<SocialPage />} />
                      <Route path="/profile" element={<ProfilePage />} />
                 </Route>
             </Routes>
