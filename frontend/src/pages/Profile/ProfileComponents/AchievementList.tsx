@@ -10,7 +10,7 @@ export default function AchievementList() {
     ];
 
     return (
-        <div className="flex items-stretch gap-3 overflow-x-auto justify-center pb-1">
+        <div className="flex items-stretch gap-3 overflow-x-auto justify-between pb-1">
             {recentAchievements.map((a) => (
                 <Achievement key={a.id} {...a} />
             ))}

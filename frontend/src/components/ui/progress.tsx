@@ -16,7 +16,7 @@ function Progress({
         className
       )}
       style={{
-        border: `1px solid var(--border-app-border)`,
+        border: `1px solid var(--basic-colours-zinc-200)`,
         borderRadius: "var(--border-radius-md)"
       }}
       {...props}
