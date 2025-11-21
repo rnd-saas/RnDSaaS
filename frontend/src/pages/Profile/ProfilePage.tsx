@@ -105,7 +105,7 @@ export default function ProfilePage() {
                         <Button
                             className="h-6 w-[75vw] md:w-[40vw] lg:w-[20vw] m-2"
                             onClick={() => navigate(section.destination)}
-                            variant="secondary"
+                            variant="outline"
                         >
                             {section.buttonText}
                         </Button>

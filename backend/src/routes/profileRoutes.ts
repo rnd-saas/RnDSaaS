@@ -263,8 +263,23 @@ function buildWorkoutGrid(
         }
     });
 
-    const start = new Date(today);
-    start.setDate(start.getDate() - 20);
+    // Find the Monday of the week that contains (today - 18 days)
+    // This ensures the calendar grid starts on Monday, matching CalendarPage
+    // Total: 18 days past + today + 2 days future = 21 days
+    const targetDate = new Date(today);
+    targetDate.setDate(targetDate.getDate() - 18); // 18 days before today
+    targetDate.setHours(0, 0, 0, 0);
+    
+    // Get the day of week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+    const dayOfWeek = targetDate.getDay();
+    // Calculate days to subtract to get to Monday (1)
+    // If dayOfWeek is 0 (Sunday), we need to go back 6 days to get to Monday
+    // If dayOfWeek is 1 (Monday), we need to go back 0 days
+    const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    
+    const start = new Date(targetDate);
+    start.setDate(targetDate.getDate() - daysToMonday);
+    start.setHours(0, 0, 0, 0);
 
     const cells: WorkoutDay[] = [];
     for (let i = 0; i < 21; i++) {
