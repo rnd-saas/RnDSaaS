@@ -91,7 +91,7 @@ export default function MoodPage() {
   };
 
   return (
-    <>
+    <div className="w-full max-w-md min-h-[75vh] flex flex-col mx-auto px-4 py-4 space-y-4">
       {/* Header */}
       <header className="flex items-start justify-between">
         <div className="flex items-center gap-3">
@@ -103,19 +103,18 @@ export default function MoodPage() {
             </p>
           </div>
         </div>
-      </header>   {/* <-- add this closing tag */}
-
-      <Separator className="my-4" />
-
-
+      </header>
+  
+      <Separator className="my-2" />
+  
       {/* Mood options */}
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">Pick your current mood</h2>
-
+  
         <div className="grid grid-cols-1 gap-3">
           {MOODS.map((m) => {
             const active = m.key === selected;
-
+  
             return (
               <button
                 key={m.key}
@@ -139,10 +138,10 @@ export default function MoodPage() {
                   >
                     {m.emoji}
                   </div>
-
+  
                   <div className="flex flex-col">
                     <span className="text-sm font-medium">{m.label}</span>
-
+  
                     {/* Comfort meter */}
                     <div className="mt-1 flex items-center gap-2">
                       <div className="flex gap-1">
@@ -162,7 +161,7 @@ export default function MoodPage() {
                     </div>
                   </div>
                 </div>
-
+  
                 {/* Right-side selected indicator */}
                 <span
                   className={[
@@ -175,18 +174,18 @@ export default function MoodPage() {
           })}
         </div>
       </section>
-
+  
       {/* Sticky save bar */}
-      <div className="pointer-events-none sticky bottom-[72px] mt-4">
+      <div className="pointer-events-none sticky bottom-[72px] mt-2">
         <div className="pointer-events-auto mx-auto max-w-screen-sm rounded-xl bg-background/80 p-2 backdrop-blur">
           <Button onClick={saveMood} className="w-full rounded-xl">
             Save mood
           </Button>
         </div>
       </div>
-
-      <Separator className="my-6" />
-
+  
+      <Separator className="my-4" />
+  
       {/* Explanation */}
       <section className="space-y-4">
         <Card className="bg-muted/40">
@@ -200,7 +199,7 @@ export default function MoodPage() {
             {selectedMood.explanation}
           </CardContent>
         </Card>
-
+  
         {/* If anxious, show calming advice */}
         {selectedMood.anxious && (
           <Card className="bg-muted/40">
@@ -213,7 +212,7 @@ export default function MoodPage() {
                   <li key={i}>{tip}</li>
                 ))}
               </ul>
-
+  
               <Button
                 variant="secondary"
                 className="mt-1 w-full rounded-xl"
@@ -225,6 +224,7 @@ export default function MoodPage() {
           </Card>
         )}
       </section>
-    </>
+    </div>
   );
+  
 }
