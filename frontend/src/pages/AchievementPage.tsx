@@ -39,15 +39,11 @@ export default function AchievementPage(){
                     <BackButton/>
                 </div>
             </header>
-            <Card className="w-fit py-4">
+            <Card className="w-full max-w-lg lg:min-w-[50vw] min-w-[90vw] py-4">
                 <div className="space-y-4 p-10">
-                    <div className="space-y-2">
-                        {achievements.map((row, rIndex) => (
-                            <div key={rIndex} className="grid grid-cols-7 gap-2">
-                                    {row.map((a) => (
-                                    <Achievement key={a.id} {...a} />
-                                ))}
-                            </div>
+                    <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(150px,1fr))]">
+                        {achievements.flat().map((a) => (
+                            <Achievement key={a.id} {...a} />
                         ))}
                     </div>
                 </div>
