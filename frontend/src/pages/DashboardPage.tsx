@@ -59,6 +59,18 @@ const ADVICE_TIPS: string[] = [
   "Remind yourself why you started this journey."
 ];
 
+const MOODS = {
+  anxious: "😣",
+  insecure: "😟",
+  nervous: "😬",
+  fine: "🙂",
+  comfortable: "😌",
+  never_been: "🤷‍♂️",
+};
+
+type MoodKey = keyof typeof MOODS;
+
+
 
 /**
  * Pure UI mock: no data fetching yet.
@@ -137,23 +149,39 @@ export default function DashboardPage() {
 
         {/* Mood + Next workout */}
         <section className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Card className="bg-muted/40">
-            <CardHeader>
-              <CardTitle className="text-2xl">Mood</CardTitle>
-            </CardHeader>
-            <CardContent className="flex items-center justify-center py-4">
-              <div className="text-6xl">😣</div>
-            </CardContent>
-          </Card>
+        <Card
+          className="bg-muted/40 cursor-pointer hover:bg-accent/30 transition-colors"
+          onClick={() => navigate("/mood")}
+        >
+          <CardHeader>
+            <CardTitle className="text-2xl">Mood</CardTitle>
+          </CardHeader>
 
-          <Card className="bg-muted/40">
-            <CardHeader>
-              <CardTitle className="text-2xl">Next Workout</CardTitle>
-            </CardHeader>
-            <CardContent className="flex items-center justify-center py-4">
-              <div className="text-6xl">🏋️‍♂️</div>
-            </CardContent>
-          </Card>
+          <CardContent className="flex items-center justify-center py-4">
+            <div className="text-6xl">
+              {(() => {
+                const key = localStorage.getItem("currentMood_v1") as MoodKey | null;
+                if (!key || !(key in MOODS)) return "😣"; // fallback
+                return MOODS[key];
+              })()}
+            </div>
+          </CardContent>
+        </Card>
+
+
+
+        <Card
+          className="bg-muted/40 cursor-pointer hover:bg-accent/30 transition-colors"
+          onClick={() => navigate("/workout/exercise")}
+        >
+          <CardHeader>
+            <CardTitle className="text-2xl">Next Workout</CardTitle>
+          </CardHeader>
+          <CardContent className="flex items-center justify-center py-4">
+            <div className="text-6xl">🏋️‍♂️</div>
+          </CardContent>
+        </Card>
+
         </section>
 
         <p className="mt-3 text-[15px] text-amber-600">Need help calming down?</p>
