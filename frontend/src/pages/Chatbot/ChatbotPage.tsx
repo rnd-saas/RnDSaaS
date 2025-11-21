@@ -1,11 +1,12 @@
 ﻿import {Button} from "@/components/ui/button.tsx";
-import {ArrowLeft, MoreVertical, Send} from "lucide-react";
+import {MoreVertical, Send} from "lucide-react";
 import avatarPlaceholder from "@/assets/avatar-placeholder.png";
 import {Input} from "@/components/ui/input.tsx";
-import {useLocation, useNavigate} from "react-router-dom";
+import {useLocation} from "react-router-dom";
 import AvatarIcon from "@/components/avatarIcon.tsx";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu.tsx";
 import {useEffect, useRef, useState} from "react";
+import BackButton from "@/components/backButton.tsx";
 interface ChatMessage {
     type: "user" | "bot";
     content: string;
@@ -48,12 +49,6 @@ export default function ChatbotPage() {
         }
     };
 
-    //back button
-    const navigate = useNavigate();
-    const handleGoBack = () => {
-        navigate(-1);
-    };
-
     //auto-scroll logic
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     useEffect(() => {
@@ -68,9 +63,7 @@ export default function ChatbotPage() {
         <div className="w-full min-w-[50vw] min-h-[90vh] relative flex flex-col">
             <header className="px-6 pt-11 pb-4">
                 <div className="flex items-center justify-between">
-                    <Button variant="outline" size="icon" className="h-11 w-11 rounded-full" onClick={handleGoBack}>
-                        <ArrowLeft className="h-6 w-6"/>
-                    </Button>
+                    <BackButton/>
                     <div className="flex items-center gap-3">
                         <AvatarIcon icon={avatarPlaceholder}/>
                         <div className="flex flex-col gap-0.5">

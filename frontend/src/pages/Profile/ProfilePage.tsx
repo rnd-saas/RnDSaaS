@@ -10,14 +10,14 @@ import {Button} from "@/components/ui/button.tsx";
 export default function ProfilePage() {
     const navigate = useNavigate();
     const profileComponents = [
-        { value:"achivements", component: AchievementList, destination: "/achievements", buttonText:"See More", label: "Recent Achievements:" },
-        { value:"recent-workouts", component: WorkoutDisplay, destination: "/calendar", buttonText:"See Full List", label:"Recent Workouts:" },
+        { value:"achivements", component: AchievementList, destination: "/achievements", buttonText:"See More", label: "Recent Achievements" },
+        { value:"recent-workouts", component: WorkoutDisplay, destination: "/calendar", buttonText:"See Full List", label:"Recent Workouts" },
     ];
     const { state } = useLocation() as { state?: { firstName?: string } };
     const userName = state?.firstName ?? localStorage.getItem("firstName") ?? "User";
 
     return (
-        <div className="w-full max-w-md min-h-[75vh] min-w-[30vw] flex flex-col items-center space-y-6">
+        <div className="w-full max-w-lg min-h-[75vh] min-w-[30vw] flex flex-col items-center space-y-6">
             <Avatar className="w-32 h-32">
                 <AvatarImage src={avatarPlaceholder} />
                 <AvatarFallback className="text-3xl">CN</AvatarFallback>
@@ -26,9 +26,9 @@ export default function ProfilePage() {
             <main>
                 {profileComponents.map((g) => (
                     <div className={"m-10"}>
-                        <Label className={"p-5"}>{g.label}</Label>
+                        <Label className={"my-5"}>{g.label}</Label>
                         <g.component />
-                        <Button className={"h-6 w-[75vw] md:w-[40vw] lg:w-[20vw] m-2"} onClick={() => navigate(g.destination)}>{g.buttonText}</Button>
+                        <Button variant={"outline"} className={"h-6 w-full my-4 p-4"} onClick={() => navigate(g.destination)}>{g.buttonText}</Button>
                     </div>
                 ))}
             </main>
