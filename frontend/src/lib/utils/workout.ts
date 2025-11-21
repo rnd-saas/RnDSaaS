@@ -8,8 +8,11 @@ import type { PlannedExercise, LoggedExercise } from "@/lib/types/Workout";
 export function convertPlannedToLogged(
   planned: PlannedExercise[]
 ): LoggedExercise[] {
-  return planned.map((exercise) => ({
+  const plannedConverted: LoggedExercise[] = planned;
+
+  const test = plannedConverted.map((exercise) => ({
     ...exercise,
     sets: exercise.sets.map((set) => ({ ...set, completed: false })),
   }));
+  return test;
 }

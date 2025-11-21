@@ -9,7 +9,9 @@ import { useParams } from "react-router-dom";
 import { formatRestTime } from "@/lib/utils/time.ts";
 import { convertPlannedToLogged } from "@/lib/utils/workout";
 
-// GENERAL NOTE: first render is test, second render is actual first render due to strict mode in dev
+// GENERAL NOTE: first render is test, second render is actual first render due to strict mode in dev.
+// Note: the first render will have null for loggedWorkout since the workout is only started in useEffect after first render.
+// that is now taken into account into table rendering etc.
 export default function ActiveWorkoutPage() {
   const { id } = useParams();
   const elapsedTimeSeconds = useWorkoutStore(
@@ -62,9 +64,10 @@ export default function ActiveWorkoutPage() {
 
   // console.log("INSIDE COMPONENT RENDER");
   // console.log(`value of plannedwworkout: ${plannedWorkout}`);
-  // console.log(`value o f id param: ${id}`);
+  // console.log(`value of id param: ${id}`);
   // console.log(`value of logged workout is: ${loggedWorkout}`);
   // console.log(loggedWorkout);
+  console.log("testing out: ", loggedWorkout?.exercises);
 
   // console.log(`value of is running: ${isRunning}`);
 

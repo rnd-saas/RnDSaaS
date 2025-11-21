@@ -26,18 +26,18 @@ export default function WorkoutList({ exerciseId }: { exerciseId: string }) {
   const plannedExercise = usePlannedWorkout(new Date()).data?.exercises.find(
     (ex) => ex.exerciseInfo.exerciseId === exerciseId
   );
-  let loggedExercise = useWorkoutStore((state) =>
+  const loggedExercise = useWorkoutStore((state) =>
     state.getExercise(exerciseId)
   );
 
   const updateExerciseSet = useWorkoutStore((state) => state.updateExerciseSet); // needs be used like this, otherwise no reactive updates will be possible.
 
-  if (!loggedExercise) return;
-  setTableHeadersByLogMode(tableHeaders, loggedExercise.exerciseInfo.logMode);
+  // if (!loggedExercise) return;
+  setTableHeadersByLogMode(tableHeaders, loggedExercise?.exerciseInfo.logMode);
   setTableRowsByLogMode(
     tableRows,
-    loggedExercise.exerciseInfo.logMode,
-    loggedExercise.sets
+    loggedExercise?.exerciseInfo.logMode,
+    loggedExercise?.sets
   );
 
   return (
@@ -61,7 +61,7 @@ export default function WorkoutList({ exerciseId }: { exerciseId: string }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {tableRows.map((rowData: number[]) => (
+          {tableRows.map((rowData: number[], rowIndex: number) => (
             <TableRow
               key={`${rowData[0]}-${rowData.join("-")}`}
               className="flex items-center justify-center hover:bg-yellow-50"
@@ -78,14 +78,25 @@ export default function WorkoutList({ exerciseId }: { exerciseId: string }) {
                     cellData
                   ) : (
                     <Input
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
+                      onBeforeInput={(e) => {
+                        if (!/^[0-9]$/.test(e.data)) {
+                          e.preventDefault();
+                        }
+                      }}
                       placeholder={`${cellData}`}
                       className="border-0 shadow-none focus:ring-0! p-0 placeholder:text-zinc-300 focus:text-left text-center focus:pl-4"
                       onBlur={(e) => {
                         const value = Number(e.target.value);
                         const setNumber = rowData[0];
+                        if (rowIndex == 0)
+                          console.log(
+                            "Completed: ",
+                            loggedExercise?.sets[0]?.completed
+                          );
 
-                        switch (loggedExercise.exerciseInfo.logMode) {
+                        switch (loggedExercise?.exerciseInfo.logMode) {
                           case "reps_weight":
                             if (cellIndex === 1)
                               updateExerciseSet(exerciseId, setNumber, {
@@ -146,7 +157,15 @@ export default function WorkoutList({ exerciseId }: { exerciseId: string }) {
                 </TableCell>
               ))}
               <TableCell className="flex-1 body-styles pr-2! text-center">
-                <Checkbox className="bg-300 border-text data-[state=unchecked]:text-white data-[state=checked]:bg-zinc-700 data-[state=checked]:border-green-500 data-[state=checked]:text-white" />
+                <Checkbox
+                  onCheckedChange={(checked) =>
+                    updateExerciseSet(exerciseId, rowData[0], {
+                      completed:
+                        checked === "indeterminate" ? false : Boolean(checked),
+                    })
+                  }
+                  className="bg-300 border-text data-[state=unchecked]:text-white data-[state=checked]:bg-zinc-700 data-[state=checked]:border-green-500 data-[state=checked]:text-white"
+                />
               </TableCell>
             </TableRow>
           ))}
@@ -183,6 +202,7 @@ function setTableRowsByLogMode(
   logMode: ExerciseInformation["logMode"],
   sets: TargetSet[]
 ) {
+  if (!sets) return;
   for (const set of sets) {
     if (logMode === "reps_weight")
       tableRows.push([set.setNumber, set.targetReps!, set.targetWeightKg!]);
@@ -207,13 +227,4 @@ function setTableRowsByLogMode(
   }
 
   return tableRows;
-}
-
-function updateExerciseSet(
-  event: React.ChangeEvent<HTMLInputElement>,
-  exerciseId: string,
-  setNumber: number,
-  onUpdate
-) {
-  const newValue = parseInt(event.target.value);
 }
