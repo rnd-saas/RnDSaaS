@@ -3,6 +3,7 @@ import type { Request } from 'express';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../db/supabase';
 import { requireAuth } from '../middleware/requireAuth';
+import { generateWorkoutPlanForUser } from '../services/workoutPlanGenerator';
 
 const router = Router();
 
@@ -64,6 +65,8 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
     }
 });
 
+type PlanGenerationStatus = 'success' | 'queued' | 'skipped' | 'failed';
+
 router.post('/', requireAuth, async (req: AuthedRequest, res) => {
     try {
     const userId = req.user?.id;
@@ -114,7 +117,16 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
             }
         }
 
-        return res.status(200).json({ success: true });
+        let planGeneration: PlanGenerationStatus = 'skipped';
+        try {
+            const result = await generateWorkoutPlanForUser(userId);
+            planGeneration = result ? 'success' : 'skipped';
+        } catch (planError: any) {
+            console.error('Failed to generate workout program:', planError?.message || planError);
+            planGeneration = 'failed';
+        }
+
+        return res.status(200).json({ success: true, planGeneration });
     } catch (err: any) {
         console.error('Unexpected error saving onboarding answers:', err);
         return res.status(500).json({

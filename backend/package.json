@@ -7,7 +7,8 @@
     "dev": "npx nodemon src/server.ts",
     "build": "tsc -p .",
     "start": "node dist/server.js",
-    "test:connection": "npx ts-node src/test-connection.ts"
+    "test:connection": "npx ts-node src/test-connection.ts",
+    "generate:plan": "npx ts-node src/scripts/generatePlan.ts"
   },
   "keywords": [],
   "author": "",

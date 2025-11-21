@@ -4,7 +4,7 @@
  */
 
 import { Router } from 'express';
-import { supabase } from '../db/supabase';
+import { supabase, supabaseAuth } from '../db/supabase';
 import withTimeout from '../utils/withTimeout';
 
 const router = Router();
@@ -29,7 +29,7 @@ router.post('/login', async (req, res) => {
             const result = await withTimeout(
                 new Promise<any>(async (resolve, reject) => {
                     try {
-                        const r = await supabase.auth.signInWithPassword({ email, password });
+                        const r = await supabaseAuth.auth.signInWithPassword({ email, password });
                         resolve(r);
                     } catch (e) {
                         reject(e);
@@ -180,7 +180,7 @@ router.post('/register', async (req, res) => {
 
         // Create user using Supabase Auth
         // Note: If email confirmation is enabled in Supabase, users need to verify their email before logging in
-        const { data: authData, error: authError } = await supabase.auth.signUp({
+        const { data: authData, error: authError } = await supabaseAuth.auth.signUp({
             email,
             password,
             options: {
@@ -289,7 +289,7 @@ router.post('/logout', async (req, res) => {
         const token = authHeader?.replace('Bearer ', '');
 
         if (token) {
-            await supabase.auth.signOut();
+            await supabaseAuth.auth.signOut();
         }
 
         res.json({ message: 'Logout successful' });
