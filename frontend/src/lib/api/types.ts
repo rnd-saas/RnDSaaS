@@ -180,3 +180,18 @@ export interface ProfileResponse {
     workoutGrid: ProfileWorkoutDay[][];
 }
 
+export interface AchievementListResponse {
+    achievements: ProfileAchievement[];
+}
+
+export interface WorkoutHistoryEntry {
+    id: string;
+    title: string;
+    from: string; // ISO date string
+    to: string | null; // ISO date string
+}
+
+export interface WorkoutHistoryResponse {
+    workouts: WorkoutHistoryEntry[];
+}
+

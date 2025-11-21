@@ -58,7 +58,7 @@ export default function ProfilePage() {
             destination: "/achievements",
             content: (
                 <AchievementList
-                    achievements={profile?.achievements ?? []}
+                    achievements={profile?.achievements?.slice(0, 3) ?? []}
                     isLoading={isLoading}
                 />
             ),

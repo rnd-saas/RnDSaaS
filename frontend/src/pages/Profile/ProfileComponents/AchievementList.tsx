@@ -32,7 +32,13 @@ export default function AchievementList({ achievements, isLoading }: Achievement
     return (
         <div className="flex items-stretch gap-3 overflow-x-auto justify-center pb-1">
             {displayAchievements.map((a) => (
-                <Achievement key={a.id} {...a} />
+                <Achievement 
+                    key={a.id} 
+                    title={a.title}
+                    sub={a.sub}
+                    image={a.emoji}
+                    obtained={true}
+                />
             ))}
         </div>
     );
