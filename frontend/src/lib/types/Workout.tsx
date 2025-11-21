@@ -16,16 +16,15 @@ export interface PlannedExercise {
   exerciseId: string;
   sets: TargetSet[]; //array of sets for the exercise
   restTimeSeconds: number; //rest time between sets in seconds
-  imageUrl?: string; //optional image URL for the exercise
   exerciseInfo: ExerciseInformation;
 }
 
 export interface LoggedWorkout {
   workoutId: string;
-  date: Date; //date of the logged workout
-  exercises: LoggedExercise[];
+  date: string; //date of the logged workout
+  exercises?: LoggedExercise[];
   startDatetime: Date; //start date and time of the workout
-  endDatetime: Date; //end date and time of the workout
+  endDatetime?: Date; //end date and time of the workout
 }
 
 /**
@@ -36,6 +35,7 @@ export interface LoggedExercise {
   sets: LoggedSet[]; //array of logged sets for the exercise
   restTimeSeconds: number; //rest time between sets in seconds
   notes?: string; //optional notes for the exercise
+  exerciseInfo: ExerciseInformation;
 }
 
 /**
@@ -43,10 +43,12 @@ export interface LoggedExercise {
   // adjust later for user generated content
  */
 export interface ExerciseInformation {
+  exerciseId: string; // same for logged and planned exercise...! so using this for fetching of the workouts.
   name: string;
   description: string;
   slug: string; //URL friendly name
   tutorialUrl?: string; //optional tutorial video URL for the exercise
+  imageUrl?: string; //optional image URL for the exercise
   difficultyLevel: "Beginner" | "Intermediate" | "Advanced";
   logMode:
     | "reps_weight"

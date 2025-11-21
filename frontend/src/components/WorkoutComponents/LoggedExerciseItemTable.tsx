@@ -10,6 +10,8 @@ import type { TargetSet, ExerciseInformation } from "@/lib/types/Workout";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Check } from "lucide-react";
+import { useWorkoutStore } from "@/lib/state/workoutStore";
+import { usePlannedWorkout } from "@/api/workouts";
 
 // const workoutData = [
 //   { set: 1, reps: 12, kg: 60 },
@@ -18,19 +20,25 @@ import { Check } from "lucide-react";
 //   { set: 4, reps: 8, kg: 100 },
 // ];
 
-export default function WorkoutList({
-  sets,
-  logMode,
-}: {
-  sets: TargetSet[];
-  logMode: ExerciseInformation["logMode"];
-}) {
+export default function WorkoutList({ exerciseId }: { exerciseId: string }) {
   const tableHeaders: string[] = [];
   const tableRows: number[][] = [];
+  const plannedExercise = usePlannedWorkout(new Date()).data?.exercises.find(
+    (ex) => ex.exerciseInfo.exerciseId === exerciseId
+  );
+  let loggedExercise = useWorkoutStore((state) =>
+    state.getExercise(exerciseId)
+  );
 
-  setTableHeadersByLogMode(tableHeaders, logMode);
-  setTableRowsByLogMode(tableRows, logMode, sets);
-  const headerCount = tableHeaders.length;
+  const updateExerciseSet = useWorkoutStore((state) => state.updateExerciseSet); // needs be used like this, otherwise no reactive updates will be possible.
+
+  if (!loggedExercise) return;
+  setTableHeadersByLogMode(tableHeaders, loggedExercise.exerciseInfo.logMode);
+  setTableRowsByLogMode(
+    tableRows,
+    loggedExercise.exerciseInfo.logMode,
+    loggedExercise.sets
+  );
 
   return (
     <>
@@ -73,6 +81,66 @@ export default function WorkoutList({
                       type="number"
                       placeholder={`${cellData}`}
                       className="border-0 shadow-none focus:ring-0! p-0 placeholder:text-zinc-300 focus:text-left text-center focus:pl-4"
+                      onBlur={(e) => {
+                        const value = Number(e.target.value);
+                        const setNumber = rowData[0];
+
+                        switch (loggedExercise.exerciseInfo.logMode) {
+                          case "reps_weight":
+                            if (cellIndex === 1)
+                              updateExerciseSet(exerciseId, setNumber, {
+                                actualReps: value,
+                              });
+                            if (cellIndex === 2)
+                              updateExerciseSet(exerciseId, setNumber, {
+                                actualWeightKg: value,
+                              });
+                            break;
+
+                          case "reps":
+                            if (cellIndex === 1)
+                              updateExerciseSet(exerciseId, setNumber, {
+                                actualReps: value,
+                              });
+                            break;
+
+                          case "time_weight":
+                            if (cellIndex === 1)
+                              updateExerciseSet(exerciseId, setNumber, {
+                                actualTimeSeconds: value,
+                              });
+                            if (cellIndex === 2)
+                              updateExerciseSet(exerciseId, setNumber, {
+                                actualWeightKg: value,
+                              });
+                            break;
+
+                          case "time":
+                            if (cellIndex === 1)
+                              updateExerciseSet(exerciseId, setNumber, {
+                                actualTimeSeconds: value,
+                              });
+                            break;
+
+                          case "distance_weight":
+                            if (cellIndex === 1)
+                              updateExerciseSet(exerciseId, setNumber, {
+                                actualDistanceMeters: value,
+                              });
+                            if (cellIndex === 2)
+                              updateExerciseSet(exerciseId, setNumber, {
+                                actualWeightKg: value,
+                              });
+                            break;
+
+                          case "distance":
+                            if (cellIndex === 1)
+                              updateExerciseSet(exerciseId, setNumber, {
+                                actualDistanceMeters: value,
+                              });
+                            break;
+                        }
+                      }}
                     />
                   )}
                 </TableCell>
@@ -139,4 +207,13 @@ function setTableRowsByLogMode(
   }
 
   return tableRows;
+}
+
+function updateExerciseSet(
+  event: React.ChangeEvent<HTMLInputElement>,
+  exerciseId: string,
+  setNumber: number,
+  onUpdate
+) {
+  const newValue = parseInt(event.target.value);
 }

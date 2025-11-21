@@ -7,31 +7,73 @@ import type { PlannedExercise, PlannedWorkout } from "@/lib/types/Workout";
 import { useWorkoutStore } from "@/lib/state/workoutStore";
 import { useParams } from "react-router-dom";
 import { formatRestTime } from "@/lib/utils/time.ts";
+import { convertPlannedToLogged } from "@/lib/utils/workout";
 
+// GENERAL NOTE: first render is test, second render is actual first render due to strict mode in dev
 export default function ActiveWorkoutPage() {
   const { id } = useParams();
   const elapsedTimeSeconds = useWorkoutStore(
     (state) => state.elapsedTimeSeconds
   );
   const isRunning = useWorkoutStore((state) => state.isRunning);
+  const resetWorkout = useWorkoutStore((state) => state.resetWorkout);
   const startWorkout = useWorkoutStore((state) => state.startWorkout);
-  const resetTimer = useWorkoutStore((state) => state.resetTimer);
-
-  // Start the workout when the component mounts
-  useEffect(() => {
-    if (!isRunning) {
-      startWorkout(id!);
-    }
-
-    return () => {
-      resetTimer();
-    };
-  }, []);
+  const loggedWorkout = useWorkoutStore((state) => state.loggedWorkout);
+  const updateWorkout = useWorkoutStore((state) => state.updateWorkout);
 
   // fetch the planned workout data for today
-  const { data, isLoading, error } = usePlannedWorkout(new Date());
+  const { data, isLoading, error } = usePlannedWorkout(new Date()); // this or use the plannedworwkout id to fetch it?
   const plannedWorkout: PlannedWorkout | null | undefined = data;
   let workoutContentBlock;
+
+  // Start the workout when the component mounts
+
+  useEffect(() => {
+    if (!plannedWorkout) {
+      console.log("no planned workout found");
+      console.error("testing the effect");
+      console.error(`value of plannedwworkout: ${plannedWorkout}`);
+      console.error(`value o f id param: ${id}`);
+      console.error(`value of logged workout is: ${loggedWorkout}`);
+      console.error(loggedWorkout);
+      console.error(`value of is running: ${isRunning}`);
+      return;
+    }
+
+    console.log("testing the effect");
+    console.log(`value of plannedwworkout: ${plannedWorkout}`);
+    console.log(`value o f id param: ${id}`);
+    console.log(`value of logged workout is: ${loggedWorkout}`);
+    console.log(`value of is running: ${isRunning}`);
+    if (!isRunning) {
+      console.log(`Planned workout is: ${plannedWorkout}`);
+      console.log(`is runnign has value of: ${isRunning}`);
+      // convert planned exercises to logged exercises and add to store
+      if (plannedWorkout.exercises) {
+        const loggedExercises = convertPlannedToLogged(
+          plannedWorkout.exercises
+        );
+
+        startWorkout(id!, loggedExercises);
+        updateWorkout({ exercises: loggedExercises });
+      }
+    }
+  }, []);
+
+  // console.log("INSIDE COMPONENT RENDER");
+  // console.log(`value of plannedwworkout: ${plannedWorkout}`);
+  // console.log(`value o f id param: ${id}`);
+  // console.log(`value of logged workout is: ${loggedWorkout}`);
+  // console.log(loggedWorkout);
+
+  // console.log(`value of is running: ${isRunning}`);
+
+  useEffect(() => {
+    return () => {
+      console.error("running clean up");
+      resetWorkout();
+    };
+  }, []);
 
   // handle different states: loading, error, no workout, display workout
   if (isLoading) {
@@ -49,8 +91,11 @@ export default function ActiveWorkoutPage() {
   } else {
     workoutContentBlock = (
       <div className="flex flex-col items-center justify-start flex-1 gap-5 md:gap-[30px] w-full">
-        {plannedWorkout.exercises.map((exercise: PlannedExercise) => (
-          <LoggedExerciseItem key={exercise.exerciseId} exercise={exercise} />
+        {plannedWorkout.exercises.map((plannedExercise: PlannedExercise) => (
+          <LoggedExerciseItem
+            key={plannedExercise.exerciseId}
+            plannedExerciseId={plannedExercise.exerciseInfo.exerciseId}
+          />
         ))}
       </div>
     );

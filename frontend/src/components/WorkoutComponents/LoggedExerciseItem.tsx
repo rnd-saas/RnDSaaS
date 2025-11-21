@@ -17,26 +17,37 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { calculateRestTimeOptions, formatRestTime } from "@/lib/utils/time.ts";
+import { useWorkoutStore } from "@/lib/state/workoutStore";
+import { usePlannedWorkout } from "@/api/workouts";
 
 export default function LoggedExerciseItem({
-  exercise,
+  plannedExerciseId,
 }: {
-  exercise: PlannedExercise;
+  plannedExerciseId: string;
+  // plannedExercise: PlannedExercise;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [restTimeSeconds, setRestTimeSeconds] = useState<string>("0");
-  const restTimeOptions: number[] = calculateRestTimeOptions(5, 300);
-  // console.log(restTimeOptions);
+  const { data, isLoading, error } = usePlannedWorkout(new Date());
+  const plannedWorkout = data;
+  while (isLoading) {
+    return;
+  }
+  const plannedExercise = plannedWorkout?.exercises.find((exercise) => {
+    return exercise.exerciseInfo.exerciseId === plannedExerciseId;
+  }) as PlannedExercise;
 
-  // console.log(exercise);
+  const [restTimeSeconds, setRestTimeSeconds] = useState<string>(
+    plannedExercise.restTimeSeconds.toString()
+  );
+  const restTimeOptions: number[] = calculateRestTimeOptions(5, 300);
 
   return (
     <>
       <Card
         className={`w-4/5 max-w-[728px] p-0 rounded-lg shadow-card shadow border-0 transform-all duration-300 ease-in-out ${
           isOpen
-            ? "bg-(--basic-colours-yellow-50) shadow-lg scale-102"
-            : "bg-(--basic-colours-yellow-50) hover:bg-(--basic-colours-yellow-100) active:bg-(--basic-colours-yellow-300)/50 hover:scale-102"
+            ? "bg-yellow-50 shadow-lg scale-102"
+            : "bg-yellow-50 hover:bg-yellow-100 active:bg-(--basic-colours-yellow-300)/50 hover:scale-102"
         }`}
       >
         <CardContent className="flex flex-col gap-0 items-center pl-2 pr-2 md:pl-4 md:pr-4">
@@ -52,7 +63,7 @@ export default function LoggedExerciseItem({
 
               <div className="flex-1 flex items-center justify-between md:justify-start  gap-1 md:gap-2">
                 <h3 className="flex-1 h3-styles text-base md:text-xl lg:text-base font-bold min-w-0">
-                  {exercise.exerciseInfo.name}
+                  {plannedExercise.exerciseInfo.name}
                 </h3>
 
                 <HelpCircle className="shrink-0 w-4 h-4" />
@@ -92,7 +103,7 @@ export default function LoggedExerciseItem({
                   defaultValue="OFF"
                   className="text-center flex flex-col items-center justify-center"
                   value={restTimeSeconds.toString()}
-                  onValueChange={setRestTimeSeconds}
+                  onValueChange={setRestTimeSeconds} //TODO: CHANGE TO USE LOGGEDWORKOUT RESTTIME VALUE INSTEAD.
                 >
                   <DropdownMenuRadioItem key={0} value={"0"}>
                     OFF
@@ -113,8 +124,7 @@ export default function LoggedExerciseItem({
               <ExerciseNote bgColor="bg-white " />
             </div>
             <LoggedExerciseItemTable
-              sets={exercise.sets}
-              logMode={exercise.exerciseInfo.logMode}
+              exerciseId={plannedExercise.exerciseInfo.exerciseId}
             />
           </div>
         </CardContent>

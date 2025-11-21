@@ -3,19 +3,19 @@ import type { PlannedWorkout } from "@/lib/types/Workout";
 export const dummyPlannedWorkouts: PlannedWorkout[] = [
   {
     workoutId: "workout_push_001",
-    date: new Date("2025-11-17"),
+    date: new Date("2025-11-21"),
     muscleGroups: ["Chest", "Shoulders", "Triceps"],
     exercises: [
       {
         exerciseId: "bench_press_001",
         restTimeSeconds: 120,
-        imageUrl: "https://example.com/images/bench-press.png",
         sets: [
           { setNumber: 1, targetReps: 8, targetWeightKg: 60 },
           { setNumber: 2, targetReps: 8, targetWeightKg: 60 },
           { setNumber: 3, targetReps: 6, targetWeightKg: 60 },
         ],
         exerciseInfo: {
+          exerciseId: "xdsf1234",
           name: "Barbell Bench Press",
           description:
             "A compound chest exercise targeting the pectorals, anterior delts, and triceps.",
@@ -32,13 +32,13 @@ export const dummyPlannedWorkouts: PlannedWorkout[] = [
       {
         exerciseId: "incline_dumbbell_press_002",
         restTimeSeconds: 90,
-        imageUrl: "https://example.com/images/incline-db-press.png",
         sets: [
           { setNumber: 1, targetReps: 10, targetWeightKg: 22 },
           { setNumber: 2, targetReps: 10, targetWeightKg: 22 },
           { setNumber: 3, targetReps: 8, targetWeightKg: 22 },
         ],
         exerciseInfo: {
+          exerciseId: "asdz5678",
           name: "Incline Dumbbell Press",
           description:
             "Targets the upper chest and anterior deltoids with a deep stretch.",
@@ -60,6 +60,7 @@ export const dummyPlannedWorkouts: PlannedWorkout[] = [
           { setNumber: 3, targetReps: 12, targetWeightKg: 8 },
         ],
         exerciseInfo: {
+          exerciseId: "qwer7890",
           name: "Dumbbell Lateral Raise",
           description: "Isolation exercise for the side delts.",
           slug: "dumbbell-lateral-raise",
@@ -80,6 +81,7 @@ export const dummyPlannedWorkouts: PlannedWorkout[] = [
           { setNumber: 3, targetReps: 10, targetWeightKg: 25 },
         ],
         exerciseInfo: {
+          exerciseId: "zxcv4567",
           name: "Cable Tricep Pushdown",
           description: "Isolation movement focusing on the triceps long head.",
           slug: "cable-tricep-pushdown",
@@ -100,6 +102,7 @@ export const dummyPlannedWorkouts: PlannedWorkout[] = [
           { setNumber: 3, targetTimeSeconds: 45 },
         ],
         exerciseInfo: {
+          exerciseId: "sadfg3456",
           name: "Plank Hold",
           description:
             "Isometric core exercise emphasizing stability and endurance.",
@@ -128,6 +131,7 @@ export const dummyPlannedWorkouts: PlannedWorkout[] = [
           { setNumber: 3, targetReps: 5, targetWeightKg: 100 },
         ],
         exerciseInfo: {
+          exerciseId: "tyui8901",
           name: "Conventional Deadlift",
           description: "Full posterior-chain compound lift.",
           slug: "conventional-deadlift",
@@ -149,6 +153,7 @@ export const dummyPlannedWorkouts: PlannedWorkout[] = [
           { setNumber: 3, targetReps: 6 },
         ],
         exerciseInfo: {
+          exerciseId: "uiojkl2345",
           name: "Bodyweight Pull-up",
           description: "Vertical pull emphasizing lats and biceps.",
           slug: "pull-up",
@@ -169,6 +174,7 @@ export const dummyPlannedWorkouts: PlannedWorkout[] = [
           { setNumber: 3, targetReps: 15, targetWeightKg: 18 },
         ],
         exerciseInfo: {
+          exerciseId: "zxcv4567",
           name: "Cable Face Pull",
           description: "Rear delt and upper back activation.",
           slug: "cable-face-pull",
@@ -189,6 +195,7 @@ export const dummyPlannedWorkouts: PlannedWorkout[] = [
           { setNumber: 3, targetReps: 10, targetWeightKg: 30 },
         ],
         exerciseInfo: {
+          exerciseId: "sadfg3456",
           name: "EZ-Bar Curl",
           description: "Biceps isolation using EZ bar.",
           slug: "ez-bar-curl",
@@ -216,6 +223,7 @@ export const dummyPlannedWorkouts: PlannedWorkout[] = [
           { setNumber: 3, targetReps: 6, targetWeightKg: 90 },
         ],
         exerciseInfo: {
+          exerciseId: "ssav3456",
           name: "Back Squat",
           description: "Compound lift for lower body strength.",
           slug: "back-squat",
@@ -236,6 +244,7 @@ export const dummyPlannedWorkouts: PlannedWorkout[] = [
           { setNumber: 3, targetReps: 8, targetWeightKg: 70 },
         ],
         exerciseInfo: {
+          exerciseId: "dfghj6789",
           name: "Romanian Deadlift",
           description: "Hip hinge emphasizing hamstrings and glutes.",
           slug: "romanian-deadlift",
@@ -256,6 +265,7 @@ export const dummyPlannedWorkouts: PlannedWorkout[] = [
           { setNumber: 3, targetReps: 10, targetWeightKg: 140 },
         ],
         exerciseInfo: {
+          exerciseId: "ghjkl8901",
           name: "Leg Press",
           description: "Machine-based compound for quads and glutes.",
           slug: "leg-press",
@@ -276,6 +286,7 @@ export const dummyPlannedWorkouts: PlannedWorkout[] = [
           { setNumber: 3, targetReps: 12, targetWeightKg: 40 },
         ],
         exerciseInfo: {
+          exerciseId: "dfghj6789",
           name: "Seated Calf Raise",
           description: "Isolation for soleus and gastrocnemius.",
           slug: "seated-calf-raise",

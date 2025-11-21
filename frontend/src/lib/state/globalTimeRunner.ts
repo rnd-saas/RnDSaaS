@@ -18,12 +18,12 @@ export default function GlobalTimeRunner() {
   }, [isRunning, tick]);
 
   useEffect(() => {
-    console.log(
-      "GlobalTimeRunner - isRunning:",
-      isRunning,
-      " with value of ",
-      elapsedTimeSeconds
-    );
+    // console.log(
+    //   "GlobalTimeRunner - isRunning:",
+    //   isRunning,
+    //   " with value of ",
+    //   elapsedTimeSeconds
+    // );
   }, [isRunning, elapsedTimeSeconds]);
   return null;
 }
