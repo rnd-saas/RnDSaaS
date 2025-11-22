@@ -1,15 +1,16 @@
 ﻿import { useForm } from "react-hook-form";
 import {Button} from "@/components/ui/button.tsx";
-import {Link} from "react-router-dom";
 import {DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog.tsx";
-
+type RegisterDialogProps = {
+    onSwitchToLogin: () => void;
+};
 type Inputs = {
     email: string
     username: string
     password: string
     passwordConfirmation: string
 }
-function Register() {
+export default function RegisterDialog({onSwitchToLogin}:RegisterDialogProps) {
     const {
         register,
         handleSubmit,
@@ -97,11 +98,8 @@ function Register() {
                 <Button variant={"default"} type="submit">Register</Button>
             </form>
             <DialogFooter className={'p-6'}>
-                <Link to={'/login'} style={{color: "var(--color-link)"}}>Already an existing
-                    user?</Link>
+                <Button variant={"link"}  onClick={onSwitchToLogin}>Already an existing user?</Button>
             </DialogFooter>
         </DialogContent>
     );
 }
-
-export default Register;

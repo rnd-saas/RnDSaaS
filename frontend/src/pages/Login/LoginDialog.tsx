@@ -1,13 +1,15 @@
 ﻿import { useForm } from "react-hook-form";
 import {Button} from "@/components/ui/button.tsx";
 import {Link, useNavigate} from "react-router-dom";
-import {DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog.tsx";
-
+import {DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog.tsx";
+type LoginDialogProps = {
+    onSwitchToRegister: () => void;
+};
 type Inputs = {
     email: string
     password: string
 }
-function Login() {
+export default function LoginDialog({ onSwitchToRegister }: LoginDialogProps) {
     const navigate = useNavigate();
     const {
         register,
@@ -59,17 +61,14 @@ function Login() {
                     {errors.password && (
                         <span className="text-red-500 text-sm mt-1">*Password is mandatory</span>
                     )}
-                    {/*will need to implement properly with backend*/}
                     <Link to={'/'} style={{ fontSize: "14px", display: "block", textAlign: "left", color: "var(--color-link)" }}>Forgot password?</Link>
                 </div>
                 <Button variant={"default"} type="submit">Login</Button>
             </form>
             <DialogFooter className={'p-6'}>
+                <Button variant={"secondary"} onClick={onSwitchToRegister}>Register</Button>
                 <p>Don't have an account yet?</p>
-                <Button variant={"secondary"} onClick={() => navigate("/register")}>Register</Button>
             </DialogFooter>
         </DialogContent>
     );
 }
-
-export default Login;
