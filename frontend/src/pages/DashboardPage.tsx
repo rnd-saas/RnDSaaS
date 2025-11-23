@@ -4,8 +4,7 @@ import {useLocation, useNavigate} from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import Achievement from "@/components/achievement.tsx";
-import type {AchievementType} from "@/utils/AchievementType.tsx";
+import AchievementList from "@/pages/Profile/ProfileComponents/AchievementList.tsx";
 
 const ADVICE_TIPS: string[] = [
   "Fill half your plate with colorful vegetables.",
@@ -100,11 +99,6 @@ export default function DashboardPage() {
     longestStreak: { current: 0, target: 7 },
   };
   const level = { label: "Novice", currentXp: 0, nextLevelXp: 1200 };
-  const achievements: AchievementType[] = [
-    { id: 1, title: "100 Workouts", sub: "Completed", image: "💪", obtained:true },
-    { id: 2, title: "7 Days", sub: "Streak", image: "📆", obtained: true },
-    { id: 3, title: "Consecutive", sub: "Workout 12", image: "🔥", obtained:true },
-  ];
   // ----------------------
 
   const navigate = useNavigate();
@@ -210,11 +204,7 @@ export default function DashboardPage() {
         {/* Achievements */}
         <section className="mt-5">
           <h3 className="mb-3 text-lg font-semibold">Achievements:</h3>
-          <div className="flex items-stretch gap-3 overflow-x-auto pb-1">
-            {achievements.map((a) => (
-              <Achievement key={a.id} {...a} />
-            ))}
-          </div>
+          <AchievementList/>
           <div className="mt-2 flex items-center justify-center gap-2">
             <Dot active />
             <Dot />
