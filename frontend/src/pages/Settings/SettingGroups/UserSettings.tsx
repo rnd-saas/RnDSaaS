@@ -2,6 +2,8 @@
 import {Label} from "@/components/ui/label.tsx";
 import {Separator} from "@/components/ui/separator.tsx";
 import {Switch} from "@/components/ui/switch.tsx";
+import {Button} from "@/components/ui/button.tsx";
+import {useNavigate} from "react-router-dom";
 
 export type UserSettings = {
     weightUnits:string,
@@ -14,6 +16,7 @@ export type UserSettings = {
 }
 
 export default function UserSettings() {
+    const navigate = useNavigate();
     const weightUnitOptions = [
         { value: "kg", label: "Kg" },
         { value: "lbs", label: "Lbs" },
@@ -119,6 +122,8 @@ export default function UserSettings() {
                     </SelectContent>
                 </Select>
             </div>
+            <Separator/>
+            <Button variant={"outline"}  onClick={() => navigate("/onboarding")}>Redo Onboarding</Button>
         </div>
     );
 }

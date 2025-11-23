@@ -28,21 +28,18 @@ export default function LoginDialog({ onSwitchToRegister }: LoginDialogProps) {
     };
 
     return (
-        <DialogContent>
+        <DialogContent className={"bg-[var(--color-background)] rounded-lg shadow-md"}>
             <DialogHeader>
                 <DialogTitle>Login Form</DialogTitle>
             </DialogHeader>
 
             <form
-                className="Login max-w-sm bg-[var(--color-background)] p-6 rounded-lg shadow-md space-y-4"
+                className="Login max-w-sm p-6 space-y-4"
                 onSubmit={handleSubmit(onSubmit)}
             >
                 <div className="flex flex-col">
                     <label htmlFor="email" className="mb-1 font-medium text-left">Email</label>
-                    <input
-                        id="email"
-                        type="email"
-                        {...register("email", { required: true })}
+                    <input id="email" type="email"{...register("email", { required: true })}
                         placeholder="Enter your email"
                     />
                     {errors.email && (
@@ -52,10 +49,7 @@ export default function LoginDialog({ onSwitchToRegister }: LoginDialogProps) {
 
                 <div className="flex flex-col">
                     <label htmlFor="password" className="mb-1 font-medium text-left">Password</label>
-                    <input
-                        id="password"
-                        type="password"
-                        {...register("password", { required: true })}
+                    <input id="password" type="password"{...register("password", { required: true })}
                         placeholder="Enter your password"
                     />
                     {errors.password && (
@@ -65,9 +59,11 @@ export default function LoginDialog({ onSwitchToRegister }: LoginDialogProps) {
                 </div>
                 <Button variant={"default"} type="submit">Login</Button>
             </form>
-            <DialogFooter className={'p-6'}>
-                <Button variant={"secondary"} onClick={onSwitchToRegister}>Register</Button>
-                <p>Don't have an account yet?</p>
+            <DialogFooter className="!justify-start">
+                <div className="flex flex-col items-start gap-2">
+                    <p>Don't have an account yet?</p>
+                    <Button variant="secondary" onClick={onSwitchToRegister}>Register</Button>
+                </div>
             </DialogFooter>
         </DialogContent>
     );

@@ -1,6 +1,7 @@
 ﻿import { useForm } from "react-hook-form";
 import {Button} from "@/components/ui/button.tsx";
 import {DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog.tsx";
+import {useNavigate} from "react-router-dom";
 type RegisterDialogProps = {
     onSwitchToLogin: () => void;
 };
@@ -11,6 +12,7 @@ type Inputs = {
     passwordConfirmation: string
 }
 export default function RegisterDialog({onSwitchToLogin}:RegisterDialogProps) {
+    const navigate = useNavigate();
     const {
         register,
         handleSubmit,
@@ -25,18 +27,19 @@ export default function RegisterDialog({onSwitchToLogin}:RegisterDialogProps) {
         } else {
             //here will need to save new user to db
             alert(data.email + " has been successfully registered");
+            navigate("/landing")
         }
     };
 
     const password = watch("password");
 
     return (
-        <DialogContent>
+        <DialogContent className={"bg-[var(--color-background)] rounded-lg shadow-md"}>
             <DialogHeader>
                 <DialogTitle>Registration Form</DialogTitle>
             </DialogHeader>
             <form
-                className="Register max-w-sm bg-[var(--color-background)] p-6 rounded-lg shadow-md space-y-4"
+                className="Register max-w-sm p-6 space-y-4"
                 onSubmit={handleSubmit(onSubmit)}
             >
                 <div className="flex flex-col">
@@ -97,8 +100,8 @@ export default function RegisterDialog({onSwitchToLogin}:RegisterDialogProps) {
                 </div>
                 <Button variant={"default"} type="submit">Register</Button>
             </form>
-            <DialogFooter className={'p-6'}>
-                <Button variant={"link"}  onClick={onSwitchToLogin}>Already an existing user?</Button>
+            <DialogFooter>
+                <Button variant={"link"} className="justify-start w-full" onClick={onSwitchToLogin}>Already an existing user?</Button>
             </DialogFooter>
         </DialogContent>
     );
