@@ -27,7 +27,7 @@ export default function RegisterDialog({onSwitchToLogin}:RegisterDialogProps) {
         } else {
             //here will need to save new user to db
             alert(data.email + " has been successfully registered");
-            navigate("/landing")
+            navigate("/onboarding-invite")
         }
     };
 

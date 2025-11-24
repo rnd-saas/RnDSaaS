@@ -1,5 +1,4 @@
 import {cn} from "@/lib/utils.ts";
-import {Button} from "@/components/ui/button.tsx";
 
 
 export default function WorkoutDisplay() {
@@ -10,7 +9,7 @@ export default function WorkoutDisplay() {
         isCurrent?: boolean;
     }
 
-    const weekData: Day[][] = [ //todo:get from somewhere
+    const weekData: Day[][] = [
         [
             { state: "worked" },
             { state: "worked" },

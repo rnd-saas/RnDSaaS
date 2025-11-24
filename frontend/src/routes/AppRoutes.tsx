@@ -13,6 +13,7 @@ import SocialPage from "@/pages/Social/SocialPage.tsx";
 import MoodPage from "@/pages/Mood/MoodPage";
 import CalendarPage from "@/pages/CalendarPage.tsx";
 import AchievementPage from "@/pages/AchievementPage.tsx";
+import OnboardingInvitePage from "@/pages/Onboarding/OnboardingInvitePage.tsx";
 
 
 export default function AppRoutes() {
@@ -21,6 +22,7 @@ export default function AppRoutes() {
             <Routes>
                 <Route path="/" element={<DefaultPage />} />
                 <Route path="/onboarding" element={<OnboardingManager/>}/>
+                <Route path="/onboarding-invite" element={<OnboardingInvitePage/>}/>
                 <Route path="/landing" element={<LandingPage />} />
                 <Route path="/chatbot" element={<ChatbotPage />} />
                 <Route path="/workout/rest" element={<RestTimer />} />
