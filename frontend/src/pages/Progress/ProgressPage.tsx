@@ -1,4 +1,4 @@
-import {useLocation, useNavigate} from "react-router-dom";
+import {useLocation} from "react-router-dom";
 import AchievementList from "@/pages/Profile/ProfileComponents/AchievementList.tsx";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar.tsx";
 import avatarPlaceholder from "@/assets/avatar-placeholder.png";
@@ -8,7 +8,6 @@ import Goals from "@/pages/Progress/ProgressComponents/Goals.tsx";
 import Moods from "@/pages/Progress/ProgressComponents/Moods.tsx";
 
 export default function ProgressPage() {
-    const navigate = useNavigate();
     const progressComponents = [
         { value:"achievements", component: AchievementList, label: "Recent Achievements" },
         { value:"goals", component: Goals, label:"Your goals" },

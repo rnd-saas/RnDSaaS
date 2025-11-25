@@ -35,7 +35,6 @@ export default function Moods(){
                     <YAxis type="number" dataKey="y" name="mood" width="auto" />
                     <Scatter name="Moods" data={latestMoods} />
                 </ScatterChart>
-                );
             </ChartContainer>
         </div>
     )

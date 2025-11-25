@@ -26,18 +26,18 @@ export default function Goals(){
         <div>
             <section className="space-y-3">
                 <h2 className="text-xl font-semibold">To your goal:</h2>
-                {selectedGoals.map(g => (
-                    <GoalRow label=g.labal value=g.value target=g.target />
-                ))}
+                {/*{selectedGoals.map(g => (*/}
+                {/*    <GoalRow label=g.labal value=g.value target=g.target />*/}
+                {/*))}*/}
             </section>
             <Select>
                 <SelectTrigger>
                     <SelectValue placeholder="Add a new goal"/>
                 </SelectTrigger>
                 <SelectContent>
-                    {possibleGoals.map(g => (
-                            <SelectItem value=g.value>{g.label}</SelectItem>
-                    ))}
+                    {/*{possibleGoals.map(g => (*/}
+                    {/*        <SelectItem value=g.value>{g.label}</SelectItem>*/}
+                    {/*))}*/}
                 </SelectContent>
             </Select>
         </div>
