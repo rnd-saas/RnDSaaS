@@ -13,6 +13,9 @@ export default function WorkoutTimer() {
   const [seconds, setSeconds] = useState(INITIAL_EXERCISE_SECONDS);
   const [isRunning, setIsRunning] = useState(true);
 
+  // Store the remaining time before pausing
+  const [storedExerciseSeconds, setStoredExerciseSeconds] = useState<number | null>(null);
+
   // --- countdown tick ---
   useEffect(() => {
     if (!isRunning) return;
@@ -25,35 +28,43 @@ export default function WorkoutTimer() {
     return () => window.clearInterval(id);
   }, [isRunning, seconds]);
 
-  // --- auto-switch: workout -> rest when timer hits 0 ---
+  // --- auto-switch on timer end (exercise -> rest) ---
   useEffect(() => {
     if (seconds === 0 && mode === "exercise") {
       startRest();
     }
-    // If you later want rest -> exercise auto-switch,
-    // you can add: if (seconds === 0 && mode === "rest") startExercise();
   }, [seconds, mode]);
 
-  // helpers
   const formatTime = (s: number) => {
     const minutes = Math.floor(s / 60);
     const secs = s % 60;
-    return `${String(minutes).padStart(2, "0")} : ${String(secs).padStart(
-      2,
-      "0",
-    )}`;
+    return `${String(minutes).padStart(2, "0")} : ${String(secs).padStart(2, "0")}`;
   };
 
   const timeLabel = formatTime(seconds);
 
+  // --- START exercise fresh OR return from rest ---
   const startExercise = () => {
     setMode("exercise");
-    setSeconds(INITIAL_EXERCISE_SECONDS);
+
+    // If coming back from skip → restore old value
+    if (storedExerciseSeconds !== null) {
+      setSeconds(storedExerciseSeconds);
+      setStoredExerciseSeconds(null);
+    } else {
+      setSeconds(INITIAL_EXERCISE_SECONDS);
+    }
+
     setIsRunning(true);
   };
 
+  // --- START rest, but PAUSE an active workout ---
   const startRest = () => {
     setMode("rest");
+
+    // Save current workout time so Skip can restore it
+    setStoredExerciseSeconds(seconds);
+
     setSeconds(INITIAL_REST_SECONDS);
     setIsRunning(true);
   };
@@ -63,31 +74,36 @@ export default function WorkoutTimer() {
   };
 
   const togglePause = () => {
-    setIsRunning((prev) => !prev);
+    // PAUSE → go to rest screen
+    if (isRunning) {
+      startRest();
+    } else {
+      // RESUME → go back to exercise
+      startExercise();
+    }
   };
 
   const skipRest = () => {
-    // skipping rest jumps back to exercise
-    startExercise();
+    startExercise(); // restores saved time
   };
 
   return (
-    <div className="min-h-[100dvh] bg-muted/40 flex items-center justify-center px-4 py-6">
+    <div className="relative min-h-[100dvh] bg-muted/40 flex items-center justify-center px-4 py-6">
       <div className="w-full max-w-sm bg-background shadow-lg rounded-3xl pt-6 pb-8 px-6">
         {mode === "exercise" ? (
           <ExerciseScreen
             timeLabel={timeLabel}
             isRunning={isRunning}
-            onTogglePause={togglePause}
-            onSwitchToRest={startRest} // top arrow
+            onTogglePause={togglePause}     // ← pause goes to rest!
+            onSwitchToRest={startRest}      // optional top arrow
           />
         ) : (
           <RestScreen
             timeLabel={timeLabel}
             onMinus={() => adjustSeconds(-15)}
             onPlus={() => adjustSeconds(15)}
-            onSkip={skipRest}
-            onSwitchToExercise={startExercise} // top ✓
+            onSkip={skipRest}               // ← restore previous workout time
+            onSwitchToExercise={startExercise}
           />
         )}
       </div>
