@@ -236,7 +236,7 @@ export default function DashboardPage() {
 
 /* ---------- Small bits ---------- */
 
-function GoalRow({ label, value, target }: { label: string; value: number; target: number }) {
+export function GoalRow({ label, value, target }: { label: string; value: number; target: number }) {
   const pct = Math.max(0, Math.min(100, (value / target) * 100));
   return (
     <div className="space-y-1.5">
