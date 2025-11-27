@@ -42,7 +42,7 @@ export const useWorkoutStore = create<ActiveWorkoutState>()(
       startWorkout: (id: string, loggedExercises) =>
         set({
           isRunning: true,
-          elapsedTimeSeconds: 0,
+          // elapsedTimeSeconds: 0,
           workoutId: id,
           loggedWorkout: {
             workoutId: id,

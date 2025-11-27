@@ -31,7 +31,7 @@ export default function WorkoutPage() {
   }
 
   const handleWorkoutStart = () => {
-    navigate(`/active-workout/${todayWorkoutId}`);
+    navigate(`/workout/${todayWorkoutId}`);
   };
 
   let workoutContentBlock;

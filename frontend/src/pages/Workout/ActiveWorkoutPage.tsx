@@ -1,6 +1,13 @@
 import LoggedExerciseItem from "@/components/WorkoutComponents/LoggedExerciseItem";
 import { Button } from "@/components/WorkoutComponents/button";
-import { MessageSquareMore, MoreVertical, Pause, X, Play } from "lucide-react";
+import {
+  MessageSquareMore,
+  MoreVertical,
+  Pause,
+  X,
+  Play,
+  ChevronLeft,
+} from "lucide-react";
 import { useEffect } from "react";
 import { usePlannedWorkout } from "@/api/workouts";
 import type { PlannedExercise, PlannedWorkout } from "@/lib/types/Workout";
@@ -69,6 +76,12 @@ export default function ActiveWorkoutPage() {
     console.log(`value of logged workout is: ${loggedWorkout}`);
     console.log(`value of is running: ${isRunning}`);
     if (!isRunning) {
+      // Safety Check: If we already have a logged workout for this ID, don't overwrite it!
+      if (loggedWorkout && loggedWorkout.workoutId === id) {
+        console.log("Resuming existing paused session. Data preserved.");
+        return;
+      }
+
       console.log(`Planned workout is: ${plannedWorkout}`);
       console.log(`is runnign has value of: ${isRunning}`);
       // convert planned exercises to logged exercises and add to store
@@ -131,6 +144,29 @@ export default function ActiveWorkoutPage() {
         <div className="sticky top-0 z-20 w-full bg-zinc-50/95 backdrop-blur supports-backdrop-filter:bg-zinc-50/80">
           <div className="relative flex items-center justify-center p-4">
             <div className="absolute left-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 p-0 hover:bg-zinc-100"
+                onClick={() => {
+                  if (isRunning) pauseWorkout();
+                  navigate("../workout");
+                }}
+              >
+                <ChevronLeft className="h-6 w-6 text-zinc-700" />
+              </Button>
+            </div>
+            <div className="flex flex-col items-center">
+              <h3 className="h3-styles text-base font-bold">
+                {new Date().toLocaleDateString("en-US", {
+                  weekday: "short",
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })}
+              </h3>
+            </div>
+            <div className="absolute right-4">
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -141,7 +177,7 @@ export default function ActiveWorkoutPage() {
                     <MoreVertical className="h-6 w-6 text-zinc-700" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent align="start" className="w-48 p-1">
+                <PopoverContent align="end" className="w-48 p-1">
                   <div className="flex flex-col">
                     <button
                       onClick={() => {
@@ -176,7 +212,8 @@ export default function ActiveWorkoutPage() {
                         <AlertDialogHeader>
                           <AlertDialogTitle>Quit Workout?</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Are you sure you want to quit? Your current progress will be lost.
+                            Are you sure you want to quit? Your current progress
+                            will be lost.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
@@ -184,7 +221,7 @@ export default function ActiveWorkoutPage() {
                           <AlertDialogAction
                             onClick={() => {
                               resetWorkout();
-                              navigate("/");
+                              navigate("/workout");
                             }}
                             className="bg-red-600 hover:bg-red-700"
                           >
@@ -196,16 +233,6 @@ export default function ActiveWorkoutPage() {
                   </div>
                 </PopoverContent>
               </Popover>
-            </div>
-            <div className="flex flex-col items-center">
-              <h3 className="h3-styles text-base font-bold">
-                {new Date().toLocaleDateString("en-US", {
-                  weekday: "short",
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                })}
-              </h3>
             </div>
           </div>
 

@@ -9,6 +9,7 @@ import LandingPage from "@/pages/LandingPage";
 import PlannedWorkoutPage from "@/pages/Workout/PlannedWorkoutPage.tsx";
 import ActiveWorkoutPage from "@/pages/Workout/ActiveWorkoutPage.tsx";
 import ExercisePage from "@/pages/ExercisePage.tsx";
+import WorkoutEvaluationPage from "@/pages/Workout/WorkoutEvaluationPage.tsx";
 
 export default function AppRoutes() {
   return (
@@ -22,7 +23,8 @@ export default function AppRoutes() {
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/landing" element={<LandingPage />} />
         <Route path="/workout" element={<PlannedWorkoutPage />} />
-        <Route path="/active-workout/:id" element={<ActiveWorkoutPage />} />
+        <Route path="/workout/:id" element={<ActiveWorkoutPage />} />
+        <Route path="/workout/evaluation" element={<WorkoutEvaluationPage />} />
         <Route path="/exercise/:exerciseSlug" element={<ExercisePage />} />
       </Routes>
     </BrowserRouter>
