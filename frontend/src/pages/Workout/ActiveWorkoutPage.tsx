@@ -1,6 +1,6 @@
 import LoggedExerciseItem from "@/components/WorkoutComponents/LoggedExerciseItem";
 import { Button } from "@/components/WorkoutComponents/button";
-import { MessageSquareMore, ChevronLeft, Pause, X, Play } from "lucide-react";
+import { MessageSquareMore, MoreVertical, Pause, X, Play } from "lucide-react";
 import { useEffect } from "react";
 import { usePlannedWorkout } from "@/api/workouts";
 import type { PlannedExercise, PlannedWorkout } from "@/lib/types/Workout";
@@ -9,6 +9,17 @@ import { useParams, useNavigate } from "react-router-dom";
 import { formatRestTime } from "@/lib/utils/time.ts";
 import { convertPlannedToLogged } from "@/lib/utils/workout";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/popover";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/alert-dialog";
 
 // GENERAL NOTE: first render is test, second render is actual first render due to strict mode in dev.
 // Note: the first render will have null for loggedWorkout since the workout is only started in useEffect after first render.
@@ -127,7 +138,7 @@ export default function ActiveWorkoutPage() {
                     size="icon"
                     className="h-8 w-8 p-0 hover:bg-zinc-100"
                   >
-                    <ChevronLeft className="h-6 w-6 text-zinc-700" />
+                    <MoreVertical className="h-6 w-6 text-zinc-700" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent align="start" className="w-48 p-1">
@@ -154,16 +165,34 @@ export default function ActiveWorkoutPage() {
                         </>
                       )}
                     </button>
-                    <button
-                      onClick={() => {
-                        resetWorkout();
-                        navigate("/");
-                      }}
-                      className="flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-red-600 outline-none hover:bg-zinc-100 focus:bg-zinc-100"
-                    >
-                      <X className="h-4 w-4" />
-                      <span>Quit Workout</span>
-                    </button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <button className="flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-red-600 outline-none hover:bg-zinc-100 focus:bg-zinc-100">
+                          <X className="h-4 w-4" />
+                          <span>Quit Workout</span>
+                        </button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Quit Workout?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to quit? Your current progress will be lost.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => {
+                              resetWorkout();
+                              navigate("/");
+                            }}
+                            className="bg-red-600 hover:bg-red-700"
+                          >
+                            Quit
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </PopoverContent>
               </Popover>
