@@ -24,7 +24,7 @@ export default function AppRoutes() {
         <Route path="/landing" element={<LandingPage />} />
         <Route path="/workout" element={<PlannedWorkoutPage />} />
         <Route path="/workout/:id" element={<ActiveWorkoutPage />} />
-        <Route path="/workout/evaluation" element={<WorkoutEvaluationPage />} />
+        <Route path="/workout/:id/evaluation" element={<WorkoutEvaluationPage />} />
         <Route path="/exercise/:exerciseSlug" element={<ExercisePage />} />
       </Routes>
     </BrowserRouter>

@@ -2,8 +2,12 @@ import {
   dummyPlannedWorkouts,
   dummyExercise,
 } from "@/lib/data/dummyPlannedWorkout";
-import type { PlannedWorkout, ExerciseInformation } from "@/lib/types/Workout";
-import { useQuery } from "@tanstack/react-query";
+import type {
+  PlannedWorkout,
+  ExerciseInformation,
+  WorkoutEvaluation,
+} from "@/lib/types/Workout";
+import { useQuery, useMutation } from "@tanstack/react-query";
 
 /**
  * Simulated API call to fetch planned workout for a specific date and user
@@ -47,5 +51,23 @@ export function useExercise(exerciseSlug: string) {
     queryKey: ["exercise", exerciseSlug],
     queryFn: () => fetchExercise(exerciseSlug),
     gcTime: 60000, // will be garbage collected after 1 minute of inactivity
+  });
+}
+
+/**
+ * Simulated API call to save workout evaluation
+ */
+async function saveWorkoutEvaluation(
+  evaluation: WorkoutEvaluation
+): Promise<void> {
+  // Simulate network delay
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  console.log("Saved evaluation:", evaluation);
+  // In a real implementation, you would POST data to a backend service here
+}
+
+export function useSaveWorkoutEvaluation() {
+  return useMutation({
+    mutationFn: saveWorkoutEvaluation,
   });
 }

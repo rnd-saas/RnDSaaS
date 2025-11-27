@@ -8,7 +8,7 @@ import {
   Play,
   ChevronLeft,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { usePlannedWorkout } from "@/api/workouts";
 import type { PlannedExercise, PlannedWorkout } from "@/lib/types/Workout";
 import { useWorkoutStore } from "@/lib/state/workoutStore";
@@ -33,6 +33,7 @@ import {
 // that is now taken into account into table rendering etc.
 export default function ActiveWorkoutPage() {
   const { id } = useParams();
+  const [isFinishDialogOpen, setIsFinishDialogOpen] = useState(false);
   const elapsedTimeSeconds = useWorkoutStore(
     (state) => state.elapsedTimeSeconds
   );
@@ -50,6 +51,23 @@ export default function ActiveWorkoutPage() {
   const calculateTotalSetsFinished = useWorkoutStore(
     (state) => state.calculateTotalSetsFinished
   );
+
+  const handleFinishWorkout = () => {
+    if (!loggedWorkout?.exercises) {
+      navigate("/workout/evaluation");
+      return;
+    }
+
+    const allSetsCompleted = loggedWorkout.exercises.every((exercise) =>
+      exercise.sets.every((set) => set.completed)
+    );
+
+    if (allSetsCompleted) {
+      navigate("/workout/evaluation");
+    } else {
+      setIsFinishDialogOpen(true);
+    }
+  };
 
   // fetch the planned workout data for today
   const { data, isLoading, error } = usePlannedWorkout(new Date()); // this or use the plannedworwkout id to fetch it?
@@ -270,9 +288,39 @@ export default function ActiveWorkoutPage() {
       <div className="sticky bottom-0 w-full bg-background/50 py-4 flex justify-center">
         <div className="mx-auto w-4/5 flex items-center justify-center gap-4 max-w-[728px]">
           {isRunning ? (
-            <Button variant="secondary" className="flex-1 text-md ">
-              Finish Workout
-            </Button>
+            <>
+              <Button
+                variant="secondary"
+                className="flex-1 text-md "
+                onClick={handleFinishWorkout}
+              >
+                Finish Workout
+              </Button>
+              <AlertDialog
+                open={isFinishDialogOpen}
+                onOpenChange={setIsFinishDialogOpen}
+              >
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Finish Workout?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      You haven't completed all sets. Are you sure you want to
+                      finish?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() =>
+                        navigate(`/workout/${id}/evaluation`, { replace: true })
+                      }
+                    >
+                      Finish
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </>
           ) : (
             <Button
               variant="default"
