@@ -158,7 +158,7 @@ export default function ActiveWorkoutPage() {
           <Button variant="secondary" className="flex-1 text-md ">
             Finish Workout
           </Button>
-          <Button size={"icon"} variant="secondary" className="lg:h-9">
+          <Button size={"icon"} variant="secondary" className="">
             <MessageSquareMore size={24} />
           </Button>
         </div>

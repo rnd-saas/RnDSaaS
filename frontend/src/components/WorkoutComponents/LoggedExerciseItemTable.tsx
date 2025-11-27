@@ -80,6 +80,40 @@ export default function WorkoutList({ exerciseId }: { exerciseId: string }) {
                     <Input
                       type="text"
                       inputMode="numeric"
+                      // Add key to force re-render when store value changes (e.g. via checkbox autofill)
+                      key={`${rowData[0]}-${cellIndex}-${(() => {
+                        const setNumber = rowData[0];
+                        const set = loggedExercise?.sets.find(
+                          (s) => s.setNumber === setNumber
+                        );
+                        if (!set) return "missing";
+                        switch (loggedExercise?.exerciseInfo.logMode) {
+                          case "reps_weight":
+                            return cellIndex === 1
+                              ? set.actualReps
+                              : set.actualWeightKg;
+                          case "reps":
+                            return cellIndex === 1 ? set.actualReps : "na";
+                          case "time_weight":
+                            return cellIndex === 1
+                              ? set.actualTimeSeconds
+                              : set.actualWeightKg;
+                          case "time":
+                            return cellIndex === 1
+                              ? set.actualTimeSeconds
+                              : "na";
+                          case "distance_weight":
+                            return cellIndex === 1
+                              ? set.actualDistanceMeters
+                              : set.actualWeightKg;
+                          case "distance":
+                            return cellIndex === 1
+                              ? set.actualDistanceMeters
+                              : "na";
+                          default:
+                            return "na";
+                        }
+                      })()}`}
                       onBeforeInput={(e) => {
                         if (!/^[0-9]$/.test(e.data)) {
                           e.preventDefault();
@@ -211,12 +245,52 @@ export default function WorkoutList({ exerciseId }: { exerciseId: string }) {
                     );
                     return set?.completed ?? false;
                   })()}
-                  onCheckedChange={(checked) =>
-                    updateExerciseSet(exerciseId, rowData[0], {
-                      completed:
-                        checked === "indeterminate" ? false : Boolean(checked),
-                    })
-                  }
+                  onCheckedChange={(checked) => {
+                    const isChecked = checked === true;
+                    const setNumber = rowData[0];
+                    const updatePayload: any = {
+                      completed: isChecked,
+                    };
+
+                    // If checking the box, autofill missing values from planned data
+                    if (isChecked) {
+                      const currentSet = loggedExercise?.sets.find(
+                        (s) => s.setNumber === setNumber
+                      );
+                      const logMode = loggedExercise?.exerciseInfo.logMode;
+                      const isMissing = (val: any) =>
+                        val === null || val === undefined;
+
+                      // rowData: [setNumber, PrimaryMetric, SecondaryMetric?]
+                      if (logMode === "reps_weight") {
+                        if (isMissing(currentSet?.actualReps))
+                          updatePayload.actualReps = rowData[1];
+                        if (isMissing(currentSet?.actualWeightKg))
+                          updatePayload.actualWeightKg = rowData[2];
+                      } else if (logMode === "reps") {
+                        if (isMissing(currentSet?.actualReps))
+                          updatePayload.actualReps = rowData[1];
+                      } else if (logMode === "time_weight") {
+                        if (isMissing(currentSet?.actualTimeSeconds))
+                          updatePayload.actualTimeSeconds = rowData[1];
+                        if (isMissing(currentSet?.actualWeightKg))
+                          updatePayload.actualWeightKg = rowData[2];
+                      } else if (logMode === "time") {
+                        if (isMissing(currentSet?.actualTimeSeconds))
+                          updatePayload.actualTimeSeconds = rowData[1];
+                      } else if (logMode === "distance_weight") {
+                        if (isMissing(currentSet?.actualDistanceMeters))
+                          updatePayload.actualDistanceMeters = rowData[1];
+                        if (isMissing(currentSet?.actualWeightKg))
+                          updatePayload.actualWeightKg = rowData[2];
+                      } else if (logMode === "distance") {
+                        if (isMissing(currentSet?.actualDistanceMeters))
+                          updatePayload.actualDistanceMeters = rowData[1];
+                      }
+                    }
+
+                    updateExerciseSet(exerciseId, setNumber, updatePayload);
+                  }}
                   className="bg-300 border-text data-[state=unchecked]:text-white data-[state=checked]:bg-zinc-700 data-[state=checked]:border-green-500 data-[state=checked]:text-white"
                 />
               </TableCell>
