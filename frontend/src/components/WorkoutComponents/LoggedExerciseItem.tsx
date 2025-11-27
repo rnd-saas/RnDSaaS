@@ -30,6 +30,13 @@ export default function LoggedExerciseItem({
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const { data, isLoading, error } = usePlannedWorkout(new Date());
+
+  // Access the store actions and the specific logged exercise
+  const updateExercise = useWorkoutStore((state) => state.updateExercise);
+  const loggedExercise = useWorkoutStore((state) =>
+    state.getExercise(plannedExerciseId)
+  );
+
   const plannedWorkout = data;
   while (isLoading) {
     return;
@@ -38,9 +45,10 @@ export default function LoggedExerciseItem({
     return exercise.exerciseInfo.exerciseId === plannedExerciseId;
   }) as PlannedExercise;
 
-  const [restTimeSeconds, setRestTimeSeconds] = useState<string>(
-    plannedExercise.restTimeSeconds.toString()
-  );
+  // Use the logged value if available, otherwise fallback to planned (though logged should exist by now)
+  const currentRestTime =
+    loggedExercise?.restTimeSeconds ?? plannedExercise.restTimeSeconds;
+
   const restTimeOptions: number[] = calculateRestTimeOptions(5, 300);
 
   return (
@@ -99,20 +107,24 @@ export default function LoggedExerciseItem({
                   <Timer color="#52525C" className="" />
                   <span className="body-styles">
                     Rest Time:{" "}
-                    {restTimeSeconds == "0"
+                    {currentRestTime === 0
                       ? "OFF"
-                      : formatRestTime(parseInt(restTimeSeconds))}
+                      : formatRestTime(currentRestTime)}
                   </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-auto outline-none border-0 shadow-card">
+              <DropdownMenuContent className="w-auto outline-none border-0 shadow-card h-64 overflow-y-auto">
                 <DropdownMenuLabel>Set Rest Time</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuRadioGroup
                   defaultValue="OFF"
                   className="text-center flex flex-col items-center justify-center"
-                  value={restTimeSeconds.toString()}
-                  onValueChange={setRestTimeSeconds} //TODO: CHANGE TO USE LOGGEDWORKOUT RESTTIME VALUE INSTEAD.
+                  value={currentRestTime.toString()}
+                  onValueChange={(val) => {
+                    updateExercise(plannedExerciseId, {
+                      restTimeSeconds: parseInt(val),
+                    });
+                  }}
                 >
                   <DropdownMenuRadioItem key={0} value={"0"}>
                     OFF
