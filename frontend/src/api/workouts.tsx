@@ -1,5 +1,8 @@
-import { dummyPlannedWorkouts } from "@/lib/data/dummyPlannedWorkout";
-import type { PlannedWorkout } from "@/lib/types/Workout";
+import {
+  dummyPlannedWorkouts,
+  dummyExercise,
+} from "@/lib/data/dummyPlannedWorkout";
+import type { PlannedWorkout, ExerciseInformation } from "@/lib/types/Workout";
 import { useQuery } from "@tanstack/react-query";
 
 /**
@@ -7,9 +10,11 @@ import { useQuery } from "@tanstack/react-query";
  * @param date
  * @return promise resolving to PlannedWorkout type
  */
-async function fetchPlannedWorkout(date: Date): Promise<PlannedWorkout> {
+async function fetchPlannedWorkout(date: Date): Promise<PlannedWorkout | null> {
   // Simulate network delay
-  await new Promise<PlannedWorkout>((resolve) => setTimeout(resolve, 500));
+  await new Promise<PlannedWorkout | null>((resolve) =>
+    setTimeout(resolve, 500)
+  );
 
   // In a real implementation, you would fetch data from a backend service here
   // For now, we return the dummy data regardless of date and userId
@@ -26,5 +31,21 @@ export function usePlannedWorkout(date: Date) {
     queryKey: ["plannedWorkout", date.toDateString()],
     queryFn: () => fetchPlannedWorkout(date),
     gcTime: 60000,
+  });
+}
+
+async function fetchExercise(exerciseSlug: string) {
+  await new Promise<ExerciseInformation>((resolve) => setTimeout(resolve, 500));
+
+  // In a real implementation, you would fetch data from a backend service here
+  // For now, we return a dummy exercise based on the slug
+  return dummyExercise;
+}
+
+export function useExercise(exerciseSlug: string) {
+  return useQuery<ExerciseInformation | null>({
+    queryKey: ["exercise", exerciseSlug],
+    queryFn: () => fetchExercise(exerciseSlug),
+    gcTime: 60000, // will be garbage collected after 1 minute of inactivity
   });
 }

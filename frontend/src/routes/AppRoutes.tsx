@@ -8,6 +8,7 @@ import SettingsPage from "@/pages/Settings/SettingsPage.tsx";
 import LandingPage from "@/pages/LandingPage";
 import PlannedWorkoutPage from "@/pages/Workout/PlannedWorkoutPage.tsx";
 import ActiveWorkoutPage from "@/pages/Workout/ActiveWorkoutPage.tsx";
+import ExercisePage from "@/pages/ExercisePage.tsx";
 
 export default function AppRoutes() {
   return (
@@ -22,6 +23,7 @@ export default function AppRoutes() {
         <Route path="/landing" element={<LandingPage />} />
         <Route path="/workout" element={<PlannedWorkoutPage />} />
         <Route path="/active-workout/:id" element={<ActiveWorkoutPage />} />
+        <Route path="/exercise/:exerciseSlug" element={<ExercisePage />} />
       </Routes>
     </BrowserRouter>
   );

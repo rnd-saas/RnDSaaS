@@ -49,7 +49,7 @@ export interface ExerciseInformation {
   slug: string; //URL friendly name
   tutorialUrl?: string; //optional tutorial video URL for the exercise
   imageUrl?: string; //optional image URL for the exercise
-  difficultyLevel: "Beginner" | "Intermediate" | "Advanced";
+  difficultyLevel: 1 | 2 | 3 | 4 | 5; //1 to 5 scale
   logMode:
     | "reps_weight"
     | "reps"
@@ -58,6 +58,7 @@ export interface ExerciseInformation {
     | "distance"
     | "distance_weight";
   muscleGroups: MuscleGroup[]; //muscle groups targeted
+  instructions?: string[]; //optional instructions for the exercise
   equipment?: string[]; //equipment needed for the exercise
   createdAt: Date;
   updatedAt: Date;
@@ -92,11 +93,15 @@ export interface LoggedSet {
  * Evaluation at end of workout session
  */
 export interface WorkoutEvaluation {
-  workoutId: string; // same as in LoggedWorkout
-  feedbackAi: string; //AI generated feedback on the workout
-  comfortRating: number; //between 1 and 5.
-  difficultyRating: number; //between 1 and 5.
-  notes?: string; //optional notes for the workout
+  workoutId: string; // link to logged workout
+  feedbackAi: string; // AI generated text
+  difficultyRating: 1 | 2 | 3 | 4 | 5; // 1 to 5 stars
+  comfortRating: 1 | 2 | 3 | 4 | 5; // 1 to 5 emoji scale
+  comfortNotes?: string; // optional note for feelings
+  performanceNotes?: string; // optional note for workout performance
+  // property if filled in or skipped
+  createdAt: Date;
+  skipped: boolean; // property if user skipped evaluation
 }
 
 export type MuscleGroup =

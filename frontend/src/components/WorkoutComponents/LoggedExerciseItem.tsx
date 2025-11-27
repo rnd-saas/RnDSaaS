@@ -19,6 +19,7 @@ import {
 import { calculateRestTimeOptions, formatRestTime } from "@/lib/utils/time.ts";
 import { useWorkoutStore } from "@/lib/state/workoutStore";
 import { usePlannedWorkout } from "@/api/workouts";
+import { useNavigate } from "react-router-dom";
 
 export default function LoggedExerciseItem({
   plannedExerciseId,
@@ -26,6 +27,7 @@ export default function LoggedExerciseItem({
   plannedExerciseId: string;
   // plannedExercise: PlannedExercise;
 }) {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const { data, isLoading, error } = usePlannedWorkout(new Date());
   const plannedWorkout = data;
@@ -66,7 +68,14 @@ export default function LoggedExerciseItem({
                   {plannedExercise.exerciseInfo.name}
                 </h3>
 
-                <HelpCircle className="shrink-0 w-4 h-4" />
+                <HelpCircle
+                  onClick={() =>
+                    navigate(
+                      `../../exercise/${plannedExercise.exerciseInfo.slug}`
+                    )
+                  }
+                  className="shrink-0 w-4 h-4"
+                />
               </div>
             </div>
 

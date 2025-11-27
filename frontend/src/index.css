@@ -153,6 +153,12 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@utility h4-styles {
+  font-family: var(--h3-font-family);
+  font-weight: var(--h3-font-weight);
+  font-size: var(--font-size-small);
+}
+
 @utility h3-styles {
   font-family: var(--h3-font-family);
   font-weight: var(--h3-font-weight);
