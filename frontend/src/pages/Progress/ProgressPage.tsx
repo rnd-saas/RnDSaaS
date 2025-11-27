@@ -5,6 +5,7 @@ import Goals from "@/pages/Progress/ProgressComponents/Goals.tsx";
 import Moods from "@/pages/Progress/ProgressComponents/Moods.tsx";
 import Workouts from "@/pages/Progress/ProgressComponents/Workouts.tsx";
 import WorkoutDisplay from "@/pages/Profile/ProfileComponents/WorkoutDisplay.tsx";
+import PersonalData from "@/pages/Progress/ProgressComponents/PersonalData.tsx";
 
 export default function ProgressPage() {
     const progressComponents = [
@@ -13,6 +14,7 @@ export default function ProgressPage() {
         { value:"moods", component: Moods, label:"This week's mood" },
         { value:"workouts", component: Workouts, label:"This week's workouts" },
         { value:"calendar", component: WorkoutDisplay, label:"Planned workouts" },
+        { value:"data", component: PersonalData, label:"Your data" },
     ];
 
     return (
