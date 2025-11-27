@@ -1,5 +1,4 @@
 import {GoalRow} from "@/pages/DashboardPage.tsx";
-import {Input} from "@/components/ui/input.tsx";
 import {useState} from "react";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 
@@ -24,9 +23,9 @@ export default function Goals(){
         goal1=> !selectedGoals.some(goal2=>goal2.label === goal1.label)
     );
 
-    const level = { label: "Novice", currentXp: 0, nextLevelXp: 1200 };
+    // const level = { label: "Novice", currentXp: 0, nextLevelXp: 1200 };
 
-    const handleAddGoal = (value) => {
+    const handleAddGoal = (value: string) => {
         const selectedGoal = notSelectedGoals.find(g => g.value === value);
         if (!selectedGoal) return;
 
@@ -39,11 +38,11 @@ export default function Goals(){
         setAddSelection("");
     };
 
-    const handleRemoveGoal = (value) => {
+    const handleRemoveGoal = (value: number) => {
         setSelected(prev =>
             prev.filter(goal => goal.label !== selectedGoals.find(g => g.value === value)?.label)
         );
-        setAddSelection("");
+        setRemoveSelection("");
     };
 
     return(
