@@ -4,10 +4,14 @@ import {useState} from "react";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 
 export default function Goals(){
-    //the idea is that the user has a list of all goals that are possible within the app and they can select whichever
-    // they think is relevant to them.
-    //When a new goal is added, progress can be 0 regardless of what they have done before to avoid storing unnecessary info
-    //Goals can also be removed if user no longer wants to track it
+    const [currentAddSelection, setAddSelection]  = useState("")
+    const [currentRemoveSelection, setRemoveSelection]  = useState("")
+    const [selectedGoals, setSelected] = useState([//todo: should fetch from db
+        { label: "Workouts completed", value: 3, target: 5 },
+        { label: "Exercises discovered", value: 7, target: 10 },
+        { label: "Longest streak", value: 2, target: 7 },
+    ]);
+
     const possibleGoals = [
         { label: "Workouts completed", value: "workoutsCompleted", target: 5 },
         { label: "Exercises discovered", value: "exercisesDiscovered", target: 10 },
@@ -15,31 +19,62 @@ export default function Goals(){
         { label: "Moods logged", value: "moodsLogged", target: 7 },
         { label: "Liked friends' posts", value: "likedFriendsPosts", target: 10 },
     ];
-    const selectedGoals = [
-        { label: "Workouts completed", value: 0, target: 5 },
-        { label: "Exercises discovered", value: 0, target: 10 },
-        { label: "Longest streak", value: 0, target: 7 },
-    ];
+
+    const notSelectedGoals = possibleGoals.filter(
+        goal1=> !selectedGoals.some(goal2=>goal2.label === goal1.label)
+    );
+
     const level = { label: "Novice", currentXp: 0, nextLevelXp: 1200 };
+
+    const handleAddGoal = (value) => {
+        const selectedGoal = notSelectedGoals.find(g => g.value === value);
+        if (!selectedGoal) return;
+
+        const newGoal = {
+            label: selectedGoal.label,
+            value: 0,
+            target: selectedGoal.target
+        };
+        setSelected((prev) => [...prev, newGoal]);
+        setAddSelection("");
+    };
+
+    const handleRemoveGoal = (value) => {
+        setSelected(prev =>
+            prev.filter(goal => goal.label !== selectedGoals.find(g => g.value === value)?.label)
+        );
+        setAddSelection("");
+    };
 
     return(
         <div>
-            <section className="space-y-3">
-                <h2 className="text-xl font-semibold">To your goal:</h2>
-                {/*{selectedGoals.map(g => (*/}
-                {/*    <GoalRow label=g.labal value=g.value target=g.target />*/}
-                {/*))}*/}
+            <section className="space-y-3 mb-4">
+                {selectedGoals.map(g => (
+                    <GoalRow label={g.label} value={g.value} target={g.target}/>
+                ))}
             </section>
-            <Select>
-                <SelectTrigger>
-                    <SelectValue placeholder="Add a new goal"/>
-                </SelectTrigger>
-                <SelectContent>
-                    {/*{possibleGoals.map(g => (*/}
-                    {/*        <SelectItem value=g.value>{g.label}</SelectItem>*/}
-                    {/*))}*/}
-                </SelectContent>
-            </Select>
+            <div className={"flex justify-between"}>
+                <Select value={currentAddSelection} onValueChange={handleAddGoal}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Add a new goal"/>
+                    </SelectTrigger>
+                    <SelectContent>
+                        {notSelectedGoals.map(g => (
+                                <SelectItem value={g.value}>{g.label}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                <Select value={currentRemoveSelection} onValueChange={handleRemoveGoal}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Remove a goal"/>
+                    </SelectTrigger>
+                    <SelectContent>
+                        {selectedGoals.map(g => (
+                            <SelectItem value={g.value}>{g.label}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
         </div>
     )
 }

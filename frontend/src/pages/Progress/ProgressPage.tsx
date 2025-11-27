@@ -11,7 +11,7 @@ export default function ProgressPage() {
     const progressComponents = [
         { value:"achievements", component: AchievementList, label: "Recent Achievements" },
         { value:"goals", component: Goals, label:"Your goals" },
-        { value:"moods", component: Moods, label:"This week's mood" },
+        // { value:"moods", component: Moods, label:"This week's mood" },
     ];
     const { state } = useLocation() as { state?: { firstName?: string } };
     const userName = state?.firstName ?? localStorage.getItem("firstName") ?? "User";
