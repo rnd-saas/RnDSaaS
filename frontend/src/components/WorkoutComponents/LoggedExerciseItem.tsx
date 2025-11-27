@@ -113,7 +113,10 @@ export default function LoggedExerciseItem({
                   </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-auto outline-none border-0 shadow-card h-64 overflow-y-auto">
+              <DropdownMenuContent
+                align="start"
+                className="w-auto outline-none border-0 shadow-card h-64 overflow-y-auto z-50 bg-white pl-0!"
+              >
                 <DropdownMenuLabel>Set Rest Time</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuRadioGroup

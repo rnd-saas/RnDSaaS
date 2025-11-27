@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { useWorkoutStore } from "@/lib/state/workoutStore";
+import { usePlannedWorkout } from "@/api/workouts";
 
 export function LoggedExerciseNote({
   bgColor,
@@ -10,6 +11,16 @@ export function LoggedExerciseNote({
 }): JSX.Element {
   const ref = useRef<HTMLTextAreaElement>(null);
   const updateExercise = useWorkoutStore((state) => state.updateExercise);
+
+  const loggedExercise = useWorkoutStore((state) =>
+    state.getExercise(exerciseId)
+  );
+  const { data: plannedWorkout } = usePlannedWorkout(new Date());
+  const plannedExercise = plannedWorkout?.exercises.find(
+    (ex) => ex.exerciseInfo.exerciseId === exerciseId
+  );
+
+  const noteValue = loggedExercise?.notes ?? plannedExercise?.notes ?? "";
 
   const autoGrow = () => {
     const el = ref.current;
@@ -42,6 +53,7 @@ export function LoggedExerciseNote({
       onInput={autoGrow}
       rows={1} // start small
       placeholder="Add notes..."
+      defaultValue={noteValue}
       className={`placeholder:text-muted-foreground dark:bg-input/30 border-input w-full min-w-0 rounded-md ${
         bgColor ?? "bg-[--var(basic-colours-green-50)]"
       } px-3 py-2 text-sm shadow-card outline-none resize-none overflow-hidden`}
