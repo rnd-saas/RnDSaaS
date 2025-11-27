@@ -1,13 +1,14 @@
 import LoggedExerciseItem from "@/components/WorkoutComponents/LoggedExerciseItem";
 import { Button } from "@/components/WorkoutComponents/button";
-import { MessageSquareMore } from "lucide-react";
-import { useEffect, useState } from "react";
+import { MessageSquareMore, ChevronLeft, Pause, X, Play } from "lucide-react";
+import { useEffect } from "react";
 import { usePlannedWorkout } from "@/api/workouts";
 import type { PlannedExercise, PlannedWorkout } from "@/lib/types/Workout";
 import { useWorkoutStore } from "@/lib/state/workoutStore";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { formatRestTime } from "@/lib/utils/time.ts";
 import { convertPlannedToLogged } from "@/lib/utils/workout";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/popover";
 
 // GENERAL NOTE: first render is test, second render is actual first render due to strict mode in dev.
 // Note: the first render will have null for loggedWorkout since the workout is only started in useEffect after first render.
@@ -19,9 +20,12 @@ export default function ActiveWorkoutPage() {
   );
   const isRunning = useWorkoutStore((state) => state.isRunning);
   const resetWorkout = useWorkoutStore((state) => state.resetWorkout);
+  const pauseWorkout = useWorkoutStore((state) => state.pauseWorkout);
+  const resumeWorkout = useWorkoutStore((state) => state.resumeWorkout);
   const startWorkout = useWorkoutStore((state) => state.startWorkout);
   const loggedWorkout = useWorkoutStore((state) => state.loggedWorkout);
   const updateWorkout = useWorkoutStore((state) => state.updateWorkout);
+  const navigate = useNavigate();
   const calculateTotalVolume = useWorkoutStore(
     (state) => state.calculateTotalVolume
   );
@@ -111,18 +115,72 @@ export default function ActiveWorkoutPage() {
   }
 
   return (
-    <div className="w-full min-h-screen flex flex-col bg-(--basic-colours-zinc-50)">
+    <div className="w-full min-h-screen flex flex-col bg-zinc-50">
       <div className="flex-1 flex flex-col gap-[30px] items-center">
-        <div className="sticky top-0 z-20 w-full bg-(--basic-colours-zinc-50)/95 backdrop-blur supports-[backdrop-filter]:bg-(--basic-colours-zinc-50)/80">
+        <div className="sticky top-0 z-20 w-full bg-zinc-50/95 backdrop-blur supports-backdrop-filter:bg-zinc-50/80">
+          <div className="relative flex items-center justify-center p-4">
+            <div className="absolute left-4">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 p-0 hover:bg-zinc-100"
+                  >
+                    <ChevronLeft className="h-6 w-6 text-zinc-700" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="start" className="w-48 p-1">
+                  <div className="flex flex-col">
+                    <button
+                      onClick={() => {
+                        if (isRunning) {
+                          pauseWorkout();
+                        } else {
+                          resumeWorkout();
+                        }
+                      }}
+                      className="flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-zinc-100 focus:bg-zinc-100"
+                    >
+                      {isRunning ? (
+                        <>
+                          <Pause className="h-4 w-4" />
+                          <span>Pause Workout</span>
+                        </>
+                      ) : (
+                        <>
+                          <Play className="h-4 w-4" />
+                          <span>Resume Workout</span>
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => {
+                        resetWorkout();
+                        navigate("/");
+                      }}
+                      className="flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-red-600 outline-none hover:bg-zinc-100 focus:bg-zinc-100"
+                    >
+                      <X className="h-4 w-4" />
+                      <span>Quit Workout</span>
+                    </button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div className="flex flex-col items-center">
+              <h3 className="h3-styles text-base font-bold">
+                {new Date().toLocaleDateString("en-US", {
+                  weekday: "short",
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })}
+              </h3>
+            </div>
+          </div>
+
           <div className="flex flex-col gap-2 lg:gap-2 items-center mt-2 min-w-[60%]">
-            <h3 className="h3-styles text-base font-bold">
-              {new Date().toLocaleDateString("en-US", {
-                weekday: "short",
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })}
-            </h3>
             <div className="max-w-[728px] w-4/5 flex justify-bewteem items-center gap-5 md:gap-0 md:justify-evenly mb-2">
               <div>
                 <span className="text-zinc-700 block font-primary text-sm">
@@ -155,10 +213,24 @@ export default function ActiveWorkoutPage() {
       </div>
       <div className="sticky bottom-0 w-full bg-background/50 py-4 flex justify-center">
         <div className="mx-auto w-4/5 flex items-center justify-center gap-4 max-w-[728px]">
-          <Button variant="secondary" className="flex-1 text-md ">
-            Finish Workout
-          </Button>
-          <Button size={"icon"} variant="secondary" className="">
+          {isRunning ? (
+            <Button variant="secondary" className="flex-1 text-md ">
+              Finish Workout
+            </Button>
+          ) : (
+            <Button
+              variant="default"
+              className="flex-1 text-md bg-green-500 hover:bg-green-600 text-white"
+              onClick={() => resumeWorkout()}
+            >
+              Resume Workout
+            </Button>
+          )}
+          <Button
+            size={"icon"}
+            variant={isRunning ? "secondary" : "default"}
+            className=""
+          >
             <MessageSquareMore size={24} />
           </Button>
         </div>

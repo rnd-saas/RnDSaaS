@@ -12,6 +12,7 @@ interface ActiveWorkoutState {
   workoutId: string;
   loggedWorkout: LoggedWorkout | null;
   startWorkout: (id: string, loggedExercises) => void;
+  resumeWorkout: () => void;
   pauseWorkout: () => void;
   resetWorkout: () => void;
   tick: () => void;
@@ -50,6 +51,12 @@ export const useWorkoutStore = create<ActiveWorkoutState>()(
             date: new Date().toDateString(),
           },
         }),
+      resumeWorkout: () => {
+        console.log("resuming workout");
+        set({
+          isRunning: true,
+        });
+      },
       pauseWorkout: () => {
         console.log("run pausing");
         set({
