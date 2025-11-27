@@ -80,7 +80,7 @@ export default function ActiveWorkoutPage() {
   useEffect(() => {
     return () => {
       console.error("running clean up");
-      resetWorkout();
+      // resetWorkout();
     };
   }, []);
 

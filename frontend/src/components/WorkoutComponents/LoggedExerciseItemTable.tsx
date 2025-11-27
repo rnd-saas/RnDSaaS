@@ -86,6 +86,52 @@ export default function WorkoutList({ exerciseId }: { exerciseId: string }) {
                         }
                       }}
                       placeholder={`${cellData}`}
+                      // Bind the value to the store state
+                      defaultValue={(() => {
+                        const setNumber = rowData[0];
+                        const set = loggedExercise?.sets.find(
+                          (s) => s.setNumber === setNumber
+                        );
+                        if (!set) return "";
+
+                        // Helper to get the logged value or fallback to the planned value (cellData)
+                        const getValue = (
+                          loggedVal: number | undefined | null
+                        ) => {
+                          if (loggedVal !== undefined && loggedVal !== null)
+                            return loggedVal;
+                          return ""; // If no logged value, return empty string so placeholder shows
+                        };
+
+                        switch (loggedExercise?.exerciseInfo.logMode) {
+                          case "reps_weight":
+                            return cellIndex === 1
+                              ? getValue(set.actualReps)
+                              : getValue(set.actualWeightKg);
+                          case "reps":
+                            return cellIndex === 1
+                              ? getValue(set.actualReps)
+                              : "";
+                          case "time_weight":
+                            return cellIndex === 1
+                              ? getValue(set.actualTimeSeconds)
+                              : getValue(set.actualWeightKg);
+                          case "time":
+                            return cellIndex === 1
+                              ? getValue(set.actualTimeSeconds)
+                              : "";
+                          case "distance_weight":
+                            return cellIndex === 1
+                              ? getValue(set.actualDistanceMeters)
+                              : getValue(set.actualWeightKg);
+                          case "distance":
+                            return cellIndex === 1
+                              ? getValue(set.actualDistanceMeters)
+                              : "";
+                          default:
+                            return "";
+                        }
+                      })()}
                       className="border-0 shadow-none focus:ring-0! p-0 placeholder:text-zinc-300 focus:text-left text-center focus:pl-4"
                       onBlur={(e) => {
                         const value = Number(e.target.value);
@@ -158,6 +204,13 @@ export default function WorkoutList({ exerciseId }: { exerciseId: string }) {
               ))}
               <TableCell className="flex-1 body-styles pr-2! text-center">
                 <Checkbox
+                  checked={(() => {
+                    const setNumber = rowData[0];
+                    const set = loggedExercise?.sets.find(
+                      (s) => s.setNumber === setNumber
+                    );
+                    return set?.completed ?? false;
+                  })()}
                   onCheckedChange={(checked) =>
                     updateExerciseSet(exerciseId, rowData[0], {
                       completed:
