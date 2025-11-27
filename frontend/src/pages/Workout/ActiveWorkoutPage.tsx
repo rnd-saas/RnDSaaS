@@ -54,7 +54,7 @@ export default function ActiveWorkoutPage() {
 
   const handleFinishWorkout = () => {
     if (!loggedWorkout?.exercises) {
-      navigate("/workout/evaluation");
+      navigate(`/workout/${id}/evaluation`, { replace: true });
       return;
     }
 
@@ -63,7 +63,7 @@ export default function ActiveWorkoutPage() {
     );
 
     if (allSetsCompleted) {
-      navigate("/workout/evaluation");
+      navigate(`/workout/${id}/evaluation`, { replace: true });
     } else {
       setIsFinishDialogOpen(true);
     }
