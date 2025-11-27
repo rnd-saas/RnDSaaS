@@ -4,6 +4,7 @@ import ChatbotButton from "@/components/chatbotButton.tsx";
 import Goals from "@/pages/Progress/ProgressComponents/Goals.tsx";
 import Moods from "@/pages/Progress/ProgressComponents/Moods.tsx";
 import Workouts from "@/pages/Progress/ProgressComponents/Workouts.tsx";
+import WorkoutDisplay from "@/pages/Profile/ProfileComponents/WorkoutDisplay.tsx";
 
 export default function ProgressPage() {
     const progressComponents = [
@@ -11,6 +12,7 @@ export default function ProgressPage() {
         { value:"goals", component: Goals, label:"Your goals" },
         { value:"moods", component: Moods, label:"This week's mood" },
         { value:"workouts", component: Workouts, label:"This week's workouts" },
+        { value:"calendar", component: WorkoutDisplay, label:"Planned workouts" },
     ];
 
     return (

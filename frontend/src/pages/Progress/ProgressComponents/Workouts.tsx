@@ -1,7 +1,6 @@
 ﻿import {
     Bar,
     BarChart,
-    CartesianGrid,
     ResponsiveContainer,
     Tooltip,
     XAxis,
@@ -34,7 +33,6 @@ export default function Workouts(){
         <div className="h-[25vh] w-full">
             <ResponsiveContainer>
                 <BarChart data={data} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                    <CartesianGrid />
                     <XAxis
                         dataKey="time"
                         name="Day"
