@@ -4,9 +4,11 @@ import {useLocation, useNavigate} from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { dashboardService, settingsService } from "@/lib/api";
-import type { DashboardData } from "@/lib/api/types";
+import { dashboardService, settingsService, moodService } from "@/lib/api";
+import type { DashboardData, DashboardAchievement } from "@/lib/api/types";
 import AchievementList from "@/pages/Profile/ProfileComponents/AchievementList.tsx";
+
+const ACHIEVEMENTS_PER_PAGE = 3;
 
 const FALLBACK_DASHBOARD: DashboardData = {
   firstName: null,
@@ -81,16 +83,25 @@ const ADVICE_TIPS: string[] = [
   "Remind yourself why you started this journey."
 ];
 
-const MOODS = {
+const LOCAL_MOOD_EMOJI = {
   anxious: "😣",
-  insecure: "😟",
   nervous: "😬",
-  fine: "🙂",
+  okay: "🙂",
   comfortable: "😌",
-  never_been: "🤷‍♂️",
+  never: "🤩",
+} as const;
+
+type LocalMoodKey = keyof typeof LOCAL_MOOD_EMOJI;
+
+const LOCAL_MOOD_TO_DB_INDEX: Record<LocalMoodKey, number> = {
+  anxious: 0,
+  nervous: 1,
+  okay: 2,
+  comfortable: 3,
+  never: 4,
 };
 
-type MoodKey = keyof typeof MOODS;
+const DB_MOOD_EMOJI = ["😣", "😬", "🙂", "😌", "🤩"];
 
 export default function DashboardPage() {
   const location = useLocation();
@@ -100,6 +111,8 @@ export default function DashboardPage() {
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [streakDisplay, setStreakDisplay] = useState<boolean>(true); // Default to true
   const [tipIndex, setTipIndex] = useState(() => Math.floor(Math.random() * ADVICE_TIPS.length));
+  const [moodEmoji, setMoodEmoji] = useState<string>(() => getStoredMoodEmoji() ?? FALLBACK_DASHBOARD.mood);
+  const [achievementPage, setAchievementPage] = useState(0);
 
   // Load user settings to check streak_display
   const loadSettings = async () => {
@@ -152,6 +165,43 @@ export default function DashboardPage() {
     };
   }, []);
 
+  useEffect(() => {
+    let active = true;
+
+    const loadMood = async () => {
+      try {
+        const response = await moodService.getTodayMood();
+        if (!active) return;
+
+        if (typeof response.mood === "number" && response.mood >= 0 && response.mood < DB_MOOD_EMOJI.length) {
+          setMoodEmoji(DB_MOOD_EMOJI[response.mood]);
+        } else {
+          const localKey = getStoredMoodKey();
+          const dbIndex = mapLocalKeyToIndex(localKey);
+          if (dbIndex !== null) {
+            setMoodEmoji(DB_MOOD_EMOJI[dbIndex]);
+            try {
+              await moodService.saveTodayMood(dbIndex);
+            } catch (error) {
+              console.warn("Failed to persist mood selection", error);
+            }
+          } else {
+            setMoodEmoji(FALLBACK_DASHBOARD.mood);
+          }
+        }
+      } catch (error) {
+        if (!active) return;
+        console.warn("Failed to load today's mood", error);
+      }
+    };
+
+    loadMood();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const resolvedData = dashboardData ?? FALLBACK_DASHBOARD;
   const firstName =
     dashboardData?.firstName ?? state?.firstName ?? localStorage.getItem("firstName") ?? "User";
@@ -171,11 +221,18 @@ export default function DashboardPage() {
   const achievements = resolvedData.achievements;
   const streakDays = resolvedData.streakDays;
   const nextWorkoutEmoji = resolvedData.nextWorkout;
-  const moodEmoji = getStoredMoodEmoji() ?? FALLBACK_DASHBOARD.mood;
   const currentTip = ADVICE_TIPS[tipIndex];
+  const achievementPages = useMemo(
+    () => chunkAchievements(achievements, ACHIEVEMENTS_PER_PAGE),
+    [achievements]
+  );
+  const totalAchievementPages = achievementPages.length;
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    setAchievementPage(0);
+  }, [achievements]);
 
   return (
     <>
@@ -271,12 +328,32 @@ export default function DashboardPage() {
         {/* Achievements */}
         <section className="mt-5">
           <h3 className="mb-3 text-lg font-semibold">Achievements:</h3>
-          <AchievementList achievements={achievements} isLoading={isLoading && !dashboardData} />
-          <div className="mt-2 flex items-center justify-center gap-2">
-            <Dot active />
-            <Dot />
-            <Dot />
+          <div className="overflow-hidden">
+            <div
+              className="flex transition-transform duration-300 ease-out"
+              style={{ transform: `translateX(-${achievementPage * 100}%)` }}
+            >
+              {achievementPages.map((page, idx) => (
+                <div key={`ach-page-${idx}`} className="min-w-full">
+                  <AchievementList
+                    achievements={page}
+                    isLoading={isLoading && !dashboardData}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
+          {totalAchievementPages > 1 && (
+            <div className="mt-2 flex items-center justify-center gap-2">
+              {achievementPages.map((_, idx) => (
+                <Dot
+                  key={`ach-dot-${idx}`}
+                  active={idx === achievementPage}
+                  onClick={() => setAchievementPage(idx)}
+                />
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Advice */}
@@ -318,23 +395,50 @@ function GoalRow({ label, value, target }: { label: string; value: number; targe
   );
 }
 
-function Dot({ active = false }: { active?: boolean }) {
+function Dot({ active = false, onClick }: { active?: boolean; onClick?: () => void }) {
   return (
-    <div
-      className={`size-2 rounded-full ${
+    <button
+      type="button"
+      onClick={onClick}
+      className={`size-2 rounded-full transition-colors ${
         active ? "bg-foreground" : "bg-muted-foreground/40"
       }`}
+      aria-pressed={active}
     />
   );
 }
 
-function getStoredMoodEmoji(): string | null {
+const LOCAL_MOOD_STORAGE_KEY = "currentMood_v1";
+
+function getStoredMoodKey(): LocalMoodKey | null {
   if (typeof window === "undefined") {
     return null;
   }
-  const key = window.localStorage.getItem("currentMood_v1") as MoodKey | null;
-  if (!key || !(key in MOODS)) {
-    return null;
+  const value = window.localStorage.getItem(LOCAL_MOOD_STORAGE_KEY) as LocalMoodKey | null;
+  if (value && value in LOCAL_MOOD_EMOJI) {
+    return value;
   }
-  return MOODS[key];
+  return null;
+}
+
+function mapLocalKeyToIndex(key: string | null): number | null {
+  if (!key) return null;
+  if ((LOCAL_MOOD_TO_DB_INDEX as Record<string, number>)[key] === undefined) return null;
+  return LOCAL_MOOD_TO_DB_INDEX[key as LocalMoodKey];
+}
+
+function getStoredMoodEmoji(): string | null {
+  const key = getStoredMoodKey();
+  return key ? LOCAL_MOOD_EMOJI[key] : null;
+}
+
+function chunkAchievements(items: DashboardAchievement[], size: number) {
+  if (!items || items.length === 0) {
+    return [[]];
+  }
+  const chunks: DashboardAchievement[][] = [];
+  for (let i = 0; i < items.length; i += size) {
+    chunks.push(items.slice(i, i + size));
+  }
+  return chunks;
 }

@@ -260,11 +260,12 @@ async function buildAllAchievements(
         });
     });
 
-    // Build achievements, keeping ALL records (no deduplication)
+    // Build achievements, keeping order but removing duplicate achievement_ids
     const result: ProfileAchievement[] = [];
+    const seenAchievementIds = new Set<string>();
 
     for (const row of rows) {
-        if (!row.achievement_id) {
+        if (!row.achievement_id || seenAchievementIds.has(row.achievement_id)) {
             continue;
         }
 
@@ -273,6 +274,7 @@ async function buildAllAchievements(
             continue;
         }
 
+        seenAchievementIds.add(row.achievement_id);
         result.push({
             id: row.id,
             title: record.name ?? 'Achievement',

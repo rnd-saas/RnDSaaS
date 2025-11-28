@@ -121,7 +121,8 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
         const exercisesDiscovered = await countUniqueExercises(workoutIds);
         const streakDays = calculateStreak(workoutDates);
         const achievements = await buildAchievements(achievementRowsResult.data ?? null);
-        const level = resolveLevel(totalWorkouts * XP_PER_WORKOUT);
+        const totalXp = calculateExperience(totalWorkouts, streakDays);
+        const level = resolveLevel(totalXp);
 
         const nextPlan = nextPlanResult.data;
         const nextWorkout =
@@ -147,7 +148,7 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
                 }
             },
             level,
-            achievements: achievements.length > 0 ? achievements.slice(0, 3) : DEFAULT_ACHIEVEMENTS,
+            achievements: achievements.length > 0 ? achievements : DEFAULT_ACHIEVEMENTS,
             mood: '😐', // Frontend currently uses local state for mood, keep neutral fallback
             nextWorkout,
             streakDays,
@@ -264,6 +265,18 @@ function resolveLevel(totalXp: number): DashboardResponse['level'] {
         currentXp: progressWithinLevel,
         nextLevelXp: span
     };
+}
+
+function calculateExperience(totalWorkouts: number, streakDays: number): number {
+    const baseXp = totalWorkouts * XP_PER_WORKOUT;
+    if (baseXp === 0 || streakDays <= 0) {
+        return baseXp;
+    }
+
+    const cappedStreak = Math.min(streakDays, 45); // prevent runaway multipliers
+    const streakMultiplier = 1 + cappedStreak * 0.02; // +2% XP per streak day, up to +90%
+
+    return Math.round(baseXp * streakMultiplier);
 }
 
 function calculateStreak(workoutDates: Set<string>): number {

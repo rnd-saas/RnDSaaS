@@ -43,6 +43,7 @@ try {
     const chatbotRoutes = require('./routes/chatbotRoutes').default;
     const dashboardRoutes = require('./routes/dashboardRoutes').default;
     const settingsRoutes = require('./routes/settingsRoutes').default;
+    const moodRoutes = require('./routes/moodRoutes').default;
     const profileRoutes = require('./routes/profileRoutes').default;
     
     app.use('/api/auth', authRoutes);
@@ -52,6 +53,7 @@ try {
     app.use('/api/chatbot', chatbotRoutes);
     app.use('/api/dashboard', dashboardRoutes);
     app.use('/api/settings', settingsRoutes);
+    app.use('/api/mood', moodRoutes);
     app.use('/api/profile', profileRoutes);
     
     console.log('✅ API routes loaded');

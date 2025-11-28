@@ -4,6 +4,7 @@ import BackButton from "@/components/backButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { moodService } from "@/lib/api";
 
 type MoodKey = "anxious" | "nervous" | "okay" | "comfortable" | "never";
 
@@ -73,6 +74,13 @@ const ANXIETY_ADVICE = [
 ];
 
 const STORAGE_KEY = "currentMood_v1";
+const MOOD_KEY_TO_DB_INDEX: Record<MoodKey, number> = {
+  anxious: 0,
+  nervous: 1,
+  okay: 2,
+  comfortable: 3,
+  never: 4,
+};
 
 export default function MoodPage() {
   const navigate = useNavigate();
@@ -85,8 +93,14 @@ export default function MoodPage() {
     [selected]
   );
 
-  const saveMood = () => {
+  const saveMood = async () => {
     localStorage.setItem(STORAGE_KEY, selected);
+    const moodIndex = MOOD_KEY_TO_DB_INDEX[selected];
+    try {
+      await moodService.saveTodayMood(moodIndex);
+    } catch (error) {
+      console.warn("Failed to sync mood with server", error);
+    }
     navigate("/dashboard");
   };
 
