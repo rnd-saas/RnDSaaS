@@ -90,7 +90,7 @@
   --font-weight-bold: 700;
 
   /*shadow design tokens*/
-  --shadow-card: 0px 4px 9.899999618530273px 0px rgba(228, 228, 231, 1);
+  --shadow-card: 0px 4px 6.899999618530273px 0px rgba(228, 228, 231, 1);
 
 
   --background: oklch(0.9851 0 0);

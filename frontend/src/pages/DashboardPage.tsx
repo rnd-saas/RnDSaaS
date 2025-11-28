@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 import AchievementList from "@/pages/Profile/ProfileComponents/AchievementList.tsx";
 
 const ADVICE_TIPS: string[] = [
@@ -155,7 +156,7 @@ export default function DashboardPage() {
       {/* Mood + Next workout */}
       <section className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Card
-          className="bg-muted/40 cursor-pointer hover:bg-accent/30 transition-colors"
+          className="bg-zinc-200/40 hover:bg-zinc-200/80 border-0 cursor-pointer transition-colors"
           onClick={() => navigate("/mood")}
         >
           <CardHeader>
@@ -176,7 +177,7 @@ export default function DashboardPage() {
         </Card>
 
         <Card
-          className="bg-muted/40 cursor-pointer hover:bg-accent/30 transition-colors"
+          className="bg-zinc-200/40 hover:bg-zinc-200/80 border-0 cursor-pointer transition-colors"
           onClick={() => navigate("/workout/exercise")}
         >
           <CardHeader>
@@ -223,7 +224,7 @@ export default function DashboardPage() {
 
       {/* Advice */}
       <section className="mt-6">
-        <Card className="bg-muted/40 w-full max-w-full">
+        <Card className="bg-zinc-200/40 hover:scale-none w-full max-w-full">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg">Advice</CardTitle>
             <button

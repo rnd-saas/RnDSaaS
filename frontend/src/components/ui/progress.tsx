@@ -1,7 +1,7 @@
-import * as React from "react"
-import * as ProgressPrimitive from "@radix-ui/react-progress"
+import * as React from "react";
+import * as ProgressPrimitive from "@radix-ui/react-progress";
 
-import { cn } from "@/lib/utils.ts"
+import { cn } from "@/lib/utils.ts";
 
 function Progress({
   className,
@@ -17,7 +17,6 @@ function Progress({
       )}
       style={{
         border: `1px solid var(--basic-colours-zinc-200)`,
-        borderRadius: "var(--border-radius-md)"
       }}
       {...props}
     >
@@ -27,7 +26,7 @@ function Progress({
         style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
       />
     </ProgressPrimitive.Root>
-  )
+  );
 }
 
-export { Progress }
+export { Progress };
