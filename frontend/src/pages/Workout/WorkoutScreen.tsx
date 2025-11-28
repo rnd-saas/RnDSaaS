@@ -14,7 +14,6 @@ export default function ExerciseScreen({
   timeLabel,
   isRunning,
   onTogglePause,
-  onSwitchToRest,
 }: ExerciseScreenProps) {
   const pauseLabel = isRunning ? "Pause" : "Resume";
 

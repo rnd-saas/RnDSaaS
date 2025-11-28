@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { paymentService } from '@/lib/api/paymentService';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

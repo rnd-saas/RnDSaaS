@@ -28,6 +28,7 @@ export const dashboardService = dashboardServiceFunctions;
 // Export settings service functions
 import * as settingsServiceFunctions from './settingsService';
 export const settingsService = settingsServiceFunctions;
+export type { UserSettings, UpdateSettingsRequest } from './settingsService';
 
 // Export mood service functions
 import * as moodServiceFunctions from './moodService';
