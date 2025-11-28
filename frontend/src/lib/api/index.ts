@@ -37,3 +37,7 @@ export const moodService = moodServiceFunctions;
 import * as profileServiceFunctions from './profileService';
 export const profileService = profileServiceFunctions;
 
+// Export social service functions
+import * as socialServiceFunctions from './socialService';
+export const socialService = socialServiceFunctions;
+

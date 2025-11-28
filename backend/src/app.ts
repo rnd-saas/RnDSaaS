@@ -46,6 +46,8 @@ try {
     const settingsRoutes = require('./routes/settingsRoutes').default;
     const moodRoutes = require('./routes/moodRoutes').default;
     const profileRoutes = require('./routes/profileRoutes').default;
+    const socialRoutes = require('./routes/socialRoutes').default;
+    const achievementRoutes = require('./routes/achievementRoutes').default;
     
     app.use('/api/auth', authRoutes);
     app.use('/api/users', userRoutes);
@@ -56,6 +58,8 @@ try {
     app.use('/api/settings', settingsRoutes);
     app.use('/api/mood', moodRoutes);
     app.use('/api/profile', profileRoutes);
+    app.use('/api/social', socialRoutes);
+    app.use('/api/achievements', achievementRoutes);
     
     console.log('✅ API routes loaded');
 } catch (error: any) {
@@ -81,7 +85,9 @@ app.use((req, res) => {
             'GET /api/dashboard',
             'GET /api/settings',
             'PUT /api/settings',
-            'GET /api/profile'
+            'GET /api/profile',
+            'GET /api/social/users?q=term',
+            'GET /api/social/posts'
         ],
         timestamp: new Date().toISOString()
     });
