@@ -12,10 +12,9 @@ import ProfilePage from "@/pages/Profile/ProfilePage.tsx";
 import ProgressPage from "@/pages/Progress/ProgressPage.tsx";
 import SocialPage from "@/pages/Social/SocialPage.tsx";
 import MoodPage from "@/pages/Mood/MoodPage";
-import CalendarPage from "@/pages/CalendarPage.tsx";
-import AchievementPage from "@/pages/AchievementPage.tsx";
+import CalendarPage from "@/pages/Profile/CalendarPage.tsx";
+import AchievementPage from "@/pages/Profile/AchievementPage.tsx";
 import OnboardingInvitePage from "@/pages/Onboarding/OnboardingInvitePage.tsx";
-
 
 export default function AppRoutes() {
     return (
@@ -29,17 +28,14 @@ export default function AppRoutes() {
                 <Route path="/workout/rest" element={<RestTimer />} />
                 <Route path="/workout/exercise" element={<WorkoutTimer />} />
                 <Route path="/mood" element={<MoodPage />} />
-
                 <Route path="/calendar" element={<CalendarPage />} />
                 <Route path="/achievements" element={<AchievementPage />} />
                 {/* App layout with persistent bottom nav */}
                 <Route element={<AppLayout />}>
                     <Route path="/dashboard" element={<DashboardPage />} />
                     <Route path="/settings" element={<SettingsPage />} />
-                    {/* Uncomment when ready */}
-                    {/* <Route path="/workout" element={<WorkoutPage />} /> */}
                     <Route path="/social" element={<SocialPage />} />
-                     <Route path="/profile" element={<ProfilePage />} />
+                    <Route path="/profile" element={<ProfilePage />} />
                     <Route path="/progress" element={<ProgressPage />} />
                 </Route>
             </Routes>
