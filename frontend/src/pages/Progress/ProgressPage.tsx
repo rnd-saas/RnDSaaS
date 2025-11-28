@@ -22,7 +22,7 @@ export default function ProgressPage() {
             <h2 className="text-3xl font-semibold tracking-tight">Progress</h2>
             <main>
                 {progressComponents.map((g) => (
-                    <div className={"mb-10"}>
+                    <div key={g.value} className={"mb-10"}>
                         <Label className={"my-5"}>{g.label}</Label>
                         <g.component />
                     </div>
