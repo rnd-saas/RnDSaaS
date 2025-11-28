@@ -160,7 +160,7 @@ export default function SocialManageFriendsPage() {
         <BackButton />
         <div className="flex-1 min-w-0">
           <h1 className="!text-[15px] font-semibold tracking-tight whitespace-nowrap">Manage Friends</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <p className="text-xs text-muted-foreground mt-2">
             View and manage your friend requests
           </p>
         </div>

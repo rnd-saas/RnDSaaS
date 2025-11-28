@@ -67,7 +67,7 @@ export default function SocialCreatePostPage() {
         <BackButton />
         <div className="flex-1 min-w-0">
           <h1 className="!text-[20px] font-semibold tracking-tight">Create Post</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <p className="text-xs text-muted-foreground mt-2">
             Share your workout progress with friends
           </p>
         </div>
@@ -77,14 +77,14 @@ export default function SocialCreatePostPage() {
 
       {/* Post Composer */}
       <Card className="bg-gradient-to-br from-background to-muted/20 shadow-lg border-2 border-border/50 !py-3">
-        <CardHeader className="pb-2 !px-4">
+        <CardHeader className="pb-0.5 !px-4">
           <div className="flex items-center gap-2">
             <div className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-amber-400/20 to-amber-600/20 shrink-0">
               <Sparkles className="h-4 w-4 text-amber-600" />
             </div>
             <div className="min-w-0 flex-1">
               <CardTitle className="text-base">What's on your mind?</CardTitle>
-              <p className="text-xs text-muted-foreground mt-0.5">
+              <p className="text-xs text-muted-foreground mt-2">
                 Share your achievements, progress, or motivation
               </p>
             </div>
