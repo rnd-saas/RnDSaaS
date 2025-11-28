@@ -3,7 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { paymentService } from '@/lib/api/paymentService';
+import { authService } from '@/lib/api/authService';
 import { Button } from '@/components/ui/button';
+import { Copy } from 'lucide-react';
+import { toast } from 'sonner';
 
 export type SubscriptionSettings = {
     subscriptionType:number,
@@ -12,23 +15,28 @@ export type SubscriptionSettings = {
 
 export default function SubscriptionSettings() {
     const [subscription, setSubscription] = useState<any>(null);
+    const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [canceling, setCanceling] = useState(false);
     const navigate = useNavigate();
 
-    const fetchSubscription = async () => {
+    const fetchData = async () => {
         try {
-            const data = await paymentService.getSubscriptionStatus();
-            setSubscription(data);
+            const [subData, userData] = await Promise.all([
+                paymentService.getSubscriptionStatus(),
+                authService.getCurrentUser()
+            ]);
+            setSubscription(subData);
+            setUser(userData);
         } catch (error) {
-            console.error('Failed to fetch subscription:', error);
+            console.error('Failed to fetch data:', error);
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchSubscription();
+        fetchData();
     }, []);
 
     const handleCancelSubscription = async () => {
@@ -38,12 +46,20 @@ export default function SubscriptionSettings() {
         try {
             await paymentService.cancelSubscription();
             // Refresh subscription status
-            await fetchSubscription();
+            const subData = await paymentService.getSubscriptionStatus();
+            setSubscription(subData);
         } catch (error) {
             console.error('Failed to cancel subscription:', error);
             alert('Failed to cancel subscription. Please try again.');
         } finally {
             setCanceling(false);
+        }
+    };
+
+    const copyReferralCode = () => {
+        if (user?.referral_code) {
+            navigator.clipboard.writeText(user.referral_code);
+            toast.success("Referral code copied to clipboard!");
         }
     };
 
@@ -60,7 +76,7 @@ export default function SubscriptionSettings() {
     const isCanceled = subscription?.sub_status === 'canceled';
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-6">
             {isPremium ? (
                 <div className="p-4 border rounded-lg bg-card text-card-foreground">
                     <h3 className="font-semibold mb-2">Premium Membership</h3>
@@ -106,6 +122,34 @@ export default function SubscriptionSettings() {
                         <Button onClick={() => navigate('/subscription')}>
                             {isCanceled ? "Resubscribe Now" : "Subscribe Now"}
                         </Button>
+                    </div>
+                </div>
+            )}
+
+            {user?.referral_code && (
+                <div className="p-4 border rounded-lg bg-card text-card-foreground">
+                    <h3 className="font-semibold mb-2">Referral Program</h3>
+                    <div className="flex flex-col gap-4">
+                        <p className="text-sm text-muted-foreground">
+                            Share your referral code with friends. When they subscribe, you get €5 credit towards your next bill!
+                        </p>
+                        <div className="flex items-center gap-2 p-3 bg-secondary/20 rounded-md border border-secondary w-fit">
+                            <code className="text-lg font-bold tracking-wider">{user.referral_code}</code>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={copyReferralCode}>
+                                <Copy className="h-4 w-4" />
+                            </Button>
+                        </div>
+                        
+                        {subscription?.customerBalance > 0 && (
+                            <div className="mt-2 p-3 bg-green-500/10 border border-green-500/20 rounded-md">
+                                <p className="text-sm font-medium text-green-700 dark:text-green-400">
+                                    You have €{(subscription.customerBalance / 100).toFixed(2)} credit available!
+                                </p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    This credit will be automatically applied to your next invoice.
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

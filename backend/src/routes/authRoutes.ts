@@ -113,10 +113,12 @@ router.post('/login', async (req, res) => {
                 const result = await withTimeout(
                     new Promise<any>(async (resolve, reject) => {
                         try {
+                            const referralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
                             const r = await supabase.from('users').insert([{
                                 id: authData.user.id,
                                 username: authData.user.email?.split('@')[0] || 'user',
-                                display_name: authData.user.user_metadata?.display_name || authData.user.email || 'User'
+                                display_name: authData.user.user_metadata?.display_name || authData.user.email || 'User',
+                                referral_code: referralCode
                             }]).select().single();
                             resolve(r);
                         } catch (e) {
@@ -216,14 +218,16 @@ router.post('/register', async (req, res) => {
 
         const session = authData.session;
 
-        // Create user record in users table
+        // Update user record in users table (created by trigger)
+        const referralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
         const { data: userData, error: userError } = await supabase
             .from('users')
-            .insert([{
-                id: authData.user.id,
+            .update({
                 username: username || authData.user.email?.split('@')[0] || 'user',
-                display_name: display_name || authData.user.email?.split('@')[0] || 'User'
-            }])
+                display_name: display_name || authData.user.email?.split('@')[0] || 'User',
+                referral_code: referralCode
+            })
+            .eq('id', authData.user.id)
             .select()
             .single();
 

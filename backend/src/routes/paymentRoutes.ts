@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { requireAuth } from '../middleware/requireAuth';
 import { createCheckoutSession, cancelSubscription } from '../services/paymentService';
 import { supabase } from '../db/supabase';
+import { stripe } from '../utils/stripe';
 
 const router = Router();
 
@@ -9,7 +10,7 @@ router.get('/subscription', requireAuth, async (req: any, res) => {
   try {
     const user = req.user;
     
-    const { data, error } = await supabase
+    const { data: subscription, error } = await supabase
       .from('user_subscription')
       .select('*')
       .eq('user_id', user.id)
@@ -19,7 +20,24 @@ router.get('/subscription', requireAuth, async (req: any, res) => {
       return res.status(500).json({ error: error.message });
     }
 
-    res.json(data || null);
+    let customerBalance = 0;
+    if (subscription?.stripe_customer_id) {
+        try {
+            const customer = await stripe.customers.retrieve(subscription.stripe_customer_id) as any;
+            if (customer && !customer.deleted) {
+                // Stripe balance: negative means credit (money user has), positive means debit (money user owes)
+                // We want to show credit as a positive number to the user
+                customerBalance = -(customer.balance || 0); 
+            }
+        } catch (err) {
+            console.error('Failed to fetch stripe customer balance:', err);
+        }
+    }
+
+    res.json({
+        ...subscription,
+        customerBalance // Amount in cents
+    });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
@@ -27,7 +45,7 @@ router.get('/subscription', requireAuth, async (req: any, res) => {
 
 router.post('/create-checkout-session', requireAuth, async (req: any, res) => {
   try {
-    const { priceId } = req.body;
+    const { priceId, referralCode } = req.body;
     const user = req.user;
 
     if (!user || !user.email) {
@@ -38,7 +56,25 @@ router.post('/create-checkout-session', requireAuth, async (req: any, res) => {
       return res.status(400).json({ error: 'Price ID is required' });
     }
 
-    const session = await createCheckoutSession(user.id, user.email, priceId);
+    let referrerId: string | undefined;
+
+    if (referralCode) {
+        // Find referrer by code
+        const { data: referrer, error } = await supabase
+            .from('users')
+            .select('id')
+            .eq('referral_code', referralCode)
+            .single();
+        
+        if (referrer && !error) {
+            // Prevent self-referral
+            if (referrer.id !== user.id) {
+                referrerId = referrer.id;
+            }
+        }
+    }
+
+    const session = await createCheckoutSession(user.id, user.email, priceId, referrerId);
 
     res.json({ url: session.url });
   } catch (error: any) {
@@ -61,9 +97,26 @@ router.post('/cancel-subscription', requireAuth, async (req: any, res) => {
       return res.status(404).json({ error: 'No active subscription found' });
     }
 
-    await cancelSubscription(subscription.stripe_subscription_id);
+    try {
+        await cancelSubscription(subscription.stripe_subscription_id);
+        res.json({ message: 'Subscription canceled successfully' });
+    } catch (err: any) {
+        // If subscription is missing in Stripe (404), treat it as already canceled
+        if (err.statusCode === 404 || err.code === 'resource_missing') {
+            console.warn(`Subscription ${subscription.stripe_subscription_id} not found in Stripe. Marking as canceled locally.`);
+            
+            await supabase
+                .from('user_subscription')
+                .update({ 
+                    sub_status: 'canceled',
+                    updated_at: new Date().toISOString()
+                })
+                .eq('user_id', user.id);
 
-    res.json({ message: 'Subscription canceled successfully' });
+            return res.json({ message: 'Subscription canceled successfully (synced)' });
+        }
+        throw err;
+    }
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

@@ -156,6 +156,9 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     throw error;
   }
   console.log(`[Webhook] Subscription created/updated successfully for user ${userId}`);
+
+  // Handle referral reward if applicable
+  await handleReferralReward(session);
 }
 
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
@@ -254,6 +257,38 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
         throw error;
     }
     console.log(`[Webhook] Subscription updated from invoice for user ${existingSub.user_id}`);
+}
+
+async function handleReferralReward(session: Stripe.Checkout.Session) {
+    const referredBy = session.metadata?.referredBy;
+    if (!referredBy) return;
+
+    console.log(`[Webhook] Processing referral reward for referrer ${referredBy}`);
+
+    // Find referrer's Stripe Customer ID
+    const { data: referrerSub, error } = await supabaseAdmin
+        .from('user_subscription')
+        .select('stripe_customer_id')
+        .eq('user_id', referredBy)
+        .single();
+
+    if (error || !referrerSub?.stripe_customer_id) {
+        console.warn(`[Webhook] Referrer ${referredBy} not found or has no Stripe Customer ID`);
+        return;
+    }
+
+    try {
+        // Add 5 EUR credit to referrer's balance
+        // Amount is in cents, so 500
+        await stripe.customers.createBalanceTransaction(referrerSub.stripe_customer_id, {
+            amount: -500, // Negative amount adds credit to the customer balance
+            currency: 'eur',
+            description: 'Referral reward',
+        });
+        console.log(`[Webhook] Added 5 EUR credit to referrer ${referredBy} (Customer ${referrerSub.stripe_customer_id})`);
+    } catch (err: any) {
+        console.error(`[Webhook] Failed to add referral credit: ${err.message}`);
+    }
 }
 
 export default router;

@@ -59,3 +59,10 @@ export async function getCurrentUser(): Promise<any> {
     return apiClient.get('/api/auth/me');
 }
 
+export const authService = {
+    login,
+    register,
+    logout,
+    getCurrentUser
+};
+

@@ -1,8 +1,8 @@
 import { apiClient } from './client';
 
 export const paymentService = {
-  createCheckoutSession: async (priceId: string) => {
-    return apiClient.post<{ url: string }>('/api/payment/create-checkout-session', { priceId });
+  createCheckoutSession: async (priceId: string, referralCode?: string) => {
+    return apiClient.post<{ url: string }>('/api/payment/create-checkout-session', { priceId, referralCode });
   },
   getSubscriptionStatus: async () => {
     return apiClient.get<any>('/api/payment/subscription');
