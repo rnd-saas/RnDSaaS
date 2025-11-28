@@ -2,10 +2,11 @@ import { NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 // SVGs as React components (Vite + svgr)
-import HomeIcon from "@/components/navigation/home-icon.svg?react";
-import WorkoutIcon from "@/components/navigation/workout-icon.svg?react";
-import FriendsIcon from "@/components/navigation/social-icon.svg?react";
-import ProfileIcon from "@/components/navigation/profile-icon.svg?react";
+import {HomeIcon} from "lucide-react";
+import {ContactRound} from "lucide-react";
+import {UserRound} from "lucide-react";
+import {ChartColumnIncreasing} from "lucide-react";
+import {DumbbellIcon} from "lucide-react";
 
 type NavItem = {
   to: string;
@@ -15,9 +16,10 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   { to: "/dashboard", icon: HomeIcon, end: true },
-  { to: "/workout", icon: WorkoutIcon },
-  { to: "/social", icon: FriendsIcon },
-  { to: "/profile", icon: ProfileIcon },
+  { to: "/social", icon: ContactRound },
+  { to: "/workout", icon: DumbbellIcon },
+  { to: "/progress", icon: ChartColumnIncreasing },
+  { to: "/profile", icon: UserRound },
 ];
 
 export function BottomNav() {
@@ -44,7 +46,7 @@ function NavTab({ to, icon: Icon, end }: NavItem) {
           }`}
           aria-current={isActive ? "page" : undefined}
         >
-          <Icon className="h-9 w-9" />
+          <Icon className={"!h-6 !w-6"}/>
         </Button>
       )}
     </NavLink>
