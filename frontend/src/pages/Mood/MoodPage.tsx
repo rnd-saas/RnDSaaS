@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import BackButton from "@/components/backButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -21,7 +22,7 @@ const MOODS: {
     emoji: "😣",
     short: "Anxious",
     explanation:
-      "It’s totally normal to feel anxious or insecure at the gym. New environments, unfamiliar equipment, or comparing yourself to others can make your body go into ‘alert mode’.",
+      "You might be feeling uneasy or self-conscious today — that’s okay. Take things slowly, focus on your breathing, and remember: showing up is already progress.",
     level: 1,
     anxious: true,
   },
@@ -31,7 +32,7 @@ const MOODS: {
     emoji: "😬",
     short: "Nervous",
     explanation:
-      "Feeling nervous usually means you care and you’re pushing yourself outside your comfort zone. That’s often the first step to building confidence.",
+      "You’ve got some butterflies, but that just means you care. A quick warm-up or focusing on one simple goal can help ease that tension.",
     level: 2,
   },
   {
@@ -40,7 +41,7 @@ const MOODS: {
     emoji: "🙂",
     short: "Okay",
     explanation:
-      "You’re doing alright overall. You may still have moments of doubt, but you’re managing them and showing up anyway.",
+      "You’re managing things well overall. Some ups and downs are natural — you’re finding balance and building consistency.",
     level: 3,
   },
   {
@@ -49,16 +50,16 @@ const MOODS: {
     emoji: "😄",
     short: "Comfortable",
     explanation:
-      "Great! You’re feeling at home in the gym. This is where progress feels sustainable and enjoyable.",
+      "You feel confident and settled in your routine. It’s a great place to be — keep that positive momentum going.",
     level: 4,
   },
   {
     key: "never",
-    label: "I have never been",
-    emoji: "🆕",
-    short: "New here",
+    label: "I feel great today",
+    emoji: "🤩",
+    short: "Great",
     explanation:
-      "No worries at all. Everyone starts somewhere. The most important thing is that you’re curious and open to trying.",
+      "You’re in a really good headspace — energetic, confident, and ready to go. Enjoy that boost and make the most of it!",
     level: 5,
   },
 ];
@@ -90,103 +91,140 @@ export default function MoodPage() {
   };
 
   return (
-    <>
-      {/* Header row */}
+    <div className="w-full max-w-md min-h-[75vh] flex flex-col mx-auto px-4 py-4 space-y-4">
+      {/* Header */}
       <header className="flex items-start justify-between">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Mood</h1>
-          <p className="text-sm text-muted-foreground">
-            How are you feeling about the gym right now?
-          </p>
+        <div className="flex items-center gap-3">
+          <BackButton />
+          <div>
+            <h1 className="text-3xl font-semibold tracking-tight">Mood</h1>
+            <p className="text-sm text-muted-foreground">
+              How are you feeling about the gym right now?
+            </p>
+          </div>
         </div>
-
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => navigate(-1)}
-          className="rounded-full"
-        >
-          Back
-        </Button>
       </header>
-
-      <Separator className="my-4" />
-
-      {/* Mood scale / options */}
-      <section className="space-y-3">
+  
+      <Separator className="my-2" />
+  
+      {/* Mood options */}
+      <section className="space-y-4">
         <h2 className="text-lg font-semibold">Pick your current mood</h2>
-
+  
         <div className="grid grid-cols-1 gap-3">
           {MOODS.map((m) => {
             const active = m.key === selected;
+  
             return (
               <button
                 key={m.key}
                 type="button"
                 onClick={() => setSelected(m.key)}
-                className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-colors
-                  ${active ? "border-foreground bg-accent/40" : "border-border bg-background hover:bg-accent/20"}`}
+                aria-pressed={active}
+                className={[
+                  "group relative flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left transition-all",
+                  "bg-background hover:bg-accent/30",
+                  active
+                    ? "border-foreground ring-2 ring-foreground/20 bg-gradient-to-r from-accent/50 to-transparent"
+                    : "border-border",
+                ].join(" ")}
               >
-                <div className="text-2xl">{m.emoji}</div>
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium">{m.label}</span>
-                  <span className="text-xs text-muted-foreground">
-                    Comfort level: {m.level}/5
-                  </span>
+                <div className="flex items-center gap-3">
+                  <div
+                    className={[
+                      "grid h-10 w-10 place-items-center rounded-full text-xl",
+                      active ? "bg-foreground/10" : "bg-muted",
+                    ].join(" ")}
+                  >
+                    {m.emoji}
+                  </div>
+  
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">{m.label}</span>
+  
+                    {/* Comfort meter */}
+                    <div className="mt-1 flex items-center gap-2">
+                      <div className="flex gap-1">
+                        {Array.from({ length: 5 }).map((_, idx) => (
+                          <span
+                            key={idx}
+                            className={[
+                              "inline-block h-1.5 w-5 rounded-full",
+                              idx < m.level ? "bg-foreground/80" : "bg-muted",
+                            ].join(" ")}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        {m.level}/5
+                      </span>
+                    </div>
+                  </div>
                 </div>
+  
+                {/* Right-side selected indicator */}
+                <span
+                  className={[
+                    "h-2.5 w-2.5 rounded-full transition-colors",
+                    active ? "bg-foreground" : "bg-muted",
+                  ].join(" ")}
+                />
               </button>
             );
           })}
         </div>
-
-        <div className="pt-2">
+      </section>
+  
+      {/* Sticky save bar */}
+      <div className="pointer-events-none sticky bottom-[72px] mt-2">
+        <div className="pointer-events-auto mx-auto max-w-screen-sm rounded-xl bg-background/80 p-2 backdrop-blur">
           <Button onClick={saveMood} className="w-full rounded-xl">
             Save mood
           </Button>
         </div>
-      </section>
-
-      <Separator className="my-6" />
-
+      </div>
+  
+      <Separator className="my-4" />
+  
       {/* Explanation */}
-      <section className="space-y-3">
+      <section className="space-y-4">
         <Card className="bg-muted/40">
-          <CardHeader>
-            <CardTitle className="text-lg">
-              Your mood: {selectedMood.emoji} {selectedMood.short}
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <span className="text-xl">{selectedMood.emoji}</span>
+              <span>Your mood: {selectedMood.short}</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground">
             {selectedMood.explanation}
           </CardContent>
         </Card>
-      </section>
-
-      {/* If anxious, show calming advice */}
-      {selectedMood.anxious && (
-        <section className="mt-4 space-y-3">
+  
+        {/* If anxious, show calming advice */}
+        {selectedMood.anxious && (
           <Card className="bg-muted/40">
-            <CardHeader>
+            <CardHeader className="pb-2">
               <CardTitle className="text-lg">If you’re feeling anxious</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2 text-sm text-muted-foreground">
+            <CardContent className="space-y-3 text-sm text-muted-foreground">
               <ul className="list-disc pl-5 space-y-1">
                 {ANXIETY_ADVICE.map((tip, i) => (
                   <li key={i}>{tip}</li>
                 ))}
               </ul>
-
+  
               <Button
                 variant="secondary"
-                className="mt-2 w-full rounded-xl"
+                className="mt-1 w-full rounded-xl"
                 onClick={() => navigate("/chatbot")}
               >
                 Talk to your coach
               </Button>
             </CardContent>
           </Card>
-        </section>
-      )}
-    </>
+        )}
+      </section>
+    </div>
   );
+  
 }

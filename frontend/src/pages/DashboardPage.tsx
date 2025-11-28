@@ -3,10 +3,9 @@ import {useLocation, useNavigate} from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
 import { dashboardService, settingsService } from "@/lib/api";
 import type { DashboardData } from "@/lib/api/types";
-import Achievement from "@/components/achievement";
+import AchievementList from "@/pages/Profile/ProfileComponents/AchievementList.tsx";
 
 const FALLBACK_DASHBOARD: DashboardData = {
   firstName: null,
@@ -200,11 +199,7 @@ export default function DashboardPage() {
         {/* Achievements */}
         <section className="mt-5">
           <h3 className="mb-3 text-lg font-semibold">Achievements:</h3>
-          <div className="flex items-stretch gap-3 overflow-x-auto pb-1">
-            {achievements.map((a) => (
-              <Achievement key={a.id} {...a} />
-            ))}
-          </div>
+          <AchievementList achievements={achievements} isLoading={isLoading && !dashboardData} />
           <div className="mt-2 flex items-center justify-center gap-2">
             <Dot active />
             <Dot />

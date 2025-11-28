@@ -6,37 +6,37 @@ type WorkoutDisplayProps = {
     isLoading?: boolean;
 };
 
-export default function WorkoutDisplay({ weeks, isLoading }: WorkoutDisplayProps) {
-    const FALLBACK_WEEKS: ProfileWorkoutDay[][] = [
-        [
-            { date: "2024-01-01", state: "worked", isCurrent: false },
-            { date: "2024-01-02", state: "worked", isCurrent: false },
-            { date: "2024-01-03", state: "rest", isCurrent: false },
-            { date: "2024-01-04", state: "rest", isCurrent: false },
-            { date: "2024-01-05", state: "rest", isCurrent: false },
-            { date: "2024-01-06", state: "worked", isCurrent: false },
-            { date: "2024-01-07", state: "rest", isCurrent: false },
-        ],
-        [
-            { date: "2024-01-08", state: "worked", isCurrent: false },
-            { date: "2024-01-09", state: "worked", isCurrent: false },
-            { date: "2024-01-10", state: "rest", isCurrent: false },
-            { date: "2024-01-11", state: "rest", isCurrent: false },
-            { date: "2024-01-12", state: "rest", isCurrent: false },
-            { date: "2024-01-13", state: "worked", isCurrent: false },
-            { date: "2024-01-14", state: "rest", isCurrent: false },
-        ],
-        [
-            { date: "2024-01-15", state: "rest", isCurrent: false },
-            { date: "2024-01-16", state: "rest", isCurrent: false },
-            { date: "2024-01-17", state: "rest", isCurrent: false },
-            { date: "2024-01-18", state: "rest", isCurrent: false },
-            { date: "2024-01-19", state: "rest", isCurrent: true },
-            { date: "2024-01-20", state: "future", isCurrent: false },
-            { date: "2024-01-21", state: "future", isCurrent: false },
-        ],
-    ];
+const FALLBACK_WEEKS: ProfileWorkoutDay[][] = [
+    [
+        { date: "2024-01-01", state: "worked", isCurrent: false },
+        { date: "2024-01-02", state: "worked", isCurrent: false },
+        { date: "2024-01-03", state: "rest", isCurrent: false },
+        { date: "2024-01-04", state: "rest", isCurrent: false },
+        { date: "2024-01-05", state: "rest", isCurrent: false },
+        { date: "2024-01-06", state: "worked", isCurrent: false },
+        { date: "2024-01-07", state: "rest", isCurrent: false },
+    ],
+    [
+        { date: "2024-01-08", state: "worked", isCurrent: false },
+        { date: "2024-01-09", state: "worked", isCurrent: false },
+        { date: "2024-01-10", state: "rest", isCurrent: false },
+        { date: "2024-01-11", state: "rest", isCurrent: false },
+        { date: "2024-01-12", state: "rest", isCurrent: false },
+        { date: "2024-01-13", state: "worked", isCurrent: false },
+        { date: "2024-01-14", state: "rest", isCurrent: false },
+    ],
+    [
+        { date: "2024-01-15", state: "rest", isCurrent: false },
+        { date: "2024-01-16", state: "rest", isCurrent: false },
+        { date: "2024-01-17", state: "rest", isCurrent: false },
+        { date: "2024-01-18", state: "rest", isCurrent: false },
+        { date: "2024-01-19", state: "rest", isCurrent: true },
+        { date: "2024-01-20", state: "future", isCurrent: false },
+        { date: "2024-01-21", state: "future", isCurrent: false },
+    ],
+];
 
+export default function WorkoutDisplay({ weeks, isLoading }: WorkoutDisplayProps) {
     const displayWeeks = weeks && weeks.length > 0 ? weeks : FALLBACK_WEEKS;
 
     function DaySquare({ day }: {day: ProfileWorkoutDay }) {

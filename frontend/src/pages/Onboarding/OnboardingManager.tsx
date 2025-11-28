@@ -11,7 +11,6 @@ import Step7WhichDays from "@/pages/Onboarding/steps/Step7WhichDays.tsx";
 import Step8SessionLength from "@/pages/Onboarding/steps/Step8SessionLength.tsx";
 import Step9ProtectedAreas from "@/pages/Onboarding/steps/Step9ProtectedAreas.tsx";
 import Step10WorkoutType from "@/pages/Onboarding/steps/Step10WorkoutType.tsx";
-import Step11ComfortLevel from "@/pages/Onboarding/steps/Step11ComfortLevel.tsx";
 import Step3Gender from "@/pages/Onboarding/steps/Step3Gender.tsx";
 import Step2Data from "@/pages/Onboarding/steps/Step2Data.tsx";
 import Step4PrimaryGoal from "./steps/Step4PrimaryGoal.tsx";
@@ -21,6 +20,7 @@ import Step1Nickname from "@/pages/Onboarding/steps/Step1Nickname.tsx";
 import { onboardingService } from "@/lib/api";
 import type { OnboardingPayload } from "@/lib/api";
 import { trackOnboardingStep, trackOnboardingComplete, trackFormSubmit, trackError } from "@/lib/analytics";
+import Step11Emotions from "@/pages/Onboarding/steps/Step11Emotions.tsx";
 
 const POUNDS_TO_KG = 0.45359237;
 const STONES_TO_KG = 6.35029318;
@@ -142,9 +142,10 @@ export type Inputs = {
     strDaysPerWeek:string,
     strAvailableDays:string[],
     strSessionDuration:string,
-        problemAreas:string[],
-        preferredSplit:PreferredSplit[],
-        comfortLevel:GymComfortLevel[],
+    problemAreas:string[],
+    preferredSplit:PreferredSplit[],
+    comfortLevel:GymComfortLevel[],
+    emotions:string[],
 }
 export default function OnboardingManager() {
     const [formStep, setStep] = useState(0);
@@ -204,8 +205,8 @@ export default function OnboardingManager() {
             fields: ["preferredSplit"]
         },
         {
-            component: Step11ComfortLevel,
-            fields: ["comfortLevel"]
+            component: Step11Emotions,
+            fields: ["emotions"]
         },
     ];
     const totalSteps=stepComponents.length-1;
@@ -224,7 +225,8 @@ export default function OnboardingManager() {
         'session_length',
         'protected_areas',
         'workout_type',
-        'comfort_level'
+        'comfort_level',
+        'emotions'
     ];
 
     // Track step changes

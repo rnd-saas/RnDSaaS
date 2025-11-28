@@ -49,13 +49,13 @@ export default function AchievementPage() {
                     <BackButton />
                 </div>
             </header>
-            <Card className="w-full max-w-lg lg:min-w-[50vw] min-w-[90vw] py-4">
-                <div className="space-y-4 p-10 max-h-[80vh] overflow-y-auto">
+            <Card className="w-full lg:min-w-[50vw] min-w-[70vw] py-4">
+                <div className="space-y-4 m-8 max-h-[80vh] overflow-y-auto">
                     {error && (
                         <p className="text-sm text-red-500 text-center">{error}</p>
                     )}
                     {isLoading ? (
-                        <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(150px,1fr))]">
+                        <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(20vw,1fr))] md:grid-cols-[repeat(auto-fit,minmax(15vw,1fr))] lg:grid-cols-[repeat(auto-fit,minmax(10vw,1fr))]">
                             {Array.from({ length: 6 }).map((_, idx) => (
                                 <div
                                     key={idx}
@@ -68,7 +68,7 @@ export default function AchievementPage() {
                             还没有获得任何成就
                         </p>
                     ) : (
-                        <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(150px,1fr))]">
+                        <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(20vw,1fr))] md:grid-cols-[repeat(auto-fit,minmax(15vw,1fr))] lg:grid-cols-[repeat(auto-fit,minmax(10vw,1fr))]">
                             {achievements.map((a) => (
                                 <Achievement
                                     key={a.id}

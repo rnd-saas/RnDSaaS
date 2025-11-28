@@ -1,12 +1,18 @@
 import Achievement from "@/components/achievement.tsx";
-import type { ProfileAchievement } from "@/lib/api";
+
+type AchievementListItem = {
+    id: string;
+    title: string;
+    sub: string;
+    emoji: string;
+};
 
 type AchievementListProps = {
-    achievements: ProfileAchievement[];
+    achievements: AchievementListItem[];
     isLoading?: boolean;
 };
 
-const FALLBACK_ACHIEVEMENTS: ProfileAchievement[] = [
+const FALLBACK_ACHIEVEMENTS: AchievementListItem[] = [
     { id: "fallback-1", title: "100 Workouts", sub: "Completed", emoji: "💪" },
     { id: "fallback-2", title: "7 Days", sub: "Streak", emoji: "📆" },
     { id: "fallback-3", title: "Consecutive", sub: "Workout 12", emoji: "🔥" },

@@ -2,11 +2,14 @@
 import {Label} from "@/components/ui/label.tsx";
 import {Separator} from "@/components/ui/separator.tsx";
 import {Switch} from "@/components/ui/switch.tsx";
+import {Button} from "@/components/ui/button.tsx";
+import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {settingsService, type UserSettings as ApiUserSettings, type UpdateSettingsRequest} from "@/lib/api";
 import {ApiError} from "@/lib/api";
 
 export default function UserSettings() {
+    const navigate = useNavigate();
     const [settings, setSettings] = useState<ApiUserSettings | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
@@ -38,11 +41,11 @@ export default function UserSettings() {
 
     const updateSetting = async (updates: UpdateSettingsRequest) => {
         if (!settings) return;
-        
+
         setIsSaving(true);
         setError(null);
         setSaveSuccess(false);
-        
+
         try {
             const updated = await settingsService.updateSettings(updates);
             setSettings(updated);
@@ -86,7 +89,6 @@ export default function UserSettings() {
         const units = value === 'cm' ? 'metric' : 'imperial';
         updateSetting({ units });
     };
-
     const weightUnitOptions = [
         { value: "kg", label: "Kg" },
         { value: "lbs", label: "Lbs" },
@@ -271,10 +273,12 @@ export default function UserSettings() {
                     </SelectContent>
                 </Select>
             </div>
-            
+
             {isSaving && (
                 <p className="text-sm text-muted-foreground">Saving...</p>
             )}
+            <Separator/>
+            <Button variant={"outline"} onClick={() => navigate("/onboarding")}>Redo Onboarding</Button>
         </div>
     );
 }
