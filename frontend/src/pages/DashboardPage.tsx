@@ -164,7 +164,7 @@ export default function DashboardPage() {
       {/* Mood + Next workout */}
       <section className="grid grid-cols-2 gap-4 md:flex md:flex-col md:h-full">
         <Card
-          className="cursor-pointer transition-all hover:bg-accent hover:text-accent-foreground py-4 gap-2 md:flex-1 md:justify-center"
+          className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 bg-gradient-to-br from-background to-primary/5 py-4 gap-2 md:flex-1 md:justify-center"
           onClick={() => navigate("/mood")}
         >
           <CardHeader className="pb-0 px-4 flex flex-col items-center">
@@ -187,7 +187,7 @@ export default function DashboardPage() {
         </Card>
 
         <Card
-          className="cursor-pointer transition-all hover:bg-accent hover:text-accent-foreground py-4 gap-2 md:flex-1 md:justify-center"
+          className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 bg-gradient-to-br from-background to-primary/5 py-4 gap-2 md:flex-1 md:justify-center"
           onClick={() => navigate("/workout/exercise")}
         >
           <CardHeader className="pb-0 px-4 flex flex-col items-center">
@@ -238,9 +238,9 @@ export default function DashboardPage() {
       </section>
 
       {/* Achievements */}
-      <section className="space-y-4 lg:col-span-2">
+      <section className="lg:col-span-2">
         <div className="flex items-center justify-between px-1">
-          <h3 className="text-lg font-semibold">Achievements</h3>
+          <h3 className="h3-styles font-semibold">Achievements</h3>
           <Button
             variant="ghost"
             size="sm"
