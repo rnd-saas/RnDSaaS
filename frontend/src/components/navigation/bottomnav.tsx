@@ -1,6 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label.tsx";
+import { Button } from "@/components/button";
 
 // SVGs as React components (Vite + svgr)
 import { HomeIcon } from "lucide-react";
@@ -38,22 +37,19 @@ export function BottomNav() {
 
 function NavTab({ to, icon: Icon, end, description }: NavItem) {
   return (
-    <div>
-      <NavLink to={to} end={end} className="contents">
-        {({ isActive }) => (
-          <Button
-            variant={isActive ? "default" : "ghost"}
-            size="icon"
-            className={`h-8 w-8 rounded-2xl flex items-center justify-center ${
-              isActive ? "" : "text-zinc-500"
-            }`}
-            aria-current={isActive ? "page" : undefined}
-          >
-            <Icon className={"h-4! w-4!"} />
-          </Button>
-        )}
-      </NavLink>
-      <Label className={"text-[var(--color-grey-text)]"}>{description}</Label>
-    </div>
+    <NavLink className="flex flex-col items-center contents " to={to} end={end}>
+      {({ isActive }) => (
+        <Button
+          variant={isActive ? "default" : "ghost"}
+          size="icon"
+          className={`h-8 w-8 rounded-2xl flex items-center justify-center ${
+            isActive ? "" : "text-zinc-500"
+          }`}
+          aria-current={isActive ? "page" : undefined}
+        >
+          <Icon className={"h-4! w-4!"} />
+        </Button>
+      )}
+    </NavLink>
   );
 }
