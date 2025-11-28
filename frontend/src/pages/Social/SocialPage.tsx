@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import SocialSearchBar from "@/components/ui/searchbar";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
@@ -21,6 +22,7 @@ const initialsFromName = (value?: string | null) =>
     .toUpperCase();
 
 export default function SocialPage() {
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query, 350);
 
@@ -79,7 +81,7 @@ export default function SocialPage() {
   }, [postsError]);
 
   const handlePostWorkout = () => {
-    console.log("Post workout clicked");
+    navigate("/social/post");
   };
 
   const hasQuery = debouncedQuery.trim().length > 0;

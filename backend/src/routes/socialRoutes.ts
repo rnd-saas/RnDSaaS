@@ -98,6 +98,47 @@ router.get('/posts', async (req: AuthedRequest, res) => {
     }
 });
 
+router.post('/posts', async (req: AuthedRequest, res) => {
+    try {
+        const currentUserId = req.user?.id;
+
+        if (!currentUserId) {
+            return res.status(401).json({ error: { message: 'Unauthorized' } });
+        }
+
+        const body = typeof req.body?.body === 'string' ? req.body.body.trim() : '';
+
+        if (!body) {
+            return res.status(400).json({ error: { message: 'Post body is required' } });
+        }
+
+        if (body.length > 280) {
+            return res.status(400).json({ error: { message: 'Post body must be 280 characters or less' } });
+        }
+
+        const { data: newPost, error } = await supabase
+            .from('posts')
+            .insert([{ author_id: currentUserId, body }])
+            .select(
+                `id, body, created_at,
+                author:users!posts_author_id_fkey (id, username, display_name)`
+            )
+            .single();
+
+        if (error) {
+            return res.status(400).json({ error: { message: error.message } });
+        }
+
+        res.status(201).json({
+            ...newPost,
+            author: newPost.author ?? null
+        });
+    } catch (error: any) {
+        console.error('Social post creation error:', error);
+        res.status(500).json({ error: { message: 'Internal server error' } });
+    }
+});
+
 router.post('/friends', async (req: AuthedRequest, res) => {
     try {
         const currentUserId = req.user?.id;

@@ -44,6 +44,17 @@ export async function getPosts(): Promise<SocialPost[]> {
   return apiClient.get<SocialPost[]>("/api/social/posts");
 }
 
+export async function createPost(body: string): Promise<SocialPost> {
+  const trimmed = body.trim();
+  if (!trimmed) {
+    throw new Error("Post body cannot be empty");
+  }
+  if (trimmed.length > 280) {
+    throw new Error("Post body must be 280 characters or less");
+  }
+  return apiClient.post<SocialPost>("/api/social/posts", { body: trimmed });
+}
+
 export async function sendFriendRequest(targetUserId: string): Promise<FriendRelation> {
   return apiClient.post<FriendRelation>("/api/social/friends", { targetUserId });
 }
