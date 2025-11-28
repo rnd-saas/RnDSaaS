@@ -43,6 +43,8 @@ try {
     const onboardingRoutes = require('./routes/onboardingRoutes').default;
     const chatbotRoutes = require('./routes/chatbotRoutes').default;
     const dashboardRoutes = require('./routes/dashboardRoutes').default;
+    const socialRoutes = require('./routes/socialRoutes').default;
+    const achievementRoutes = require('./routes/achievementRoutes').default;
     
     app.use('/api/auth', authRoutes);
     app.use('/api/users', userRoutes);
@@ -50,6 +52,8 @@ try {
     app.use('/api/onboarding', onboardingRoutes);
     app.use('/api/chatbot', chatbotRoutes);
     app.use('/api/dashboard', dashboardRoutes);
+    app.use('/api/social', socialRoutes);
+    app.use('/api/achievements', achievementRoutes);
 } catch (error: any) {
     console.error('❌ Error loading routes:', error?.message || error);
 }
@@ -70,7 +74,9 @@ app.use((req, res) => {
             'POST /api/auth/logout',
             'GET /api/onboarding',
             'POST /api/onboarding',
-            'GET /api/dashboard'
+            'GET /api/dashboard',
+            'GET /api/social/users?q=term',
+            'GET /api/social/posts'
         ],
         timestamp: new Date().toISOString()
     });

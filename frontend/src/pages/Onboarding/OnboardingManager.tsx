@@ -21,6 +21,7 @@ import Step1Nickname from "@/pages/Onboarding/steps/Step1Nickname.tsx";
 import { onboardingService } from "@/lib/api";
 import type { OnboardingPayload } from "@/lib/api";
 import { trackOnboardingStep, trackOnboardingComplete, trackFormSubmit, trackError } from "@/lib/analytics";
+import { useAchievements } from "@/lib/hooks/useAchievements";
 
 const POUNDS_TO_KG = 0.45359237;
 const STONES_TO_KG = 6.35029318;
@@ -160,6 +161,7 @@ export default function OnboardingManager() {
     const navigate = useNavigate();
     const [submitError, setSubmitError] = useState<string | null>(null);
     const { isSubmitting } = methods.formState;
+    const { triggerCheck } = useAchievements();
 
     //defining all quiz steps
     type Step = {
@@ -305,6 +307,11 @@ export default function OnboardingManager() {
                 experienceLevel: analyticsExperienceLevel
             });
             trackFormSubmit('onboarding', true);
+
+            // Trigger achievement check for onboarding completion
+            console.log("Triggering achievement check for onboarding_complete...");
+            await triggerCheck({ type: 'onboarding_complete' });
+            console.log("Achievement check completed.");
 
             try {
                 localStorage.setItem("trainerId", String(trainerId));
