@@ -3,7 +3,7 @@ name: Deploy BE Staging
 on:
     push:
         branches:
-            - deploy_dbFix
+            - be_combine
 
 jobs:
   deploy:
