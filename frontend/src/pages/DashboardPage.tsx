@@ -235,7 +235,7 @@ export default function DashboardPage() {
   }, [achievements]);
 
   return (
-    <>
+    <div className="w-full max-w-md min-h-[75vh] flex flex-col mx-auto px-4 py-4 space-y-4">
       {/* Header */}
       <header className="flex items-start justify-between">
         <div>
@@ -382,7 +382,7 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </section>
-      </>
+    </div>
   );
 }
 

@@ -29,6 +29,13 @@ export interface FriendRelation {
   status: FriendStatus;
   created_at: string;
   updated_at: string;
+  requester?: SocialUserSummary;
+  addressee?: SocialUserSummary;
+}
+
+export interface FriendRequestWithUsers extends FriendRelation {
+  requester: SocialUserSummary;
+  addressee: SocialUserSummary;
 }
 
 export async function searchUsers(query: string): Promise<SocialUserSummary[]> {
@@ -55,6 +62,26 @@ export async function createPost(body: string): Promise<SocialPost> {
   return apiClient.post<SocialPost>("/api/social/posts", { body: trimmed });
 }
 
+export async function getFriendRequests(): Promise<FriendRequestWithUsers[]> {
+  return apiClient.get<FriendRequestWithUsers[]>("/api/social/friends");
+}
+
 export async function sendFriendRequest(targetUserId: string): Promise<FriendRelation> {
   return apiClient.post<FriendRelation>("/api/social/friends", { targetUserId });
+}
+
+export async function acceptFriendRequest(requestId: string): Promise<FriendRequestWithUsers> {
+  return apiClient.patch<FriendRequestWithUsers>(`/api/social/friends/${requestId}/accept`);
+}
+
+export async function rejectFriendRequest(requestId: string): Promise<{ success: boolean; message: string }> {
+  return apiClient.patch<{ success: boolean; message: string }>(`/api/social/friends/${requestId}/reject`);
+}
+
+export async function cancelFriendRequest(requestId: string): Promise<{ success: boolean; message: string }> {
+  return apiClient.delete<{ success: boolean; message: string }>(`/api/social/friends/${requestId}`);
+}
+
+export async function getFriends(): Promise<FriendRequestWithUsers[]> {
+  return apiClient.get<FriendRequestWithUsers[]>("/api/social/friends/accepted");
 }

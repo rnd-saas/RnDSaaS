@@ -61,45 +61,43 @@ export default function SocialCreatePostPage() {
   const hasContent = content.trim().length > 0;
 
   return (
-    <div className="w-full max-w-md min-h-[75vh] flex flex-col mx-auto px-4 py-4 space-y-6">
+    <div className="w-full max-w-md min-h-[75vh] flex flex-col mx-auto px-4 py-3 space-y-4 pb-20">
       {/* Header */}
-      <header className="flex items-start justify-between">
-        <div className="flex items-center gap-3">
-          <BackButton />
-          <div>
-            <h1 className="text-3xl font-semibold tracking-tight">Create Post</h1>
-            <p className="text-sm text-muted-foreground">
-              Share your workout progress with friends
-            </p>
-          </div>
+      <header className="flex items-start gap-3">
+        <BackButton />
+        <div className="flex-1 min-w-0">
+          <h1 className="!text-[20px] font-semibold tracking-tight">Create Post</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Share your workout progress with friends
+          </p>
         </div>
       </header>
 
       <Separator className="my-2" />
 
       {/* Post Composer */}
-      <Card className="bg-gradient-to-br from-background to-muted/20 shadow-lg border-2 border-border/50">
-        <CardHeader className="pb-4">
+      <Card className="bg-gradient-to-br from-background to-muted/20 shadow-lg border-2 border-border/50 !py-3">
+        <CardHeader className="pb-2 !px-4">
           <div className="flex items-center gap-2">
-            <div className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-amber-400/20 to-amber-600/20">
-              <Sparkles className="h-5 w-5 text-amber-600" />
+            <div className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-amber-400/20 to-amber-600/20 shrink-0">
+              <Sparkles className="h-4 w-4 text-amber-600" />
             </div>
-            <div>
-              <CardTitle className="text-lg">What's on your mind?</CardTitle>
+            <div className="min-w-0 flex-1">
+              <CardTitle className="text-base">What's on your mind?</CardTitle>
               <p className="text-xs text-muted-foreground mt-0.5">
                 Share your achievements, progress, or motivation
               </p>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-2 !px-4">
           <div className="relative">
             <textarea
               ref={textareaRef}
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="How was your workout today? Share your progress, achievements, or motivation..."
-              className={`min-h-[160px] w-full resize-none rounded-2xl border-2 bg-background/50 px-4 py-3 text-sm transition-all duration-200 ${
+              className={`min-h-[140px] w-full resize-none rounded-xl border-2 bg-background/50 px-3 py-2.5 text-sm transition-all duration-200 ${
                 isOverLimit
                   ? "border-red-500/50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
                   : isNearLimit
@@ -161,13 +159,13 @@ export default function SocialCreatePostPage() {
           </div>
 
           {/* Action buttons */}
-          <div className="flex items-center gap-3 pt-2">
+          <div className="flex items-center gap-2 pt-2">
             <Button
               type="button"
               variant="outline"
               onClick={() => navigate("/social")}
               disabled={isPosting}
-              className="flex-1 rounded-xl"
+              className="flex-1 rounded-xl text-sm"
             >
               Cancel
             </Button>
@@ -175,7 +173,7 @@ export default function SocialCreatePostPage() {
               type="button"
               onClick={handleSubmit}
               disabled={isPosting || !hasContent || isOverLimit}
-              className="flex-1 rounded-xl gap-2"
+              className="flex-1 rounded-xl gap-2 text-sm"
             >
               {isPosting ? (
                 <>
@@ -194,15 +192,14 @@ export default function SocialCreatePostPage() {
       </Card>
 
       {/* Tips card */}
-      <Card className="bg-muted/40 border-dashed">
-        <CardContent className="pt-6">
-          <div className="space-y-2 text-sm text-muted-foreground">
-            <p className="font-medium text-foreground mb-2">💡 Post ideas:</p>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>Share your workout achievements</li>
-              <li>Post your progress photos</li>
-              <li>Motivate your friends</li>
-              <li>Ask for workout tips</li>
+      <Card className="bg-muted/40 border-dashed !py-3">
+        <CardContent className="pt-3 text-left !px-4">
+          <div className="space-y-2 text-sm text-muted-foreground text-left">
+            <p className="font-medium text-foreground mb-2 text-left">💡 Post ideas:</p>
+            <ul className="list-disc list-inside space-y-1 text-left">
+              <li className="text-left">Share your workout achievements</li>
+              <li className="text-left">Motivate your friends</li>
+              <li className="text-left">Ask for workout tips</li>
             </ul>
           </div>
         </CardContent>

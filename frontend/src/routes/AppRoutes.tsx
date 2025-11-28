@@ -1,4 +1,4 @@
-﻿﻿import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+﻿﻿﻿import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import DefaultPage from "@/pages/DefaultPage.tsx";
 import OnboardingManager from "@/pages/Onboarding/OnboardingManager.tsx";
@@ -24,6 +24,7 @@ import WorkoutTimer from "@/pages/Workout/WorkoutTimer";
 import ProfilePage from "@/pages/Profile/ProfilePage.tsx";
 import SocialPage from "@/pages/Social/SocialPage.tsx";
 import SocialCreatePostPage from "@/pages/Social/SocialCreatePostPage.tsx";
+import SocialManageFriendsPage from "@/pages/Social/SocialManageFriendsPage.tsx";
 import MoodPage from "@/pages/Mood/MoodPage";
 import CalendarPage from "@/pages/CalendarPage.tsx";
 import AchievementPage from "@/pages/AchievementPage.tsx";
@@ -54,6 +55,7 @@ export default function AppRoutes() {
                     {/* <Route path="/workout" element={<WorkoutPage />} /> */}
                     <Route path="/social" element={<SocialPage />} />
                     <Route path="/social/post" element={<SocialCreatePostPage />} />
+                    <Route path="/social/manage" element={<SocialManageFriendsPage />} />
                      <Route path="/profile" element={<ProfilePage />} />
                 </Route>
             </Routes>

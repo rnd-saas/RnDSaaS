@@ -136,6 +136,20 @@ class ApiClient {
     }
 
     /**
+     * PATCH request
+     */
+    async patch<T>(endpoint: string, data?: any): Promise<T> {
+        const url = this.getFullUrl(endpoint);
+        const response = await fetch(url, {
+            method: 'PATCH',
+            headers: this.getHeaders(),
+            body: data ? JSON.stringify(data) : undefined,
+        });
+
+        return this.handleResponse<T>(response);
+    }
+
+    /**
      * DELETE request
      */
     async delete<T>(endpoint: string): Promise<T> {
