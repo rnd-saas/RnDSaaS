@@ -11,6 +11,11 @@ if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
 
 const app = express();
 app.use(cors());
+
+// Webhook route must be defined BEFORE express.json() to access raw body
+// We use a separate router or just middleware for this specific path
+app.use('/api/webhook', express.raw({ type: 'application/json' }), require('./routes/webhookRoutes').default);
+
 app.use(express.json());
 
 
@@ -45,6 +50,7 @@ try {
     const dashboardRoutes = require('./routes/dashboardRoutes').default;
     const socialRoutes = require('./routes/socialRoutes').default;
     const achievementRoutes = require('./routes/achievementRoutes').default;
+    const paymentRoutes = require('./routes/paymentRoutes').default;
     
     app.use('/api/auth', authRoutes);
     app.use('/api/users', userRoutes);
@@ -54,6 +60,7 @@ try {
     app.use('/api/dashboard', dashboardRoutes);
     app.use('/api/social', socialRoutes);
     app.use('/api/achievements', achievementRoutes);
+    app.use('/api/payment', paymentRoutes);
 } catch (error: any) {
     console.error('❌ Error loading routes:', error?.message || error);
 }

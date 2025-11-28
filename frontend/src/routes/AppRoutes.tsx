@@ -28,6 +28,9 @@ import SocialPage from "@/pages/Social/SocialPage.tsx";
 import MoodPage from "@/pages/Mood/MoodPage";
 import CalendarPage from "@/pages/CalendarPage.tsx";
 import AchievementPage from "@/pages/AchievementPage.tsx";
+import SubscriptionPage from "@/pages/SubscriptionPage.tsx";
+import PaymentSuccessPage from "@/pages/Payment/SuccessPage.tsx";
+import PaymentCancelPage from "@/pages/Payment/CancelPage.tsx";
 
 
 export default function AppRoutes() {
@@ -47,6 +50,9 @@ export default function AppRoutes() {
 
                 <Route path="/calendar" element={<CalendarPage />} />
                 <Route path="/achievements" element={<AchievementPage />} />
+                <Route path="/subscription" element={<SubscriptionPage />} />
+                <Route path="/payment/success" element={<PaymentSuccessPage />} />
+                <Route path="/payment/cancel" element={<PaymentCancelPage />} />
                 {/* App layout with persistent bottom nav */}
                 <Route element={<AppLayout />}>
                     <Route path="/dashboard" element={<DashboardPage />} />

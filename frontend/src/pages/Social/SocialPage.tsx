@@ -20,6 +20,16 @@ const initialsFromName = (value?: string | null) =>
     .slice(0, 2)
     .toUpperCase();
 
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+  }).format(date);
+};
+
 export default function SocialPage() {
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query, 350);
@@ -241,6 +251,9 @@ export default function SocialPage() {
                     )}
                   </div>
                 </div>
+                <span className="text-xs text-muted-foreground">
+                  {formatDate(post.created_at)}
+                </span>
               </CardHeader>
 
               <CardContent className="pb-4 text-sm text-muted-foreground">
