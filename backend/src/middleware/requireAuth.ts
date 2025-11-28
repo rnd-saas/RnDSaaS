@@ -4,6 +4,7 @@ import { supabase } from '../db/supabase';
 
 interface AuthenticatedRequest extends Request {
     user?: User;
+    token?: string;
 }
 
 export async function requireAuth(
@@ -38,6 +39,7 @@ export async function requireAuth(
         }
 
         req.user = user;
+        req.token = token; // Store token for potential use in routes
         return next();
     } catch (err: any) {
         console.error('Authentication middleware error:', err);

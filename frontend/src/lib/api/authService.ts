@@ -59,10 +59,21 @@ export async function getCurrentUser(): Promise<any> {
     return apiClient.get('/api/auth/me');
 }
 
+/**
+ * Delete user account
+ * This will permanently delete the user account and all associated data
+ */
+export async function deleteAccount(): Promise<void> {
+    await apiClient.delete('/api/auth/account');
+    // Clear tokens after successful deletion
+    apiClient.clearToken();
+}
+
 export const authService = {
     login,
     register,
     logout,
-    getCurrentUser
+    getCurrentUser,
+    deleteAccount
 };
 

@@ -25,6 +25,18 @@ export const chatbotService = chatbotServiceFunctions;
 import * as dashboardServiceFunctions from './dashboardService';
 export const dashboardService = dashboardServiceFunctions;
 
+// Export settings service functions
+import * as settingsServiceFunctions from './settingsService';
+export const settingsService = settingsServiceFunctions;
+
+// Export mood service functions
+import * as moodServiceFunctions from './moodService';
+export const moodService = moodServiceFunctions;
+
+// Export profile service functions
+import * as profileServiceFunctions from './profileService';
+export const profileService = profileServiceFunctions;
+
 // Export social service functions
 import * as socialServiceFunctions from './socialService';
 export const socialService = socialServiceFunctions;

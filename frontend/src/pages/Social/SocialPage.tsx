@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import SocialSearchBar from "@/components/ui/searchbar";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
-import { Loader2, PlusSquare, UserPlus } from "lucide-react";
+import { Loader2, PlusSquare, UserPlus, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ const formatDate = (dateString: string) => {
 };
 
 export default function SocialPage() {
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query, 350);
 
@@ -89,7 +91,7 @@ export default function SocialPage() {
   }, [postsError]);
 
   const handlePostWorkout = () => {
-    console.log("Post workout clicked");
+    navigate("/social/post");
   };
 
   const hasQuery = debouncedQuery.trim().length > 0;
@@ -98,7 +100,7 @@ export default function SocialPage() {
   return (
     <div className="w-full max-w-md min-h-[75vh] flex flex-col items-center space-y-6">
 
-      {/* ✅ TOP ROW: search bar + post button */}
+      {/* ✅ TOP ROW: search bar + buttons */}
       <div className="w-full px-4 mt-4 flex items-center gap-2">
         <div className="flex-1">
           <SocialSearchBar
@@ -106,6 +108,18 @@ export default function SocialPage() {
             onChange={setQuery}
           />
         </div>
+
+        <Button
+          type="button"
+          variant="secondary"
+          size="icon"
+          onClick={() => navigate("/social/manage")}
+          className="shrink-0 rounded-xl"
+          aria-label="Manage friends"
+          title="Manage friends"
+        >
+          <Users className="h-5 w-5" />
+        </Button>
 
         <Button
           type="button"

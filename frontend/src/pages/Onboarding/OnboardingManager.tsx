@@ -152,8 +152,9 @@ export type Inputs = {
     strAvailableDays:string[],
     strSessionDuration:string,
     problemAreas:string[],
-    preferredSplit:PreferredSplit,
+    preferredSplit:PreferredSplit[],
     comfortLevel:GymComfortLevel[],
+    emotions:string[],
 }
 export default function OnboardingManager() {
     const [formStep, setStep] = useState(0);
@@ -213,13 +214,9 @@ export default function OnboardingManager() {
             component: Step10WorkoutType,
             fields: ["preferredSplit"]
         },
-        // {
-        //     component: Step11ComfortLevel,
-        //     fields: ["comfortLevel"]
-        // },
         {
             component: Step11Emotions,
-            fields: ["comfortLevel"]
+            fields: ["emotions"]
         },
     ];
     const totalSteps=stepComponents.length-1;
@@ -238,7 +235,8 @@ export default function OnboardingManager() {
         'session_length',
         'protected_areas',
         'workout_type',
-        'comfort_level'
+        'comfort_level',
+        'emotions'
     ];
 
     // Track step changes

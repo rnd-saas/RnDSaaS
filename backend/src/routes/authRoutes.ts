@@ -5,6 +5,7 @@
 
 import { Router } from 'express';
 import { supabase, supabaseAuth } from '../db/supabase';
+import { requireAuth } from '../middleware/requireAuth';
 import withTimeout from '../utils/withTimeout';
 
 const router = Router();
@@ -346,6 +347,110 @@ router.get('/me', async (req, res) => {
 
     } catch (error: any) {
         console.error('Get current user error:', error);
+        res.status(500).json({ 
+            error: { message: 'Internal server error' } 
+        });
+    }
+});
+
+/**
+ * DELETE /api/auth/account
+ * Delete user account and all associated data
+ */
+router.delete('/account', requireAuth, async (req: any, res) => {
+    try {
+        const userId = req.user?.id;
+
+        if (!userId) {
+            return res.status(401).json({
+                error: { message: 'User not authenticated' }
+            });
+        }
+
+        console.log(`🗑️ Starting account deletion for user: ${userId}`);
+
+        // Delete all user-related data from database tables
+        // Note: Order matters - delete child records first, then parent records
+
+        // 1. Delete user_achievements
+        const { error: achievementsError } = await supabase
+            .from('user_achievements')
+            .delete()
+            .eq('user_id', userId);
+
+        if (achievementsError) {
+            console.error('Error deleting user_achievements:', achievementsError);
+            // Continue even if this fails
+        }
+
+        // 2. Delete workouts
+        const { error: workoutsError } = await supabase
+            .from('workouts')
+            .delete()
+            .eq('user_id', userId);
+
+        if (workoutsError) {
+            console.error('Error deleting workouts:', workoutsError);
+            // Continue even if this fails
+        }
+
+        // 3. Delete user_settings
+        const { error: settingsError } = await supabase
+            .from('user_settings')
+            .delete()
+            .eq('user_id', userId);
+
+        if (settingsError) {
+            console.error('Error deleting user_settings:', settingsError);
+            // Continue even if this fails
+        }
+
+        // 4. Delete user_info
+        const { error: userInfoError } = await supabase
+            .from('user_info')
+            .delete()
+            .eq('user_id', userId);
+
+        if (userInfoError) {
+            console.error('Error deleting user_info:', userInfoError);
+            // Continue even if this fails
+        }
+
+        // 5. Delete users table record
+        const { error: usersError } = await supabase
+            .from('users')
+            .delete()
+            .eq('id', userId);
+
+        if (usersError) {
+            console.error('Error deleting users record:', usersError);
+            // Continue even if this fails
+        }
+
+        // 6. Delete from Supabase Auth (requires service role key)
+        // This must be done with admin privileges
+        const { error: authError } = await supabase.auth.admin.deleteUser(userId);
+
+        if (authError) {
+            console.error('Error deleting auth user:', authError);
+            // If we can't delete from auth, still return success for database cleanup
+            // The user won't be able to log in anyway if database records are deleted
+            return res.status(500).json({
+                error: { 
+                    message: 'Account data deleted but failed to delete authentication record. Please contact support.',
+                    details: process.env.NODE_ENV === 'development' ? authError.message : undefined
+                }
+            });
+        }
+
+        console.log(`✅ Account deletion completed for user: ${userId}`);
+
+        res.json({ 
+            message: 'Account deleted successfully' 
+        });
+
+    } catch (error: any) {
+        console.error('Delete account error:', error);
         res.status(500).json({ 
             error: { message: 'Internal server error' } 
         });

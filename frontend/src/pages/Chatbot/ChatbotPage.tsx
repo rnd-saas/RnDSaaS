@@ -181,6 +181,12 @@ export default function ChatbotPage() {
         }
     };
 
+    //back button
+    const navigate = useNavigate();
+    const handleGoBack = () => {
+        navigate(-1);
+    };
+
     //auto-scroll logic
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     useEffect(() => {
@@ -195,7 +201,9 @@ export default function ChatbotPage() {
         <div className="w-full min-w-[50vw] min-h-[90vh] relative flex flex-col">
             <header className="px-6 pt-11 pb-4">
                 <div className="flex items-center justify-between">
-                    <BackButton/>
+                    <Button variant="outline" size="icon" className="h-11 w-11 rounded-full" onClick={handleGoBack}>
+                        <ArrowLeft className="h-6 w-6"/>
+                    </Button>
                     <div className="flex items-center gap-3">
                         <AvatarIcon icon={trainerAvatar}/>
                         <div className="flex flex-col gap-0.5">

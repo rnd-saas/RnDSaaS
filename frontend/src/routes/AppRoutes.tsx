@@ -1,7 +1,5 @@
-﻿import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+﻿﻿﻿import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import LoginPage from "../pages/Login/LoginPage.tsx";
-import RegisterPage from "../pages/Login/RegisterPage.tsx";
 import DefaultPage from "@/pages/DefaultPage.tsx";
 import OnboardingManager from "@/pages/Onboarding/OnboardingManager.tsx";
 import DashboardPage from "@/pages/DashboardPage";
@@ -25,12 +23,15 @@ import RestTimer from "@/pages/Workout/RestTimer";
 import WorkoutTimer from "@/pages/Workout/WorkoutTimer";
 import ProfilePage from "@/pages/Profile/ProfilePage.tsx";
 import SocialPage from "@/pages/Social/SocialPage.tsx";
+import SocialCreatePostPage from "@/pages/Social/SocialCreatePostPage.tsx";
+import SocialManageFriendsPage from "@/pages/Social/SocialManageFriendsPage.tsx";
 import MoodPage from "@/pages/Mood/MoodPage";
 import CalendarPage from "@/pages/CalendarPage.tsx";
 import AchievementPage from "@/pages/AchievementPage.tsx";
 import SubscriptionPage from "@/pages/SubscriptionPage.tsx";
 import PaymentSuccessPage from "@/pages/Payment/SuccessPage.tsx";
 import PaymentCancelPage from "@/pages/Payment/CancelPage.tsx";
+import OnboardingInvitePage from "@/pages/Onboarding/OnboardingInvitePage.tsx";
 
 
 export default function AppRoutes() {
@@ -39,9 +40,8 @@ export default function AppRoutes() {
             <PageViewTracker />
             <Routes>
                 <Route path="/" element={<DefaultPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
                 <Route path="/onboarding" element={<OnboardingManager/>}/>
+                <Route path="/onboarding-invite" element={<OnboardingInvitePage/>}/>
                 <Route path="/landing" element={<LandingPage />} />
                 <Route path="/chatbot" element={<ChatbotPage />} />
                 <Route path="/workout/rest" element={<RestTimer />} />
@@ -60,6 +60,8 @@ export default function AppRoutes() {
                     {/* Uncomment when ready */}
                     {/* <Route path="/workout" element={<WorkoutPage />} /> */}
                     <Route path="/social" element={<SocialPage />} />
+                    <Route path="/social/post" element={<SocialCreatePostPage />} />
+                    <Route path="/social/manage" element={<SocialManageFriendsPage />} />
                      <Route path="/profile" element={<ProfilePage />} />
                 </Route>
             </Routes>

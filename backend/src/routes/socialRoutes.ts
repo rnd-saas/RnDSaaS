@@ -98,6 +98,77 @@ router.get('/posts', async (req: AuthedRequest, res) => {
     }
 });
 
+router.post('/posts', async (req: AuthedRequest, res) => {
+    try {
+        const currentUserId = req.user?.id;
+
+        if (!currentUserId) {
+            return res.status(401).json({ error: { message: 'Unauthorized' } });
+        }
+
+        const body = typeof req.body?.body === 'string' ? req.body.body.trim() : '';
+
+        if (!body) {
+            return res.status(400).json({ error: { message: 'Post body is required' } });
+        }
+
+        if (body.length > 280) {
+            return res.status(400).json({ error: { message: 'Post body must be 280 characters or less' } });
+        }
+
+        const { data: newPost, error } = await supabase
+            .from('posts')
+            .insert([{ author_id: currentUserId, body }])
+            .select(
+                `id, body, created_at,
+                author:users!posts_author_id_fkey (id, username, display_name)`
+            )
+            .single();
+
+        if (error) {
+            return res.status(400).json({ error: { message: error.message } });
+        }
+
+        res.status(201).json({
+            ...newPost,
+            author: newPost.author ?? null
+        });
+    } catch (error: any) {
+        console.error('Social post creation error:', error);
+        res.status(500).json({ error: { message: 'Internal server error' } });
+    }
+});
+
+router.get('/friends', async (req: AuthedRequest, res) => {
+    try {
+        const currentUserId = req.user?.id;
+
+        if (!currentUserId) {
+            return res.status(401).json({ error: { message: 'Unauthorized' } });
+        }
+
+        // Get all friend relations where current user is either requester or addressee
+        const { data: relations, error } = await supabase
+            .from('friends')
+            .select(
+                `id, requester_id, addressee_id, status, created_at, updated_at,
+                requester:users!friends_requester_id_fkey (id, username, display_name),
+                addressee:users!friends_addressee_id_fkey (id, username, display_name)`
+            )
+            .or(`requester_id.eq.${currentUserId},addressee_id.eq.${currentUserId}`)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            return res.status(400).json({ error: { message: error.message } });
+        }
+
+        res.json(relations ?? []);
+    } catch (error: any) {
+        console.error('Social friends fetch error:', error);
+        res.status(500).json({ error: { message: 'Internal server error' } });
+    }
+});
+
 router.post('/friends', async (req: AuthedRequest, res) => {
     try {
         const currentUserId = req.user?.id;
@@ -178,6 +249,196 @@ router.post('/friends', async (req: AuthedRequest, res) => {
         res.status(201).json(newRelation);
     } catch (error: any) {
         console.error('Social friend request error:', error);
+        res.status(500).json({ error: { message: 'Internal server error' } });
+    }
+});
+
+router.patch('/friends/:requestId/accept', async (req: AuthedRequest, res) => {
+    try {
+        const currentUserId = req.user?.id;
+        const requestId = req.params.requestId;
+
+        if (!currentUserId) {
+            return res.status(401).json({ error: { message: 'Unauthorized' } });
+        }
+
+        if (!requestId) {
+            return res.status(400).json({ error: { message: 'Request ID is required' } });
+        }
+
+        // Get the friend request
+        const { data: friendRequest, error: fetchError } = await supabase
+            .from('friends')
+            .select('*')
+            .eq('id', requestId)
+            .single();
+
+        if (fetchError || !friendRequest) {
+            return res.status(404).json({ error: { message: 'Friend request not found' } });
+        }
+
+        // Verify that the current user is the addressee (receiver) of the request
+        if (friendRequest.addressee_id !== currentUserId) {
+            return res.status(403).json({ error: { message: 'You can only accept requests sent to you' } });
+        }
+
+        // Verify that the request is still pending
+        if (friendRequest.status !== 'pending') {
+            return res.status(400).json({ error: { message: `Request is already ${friendRequest.status}` } });
+        }
+
+        // Update the status to accepted
+        const { data: updatedRelation, error: updateError } = await supabase
+            .from('friends')
+            .update({ status: 'accepted', updated_at: new Date().toISOString() })
+            .eq('id', requestId)
+            .select(
+                `id, requester_id, addressee_id, status, created_at, updated_at,
+                requester:users!friends_requester_id_fkey (id, username, display_name),
+                addressee:users!friends_addressee_id_fkey (id, username, display_name)`
+            )
+            .single();
+
+        if (updateError) {
+            return res.status(400).json({ error: { message: updateError.message } });
+        }
+
+        res.json(updatedRelation);
+    } catch (error: any) {
+        console.error('Social accept friend request error:', error);
+        res.status(500).json({ error: { message: 'Internal server error' } });
+    }
+});
+
+router.patch('/friends/:requestId/reject', async (req: AuthedRequest, res) => {
+    try {
+        const currentUserId = req.user?.id;
+        const requestId = req.params.requestId;
+
+        if (!currentUserId) {
+            return res.status(401).json({ error: { message: 'Unauthorized' } });
+        }
+
+        if (!requestId) {
+            return res.status(400).json({ error: { message: 'Request ID is required' } });
+        }
+
+        // Get the friend request
+        const { data: friendRequest, error: fetchError } = await supabase
+            .from('friends')
+            .select('*')
+            .eq('id', requestId)
+            .single();
+
+        if (fetchError || !friendRequest) {
+            return res.status(404).json({ error: { message: 'Friend request not found' } });
+        }
+
+        // Verify that the current user is the addressee (receiver) of the request
+        if (friendRequest.addressee_id !== currentUserId) {
+            return res.status(403).json({ error: { message: 'You can only reject requests sent to you' } });
+        }
+
+        // Verify that the request is still pending
+        if (friendRequest.status !== 'pending') {
+            return res.status(400).json({ error: { message: `Request is already ${friendRequest.status}` } });
+        }
+
+        // Delete the friend request (reject = delete)
+        const { error: deleteError } = await supabase
+            .from('friends')
+            .delete()
+            .eq('id', requestId);
+
+        if (deleteError) {
+            return res.status(400).json({ error: { message: deleteError.message } });
+        }
+
+        res.json({ success: true, message: 'Friend request rejected' });
+    } catch (error: any) {
+        console.error('Social reject friend request error:', error);
+        res.status(500).json({ error: { message: 'Internal server error' } });
+    }
+});
+
+router.delete('/friends/:requestId', async (req: AuthedRequest, res) => {
+    try {
+        const currentUserId = req.user?.id;
+        const requestId = req.params.requestId;
+
+        if (!currentUserId) {
+            return res.status(401).json({ error: { message: 'Unauthorized' } });
+        }
+
+        if (!requestId) {
+            return res.status(400).json({ error: { message: 'Request ID is required' } });
+        }
+
+        // Get the friend request
+        const { data: friendRequest, error: fetchError } = await supabase
+            .from('friends')
+            .select('*')
+            .eq('id', requestId)
+            .single();
+
+        if (fetchError || !friendRequest) {
+            return res.status(404).json({ error: { message: 'Friend request not found' } });
+        }
+
+        // Verify that the current user is the requester (sender) of the request
+        if (friendRequest.requester_id !== currentUserId) {
+            return res.status(403).json({ error: { message: 'You can only cancel requests you sent' } });
+        }
+
+        // Verify that the request is still pending
+        if (friendRequest.status !== 'pending') {
+            return res.status(400).json({ error: { message: `Cannot cancel request that is ${friendRequest.status}` } });
+        }
+
+        // Delete the friend request (cancel = delete)
+        const { error: deleteError } = await supabase
+            .from('friends')
+            .delete()
+            .eq('id', requestId);
+
+        if (deleteError) {
+            return res.status(400).json({ error: { message: deleteError.message } });
+        }
+
+        res.json({ success: true, message: 'Friend request cancelled' });
+    } catch (error: any) {
+        console.error('Social cancel friend request error:', error);
+        res.status(500).json({ error: { message: 'Internal server error' } });
+    }
+});
+
+router.get('/friends/accepted', async (req: AuthedRequest, res) => {
+    try {
+        const currentUserId = req.user?.id;
+
+        if (!currentUserId) {
+            return res.status(401).json({ error: { message: 'Unauthorized' } });
+        }
+
+        // Get only accepted friend relations
+        const { data: relations, error } = await supabase
+            .from('friends')
+            .select(
+                `id, requester_id, addressee_id, status, created_at, updated_at,
+                requester:users!friends_requester_id_fkey (id, username, display_name),
+                addressee:users!friends_addressee_id_fkey (id, username, display_name)`
+            )
+            .eq('status', 'accepted')
+            .or(`requester_id.eq.${currentUserId},addressee_id.eq.${currentUserId}`)
+            .order('updated_at', { ascending: false });
+
+        if (error) {
+            return res.status(400).json({ error: { message: error.message } });
+        }
+
+        res.json(relations ?? []);
+    } catch (error: any) {
+        console.error('Social friends fetch error:', error);
         res.status(500).json({ error: { message: 'Internal server error' } });
     }
 });

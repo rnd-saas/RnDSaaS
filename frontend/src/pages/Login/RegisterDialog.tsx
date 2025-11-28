@@ -1,17 +1,21 @@
-﻿import { useForm } from "react-hook-form";
+﻿import { useState } from "react";
+import { useForm } from "react-hook-form";
 import {Button} from "@/components/ui/button.tsx";
-import {Link, useNavigate} from "react-router-dom";
-import { useState } from "react";
+import {DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog.tsx";
+import {useNavigate} from "react-router-dom";
 import { authService, ApiError } from "@/lib/api";
 import { trackRegistration, trackFormSubmit, trackError } from "@/lib/analytics";
 
+type RegisterDialogProps = {
+    onSwitchToLogin: () => void;
+};
 type Inputs = {
     email: string
     username: string
     password: string
     passwordConfirmation: string
 }
-function Register() {
+export default function RegisterDialog({onSwitchToLogin}:RegisterDialogProps) {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -43,7 +47,6 @@ function Register() {
             setSuccess(true);
 
             if (response.needsEmailConfirmation) {
-                // Give users a moment to read the confirmation notice before continuing onboarding
                 setTimeout(() => navigate('/onboarding', { state: { needsEmailConfirmation: true } }), 1200);
             } else {
                 navigate('/onboarding');
@@ -53,15 +56,15 @@ function Register() {
             if (err instanceof ApiError) {
                 if (err.message.includes('already exists') || err.message.includes('already registered')) {
                     setError('Email is already registered!');
-                    trackError('Email already registered', 'RegisterPage');
+                    trackError('Email already registered', 'RegisterDialog');
                 } else {
                     setError(err.message);
-                    trackError(err.message, 'RegisterPage');
+                    trackError(err.message, 'RegisterDialog');
                 }
             } else {
                 const errorMsg = 'Registration failed. Please try again.';
                 setError(errorMsg);
-                trackError(errorMsg, 'RegisterPage');
+                trackError(errorMsg, 'RegisterDialog');
             }
         } finally {
             setIsLoading(false);
@@ -71,11 +74,12 @@ function Register() {
     const password = watch("password");
 
     return (
-        <>
-            <h2 style={{ fontFamily: "var(--title-font-font-family)" }}>Registration Form</h2>
-
+        <DialogContent className={"bg-[var(--color-background)] rounded-lg shadow-md"}>
+            <DialogHeader>
+                <DialogTitle>Registration Form</DialogTitle>
+            </DialogHeader>
             <form
-                className="Register max-w-sm bg-[var(--color-background)] p-6 rounded-lg shadow-md space-y-4"
+                className="Register max-w-sm p-6 space-y-4"
                 onSubmit={handleSubmit(onSubmit)}
             >
                 <div className="flex flex-col">
@@ -144,12 +148,9 @@ function Register() {
                     {isLoading ? "Registering..." : "Register"}
                 </Button>
             </form>
-            <div className={'p-6'}>
-                <Link to={'/login'} style={{color: "var(--color-link)"}}>Already an existing
-                    user?</Link>
-            </div>
-        </>
+            <DialogFooter>
+                <Button variant={"link"} className="justify-start w-full" onClick={onSwitchToLogin}>Already an existing user?</Button>
+            </DialogFooter>
+        </DialogContent>
     );
 }
-
-export default Register;

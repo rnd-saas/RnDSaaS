@@ -21,6 +21,13 @@ if (!supabaseUrl || !serviceKey || !publicKey) {
         )}, public key set: ${Boolean(publicKey)}`
     );
     console.error('❌ Supabase initialization error:', error.message);
+    console.error('Environment check:', {
+        NODE_ENV: process.env.NODE_ENV,
+        VERCEL: process.env.VERCEL,
+        hasUrl: !!supabaseUrl,
+        hasServiceRoleKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+        urlPreview: supabaseUrl ? supabaseUrl.substring(0, 30) + '...' : 'N/A'
+    });
     throw error;
 }
 

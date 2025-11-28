@@ -48,6 +48,9 @@ try {
     const onboardingRoutes = require('./routes/onboardingRoutes').default;
     const chatbotRoutes = require('./routes/chatbotRoutes').default;
     const dashboardRoutes = require('./routes/dashboardRoutes').default;
+    const settingsRoutes = require('./routes/settingsRoutes').default;
+    const moodRoutes = require('./routes/moodRoutes').default;
+    const profileRoutes = require('./routes/profileRoutes').default;
     const socialRoutes = require('./routes/socialRoutes').default;
     const achievementRoutes = require('./routes/achievementRoutes').default;
     const paymentRoutes = require('./routes/paymentRoutes').default;
@@ -58,9 +61,14 @@ try {
     app.use('/api/onboarding', onboardingRoutes);
     app.use('/api/chatbot', chatbotRoutes);
     app.use('/api/dashboard', dashboardRoutes);
+    app.use('/api/settings', settingsRoutes);
+    app.use('/api/mood', moodRoutes);
+    app.use('/api/profile', profileRoutes);
     app.use('/api/social', socialRoutes);
     app.use('/api/achievements', achievementRoutes);
     app.use('/api/payment', paymentRoutes);
+    
+    console.log('✅ API routes loaded');
 } catch (error: any) {
     console.error('❌ Error loading routes:', error?.message || error);
 }
@@ -82,6 +90,9 @@ app.use((req, res) => {
             'GET /api/onboarding',
             'POST /api/onboarding',
             'GET /api/dashboard',
+            'GET /api/settings',
+            'PUT /api/settings',
+            'GET /api/profile',
             'GET /api/social/users?q=term',
             'GET /api/social/posts'
         ],

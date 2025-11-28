@@ -153,3 +153,45 @@ export interface ChatbotTrainerProfile {
     voice: string;
 }
 
+export type ProfileWorkoutState = 'worked' | 'rest' | 'future';
+
+export interface ProfileWorkoutDay {
+    date: string;
+    state: ProfileWorkoutState;
+    isCurrent: boolean;
+}
+
+export interface ProfileAchievement {
+    id: string;
+    title: string;
+    sub: string;
+    emoji: string;
+}
+
+export interface ProfileResponse {
+    user: {
+        preferredName: string | null;
+        avatarUrl: string | null;
+        bio: string | null;
+        trainer: boolean | null;
+        streakDays: number;
+    };
+    achievements: ProfileAchievement[];
+    workoutGrid: ProfileWorkoutDay[][];
+}
+
+export interface AchievementListResponse {
+    achievements: ProfileAchievement[];
+}
+
+export interface WorkoutHistoryEntry {
+    id: string;
+    title: string;
+    from: string; // ISO date string
+    to: string | null; // ISO date string
+}
+
+export interface WorkoutHistoryResponse {
+    workouts: WorkoutHistoryEntry[];
+}
+
