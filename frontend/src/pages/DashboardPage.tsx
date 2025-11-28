@@ -114,103 +114,144 @@ export default function DashboardPage() {
   };
 
   return (
-    <>
+    <div className="w-full max-w-lg md:max-w-4xl lg:max-w-6xl mx-auto p-6 pb-24 space-y-8 md:space-y-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6">
       {/* Header */}
-      <header className="flex items-start justify-between">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight">
+      <header className="space-y-1 md:col-span-2 lg:col-span-3">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold tracking-tight">
             Hi, {firstName}!
           </h1>
-          <p className="text-sm text-muted-foreground">{today}</p>
+          <SettingsButton />
         </div>
-        <SettingsButton />
+        <p className="text-muted-foreground">
+          {today} &bull; Let's keep up the momentum.
+        </p>
       </header>
 
-      <Separator className="my-4" />
+      <div className="md:col-span-2 lg:col-span-3">
+        <Separator />
+      </div>
 
-      {/* To your goal */}
-      <section className="space-y-3">
-        <h2 className="text-xl font-semibold">To your goal:</h2>
-        <GoalRow
-          label="Workouts completed"
-          value={goal.workoutsCompleted.current}
-          target={goal.workoutsCompleted.target}
-        />
-        <GoalRow
-          label="New exercises discovered"
-          value={goal.exercisesDiscovered.current}
-          target={goal.exercisesDiscovered.target}
-        />
-        <GoalRow
-          label="Longest streak"
-          value={goal.longestStreak.current}
-          target={goal.longestStreak.target}
-        />
+      {/* Goal Section */}
+      <section>
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg">Weekly Goals</CardTitle>
+              <span className="text-sm text-muted-foreground">Progress</span>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <GoalRow
+              label="Workouts completed"
+              value={goal.workoutsCompleted.current}
+              target={goal.workoutsCompleted.target}
+            />
+            <GoalRow
+              label="Exercises discovered"
+              value={goal.exercisesDiscovered.current}
+              target={goal.exercisesDiscovered.target}
+            />
+            <GoalRow
+              label="Longest streak"
+              value={goal.longestStreak.current}
+              target={goal.longestStreak.target}
+            />
+          </CardContent>
+        </Card>
       </section>
 
       {/* Mood + Next workout */}
-      <section className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <section className="grid grid-cols-2 gap-4 md:flex md:flex-col md:h-full">
         <Card
-          className="bg-zinc-200/40 hover:bg-zinc-200/80 border-0 cursor-pointer transition-colors"
+          className="cursor-pointer transition-all hover:bg-accent hover:text-accent-foreground py-4 gap-2 md:flex-1 md:justify-center"
           onClick={() => navigate("/mood")}
         >
-          <CardHeader>
-            <CardTitle className="text-2xl">Mood</CardTitle>
+          <CardHeader className="pb-0 px-4 flex flex-col items-center">
+            <CardTitle className="text-base font-medium">Mood</CardTitle>
           </CardHeader>
-
-          <CardContent className="flex items-center justify-center py-4">
-            <div className="text-6xl">
+          <CardContent className="flex flex-col items-center justify-center pb-2 px-4">
+            <div className="text-4xl mb-2">
               {(() => {
                 const key = localStorage.getItem(
                   "currentMood_v1"
                 ) as MoodKey | null;
-                if (!key || !(key in MOODS)) return "😣"; // fallback
+                if (!key || !(key in MOODS)) return "😣";
                 return MOODS[key];
               })()}
             </div>
+            <p className="text-[10px] text-muted-foreground text-center">
+              How are you feeling?
+            </p>
           </CardContent>
         </Card>
 
         <Card
-          className="bg-zinc-200/40 hover:bg-zinc-200/80 border-0 cursor-pointer transition-colors"
+          className="cursor-pointer transition-all hover:bg-accent hover:text-accent-foreground py-4 gap-2 md:flex-1 md:justify-center"
           onClick={() => navigate("/workout/exercise")}
         >
-          <CardHeader>
-            <CardTitle className="text-2xl">Next Workout</CardTitle>
+          <CardHeader className="pb-0 px-4 flex flex-col items-center">
+            <CardTitle className="text-base font-medium text-center">
+              Next Workout
+            </CardTitle>
           </CardHeader>
-          <CardContent className="flex items-center justify-center py-4">
-            <div className="text-6xl">🏋️‍♂️</div>
+          <CardContent className="flex flex-col items-center justify-center pb-2 px-4">
+            <div className="text-4xl mb-2">🏋️‍♂️</div>
+            <p className="text-[10px] text-muted-foreground text-center">
+              Ready to sweat?
+            </p>
           </CardContent>
         </Card>
       </section>
 
-      <p className="mt-3 text-[15px] text-amber-600">Need help calming down?</p>
-
       {/* Streak + Level */}
-      <section className="mt-6 space-y-3">
-        <h2 className="text-3xl font-semibold">Streak: 20 days</h2>
-
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Current level:</span>
-          <span className="text-sm font-medium">{level.label}</span>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Progress
-            value={(level.currentXp / level.nextLevelXp) * 100}
-            className="h-4 flex-1 rounded-full"
-          />
-          <span className="w-24 text-right text-xs text-muted-foreground">
-            {level.currentXp}/{level.nextLevelXp}
-          </span>
-        </div>
+      <section>
+        <Card>
+          <CardHeader className="pb-0">
+            <div className="flex flex-col gap-1">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Current Streak
+              </CardTitle>
+              <span className="text-3xl font-bold">20 Days</span>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">
+                  Level:{" "}
+                  <span className="font-medium text-foreground">
+                    {level.label}
+                  </span>
+                </span>
+                <span className="text-muted-foreground">
+                  {level.currentXp} / {level.nextLevelXp} XP
+                </span>
+              </div>
+              <Progress
+                value={(level.currentXp / level.nextLevelXp) * 100}
+                className="h-2"
+              />
+            </div>
+          </CardContent>
+        </Card>
       </section>
 
       {/* Achievements */}
-      <section className="mt-5">
-        <h3 className="mb-3 text-lg font-semibold">Achievements:</h3>
+      <section className="space-y-4 lg:col-span-2">
+        <div className="flex items-center justify-between px-1">
+          <h3 className="text-lg font-semibold">Achievements</h3>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 text-xs"
+            onClick={() => navigate("/achievements")}
+          >
+            View All
+          </Button>
+        </div>
         <AchievementList />
-        <div className="mt-2 flex items-center justify-center gap-2">
+        <div className="mt-4 flex items-center justify-center gap-2">
           <Dot active />
           <Dot />
           <Dot />
@@ -218,24 +259,30 @@ export default function DashboardPage() {
       </section>
 
       {/* Advice */}
-      <section className="mt-6">
-        <Card className="bg-zinc-200/40 hover:scale-none w-full max-w-full">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg">Advice</CardTitle>
-            <button
-              aria-label="Next tip"
-              className="rounded-full p-1 text-muted-foreground hover:bg-accent active:rotate-90 "
+      <section className="md:col-span-2 lg:col-span-1">
+        <Card className="bg-primary/5 border-primary/10 hover:scale-none">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-base font-medium text-primary">
+              Daily Tip
+            </CardTitle>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-full"
               onClick={showNextTip}
             >
               <RefreshCcw className="h-4 w-4" />
-            </button>
+              <span className="sr-only">Next tip</span>
+            </Button>
           </CardHeader>
-          <CardContent className="text-base break-words whitespace-normal">
-            {currentTip}
+          <CardContent>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              {currentTip}
+            </p>
           </CardContent>
         </Card>
       </section>
-    </>
+    </div>
   );
 }
 

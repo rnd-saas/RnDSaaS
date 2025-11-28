@@ -285,7 +285,7 @@ export default function ActiveWorkoutPage() {
         </div>
         {workoutContentBlock}
       </div>
-      <div className="sticky bottom-0 w-full bg-background/50 my-5 flex justify-center">
+      <div className="sticky bottom-2 mt-9 w-full bg-background/50 flex justify-center">
         <div className="mx-auto w-4/5 flex items-center justify-center gap-4 max-w-[728px]">
           {isRunning ? (
             <>

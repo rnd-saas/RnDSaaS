@@ -26,7 +26,7 @@ const NAV_ITEMS: NavItem[] = [
 export function BottomNav() {
   return (
     <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-border/40 bg-background/80 backdrop-blur-md shadow-[0_-1px_3px_rgba(0,0,0,0.05)] supports-[backdrop-filter]:bg-background/60">
-      <div className="mx-auto flex max-w-screen-sm items-center justify-around px-6 py-1">
+      <div className="mx-auto flex max-w-screen-sm items-center justify-around px-6 py-2">
         {NAV_ITEMS.map((item) => (
           <NavTab key={item.to} {...item} />
         ))}
@@ -42,7 +42,7 @@ function NavTab({ to, icon: Icon, end, description }: NavItem) {
         <Button
           variant={isActive ? "default" : "ghost"}
           size="icon"
-          className={`h-8 w-8 rounded-2xl flex items-center justify-center ${
+          className={`h-7 w-7 rounded-2xl flex items-center justify-center ${
             isActive ? "" : "text-zinc-500"
           }`}
           aria-current={isActive ? "page" : undefined}
