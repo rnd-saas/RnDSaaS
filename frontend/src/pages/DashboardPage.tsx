@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { RefreshCcw } from "lucide-react";
-import {useLocation, useNavigate} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
@@ -56,7 +56,7 @@ const ADVICE_TIPS: string[] = [
   "Put your next workout clothes out in advance.",
   "Drink a glass of water with each meal.",
   "End your day with one positive reflection.",
-  "Remind yourself why you started this journey."
+  "Remind yourself why you started this journey.",
 ];
 
 const MOODS = {
@@ -69,8 +69,6 @@ const MOODS = {
 };
 
 type MoodKey = keyof typeof MOODS;
-
-
 
 /**
  * Pure UI mock: no data fetching yet.
@@ -103,24 +101,24 @@ export default function DashboardPage() {
 
   const navigate = useNavigate();
 
-   // ---------- advice tip state ----------
-   const [tipIndex, setTipIndex] = useState(
-    () => Math.floor(Math.random() * ADVICE_TIPS.length)
+  // ---------- advice tip state ----------
+  const [tipIndex, setTipIndex] = useState(() =>
+    Math.floor(Math.random() * ADVICE_TIPS.length)
   );
-   const currentTip = ADVICE_TIPS[tipIndex];
+  const currentTip = ADVICE_TIPS[tipIndex];
 
-   const showNextTip = () => {
-     setTipIndex((prev) => (prev + 1) % ADVICE_TIPS.length);
-   };
-
-
+  const showNextTip = () => {
+    setTipIndex((prev) => (prev + 1) % ADVICE_TIPS.length);
+  };
 
   return (
     <>
       {/* Header */}
       <header className="flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Hi, {firstName}!</h1>
+          <h1 className="text-3xl font-semibold tracking-tight">
+            Hi, {firstName}!
+          </h1>
           <p className="text-sm text-muted-foreground">{today}</p>
         </div>
         <button
@@ -134,16 +132,28 @@ export default function DashboardPage() {
 
       <Separator className="my-4" />
 
-        {/* To your goal */}
-        <section className="space-y-3">
-          <h2 className="text-xl font-semibold">To your goal:</h2>
-          <GoalRow label="Workouts completed" value={goal.workoutsCompleted.current} target={goal.workoutsCompleted.target} />
-          <GoalRow label="New exercises discovered" value={goal.exercisesDiscovered.current} target={goal.exercisesDiscovered.target} />
-          <GoalRow label="Longest streak" value={goal.longestStreak.current} target={goal.longestStreak.target} />
-        </section>
+      {/* To your goal */}
+      <section className="space-y-3">
+        <h2 className="text-xl font-semibold">To your goal:</h2>
+        <GoalRow
+          label="Workouts completed"
+          value={goal.workoutsCompleted.current}
+          target={goal.workoutsCompleted.target}
+        />
+        <GoalRow
+          label="New exercises discovered"
+          value={goal.exercisesDiscovered.current}
+          target={goal.exercisesDiscovered.target}
+        />
+        <GoalRow
+          label="Longest streak"
+          value={goal.longestStreak.current}
+          target={goal.longestStreak.target}
+        />
+      </section>
 
-        {/* Mood + Next workout */}
-        <section className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      {/* Mood + Next workout */}
+      <section className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Card
           className="bg-muted/40 cursor-pointer hover:bg-accent/30 transition-colors"
           onClick={() => navigate("/mood")}
@@ -155,15 +165,15 @@ export default function DashboardPage() {
           <CardContent className="flex items-center justify-center py-4">
             <div className="text-6xl">
               {(() => {
-                const key = localStorage.getItem("currentMood_v1") as MoodKey | null;
+                const key = localStorage.getItem(
+                  "currentMood_v1"
+                ) as MoodKey | null;
                 if (!key || !(key in MOODS)) return "😣"; // fallback
                 return MOODS[key];
               })()}
             </div>
           </CardContent>
         </Card>
-
-
 
         <Card
           className="bg-muted/40 cursor-pointer hover:bg-accent/30 transition-colors"
@@ -176,43 +186,42 @@ export default function DashboardPage() {
             <div className="text-6xl">🏋️‍♂️</div>
           </CardContent>
         </Card>
+      </section>
 
-        </section>
+      <p className="mt-3 text-[15px] text-amber-600">Need help calming down?</p>
 
-        <p className="mt-3 text-[15px] text-amber-600">Need help calming down?</p>
+      {/* Streak + Level */}
+      <section className="mt-6 space-y-3">
+        <h2 className="text-3xl font-semibold">Streak: 20 days</h2>
 
-        {/* Streak + Level */}
-        <section className="mt-6 space-y-3">
-          <h2 className="text-3xl font-semibold">Streak: 20 days</h2>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">Current level:</span>
+          <span className="text-sm font-medium">{level.label}</span>
+        </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-base text-muted-foreground">Current level:</span>
-            <span className="text-base font-medium">{level.label}</span>
-          </div>
+        <div className="flex items-center gap-3">
+          <Progress
+            value={(level.currentXp / level.nextLevelXp) * 100}
+            className="h-4 flex-1 rounded-full"
+          />
+          <span className="w-24 text-right text-xs text-muted-foreground">
+            {level.currentXp}/{level.nextLevelXp}
+          </span>
+        </div>
+      </section>
 
-          <div className="flex items-center gap-3">
-            <Progress
-              value={(level.currentXp / level.nextLevelXp) * 100}
-              className="h-4 flex-1 rounded-full"
-            />
-            <span className="w-24 text-right text-sm text-muted-foreground">
-              {level.currentXp}/{level.nextLevelXp}
-            </span>
-          </div>
-        </section>
+      {/* Achievements */}
+      <section className="mt-5">
+        <h3 className="mb-3 text-lg font-semibold">Achievements:</h3>
+        <AchievementList />
+        <div className="mt-2 flex items-center justify-center gap-2">
+          <Dot active />
+          <Dot />
+          <Dot />
+        </div>
+      </section>
 
-        {/* Achievements */}
-        <section className="mt-5">
-          <h3 className="mb-3 text-lg font-semibold">Achievements:</h3>
-          <AchievementList/>
-          <div className="mt-2 flex items-center justify-center gap-2">
-            <Dot active />
-            <Dot />
-            <Dot />
-          </div>
-        </section>
-
-        {/* Advice */}
+      {/* Advice */}
       <section className="mt-6">
         <Card className="bg-muted/40 w-full max-w-full">
           <CardHeader className="flex flex-row items-center justify-between">
@@ -236,12 +245,22 @@ export default function DashboardPage() {
 
 /* ---------- Small bits ---------- */
 
-export function GoalRow({ label, value, target }: { label: string; value: number; target: number }) {
+export function GoalRow({
+  label,
+  value,
+  target,
+}: {
+  label: string;
+  value: number;
+  target: number;
+}) {
   const pct = Math.max(0, Math.min(100, (value / target) * 100));
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between text-[15px]">
-        <span className="list-item ml-6 list-disc marker:text-foreground/80">{label}:</span>
+        <span className="list-item ml-6 list-disc marker:text-foreground/80">
+          {label}:
+        </span>
         <span className="tabular-nums">{value}</span>
       </div>
       <Progress value={pct} className="h-2 rounded-full" />
