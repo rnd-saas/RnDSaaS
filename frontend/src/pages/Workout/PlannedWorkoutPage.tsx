@@ -59,7 +59,7 @@ export default function WorkoutPage() {
 
   return (
     <div className="w-full min-h-screen flex flex-col bg-(--basic-colours-zinc-50)">
-      <div className="flex-1 flex flex-col gap-[30px] items-center">
+      <div className="flex-1 flex flex-col gap-[30px] items-center pb-18">
         <div className="sticky top-0 z-20 w-full bg-(--basic-colours-zinc-50)/95 backdrop-blur supports-[backdrop-filter]:bg-(--basic-colours-zinc-50)/80">
           <div className="flex flex-col gap-2 lg:gap-0 items-center mt-4 min-w-[60%]">
             <h3 className="h3-styles text-base font-bold">
@@ -94,7 +94,7 @@ export default function WorkoutPage() {
         </div>
         {workoutContentBlock}
       </div>
-      <div className="sticky bottom-0 w-full bg-background/50 py-4 flex justify-center">
+      <div className="sticky bottom-12 z-20 w-full flex justify-center bg-background/50 backdrop-blur-sm">
         <div className="mx-auto w-4/5 flex items-center justify-center gap-4 max-w-[728px]">
           {/* IMPORTANT: BUTTON WILL ONLY START TODAY'S WORKOUT... TODO: IF TODAY DOESN'T HAVE A WORKOUT, NOTHING WILL HAPPEN...!  */}
           <Button
