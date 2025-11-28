@@ -1,10 +1,12 @@
 import { useMemo, useState } from "react";
-import { RefreshCcw } from "lucide-react";
+import {RefreshCcw, Settings} from "lucide-react";
 import {useLocation, useNavigate} from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import AchievementList from "@/pages/Profile/ProfileComponents/AchievementList.tsx";
+import {Button} from "@/components/ui/button.tsx";
+import SettingsButton from "@/components/settingsButton.tsx";
 
 const ADVICE_TIPS: string[] = [
   "Fill half your plate with colorful vegetables.",
@@ -123,13 +125,7 @@ export default function DashboardPage() {
           <h1 className="text-3xl font-semibold tracking-tight">Hi, {firstName}!</h1>
           <p className="text-sm text-muted-foreground">{today}</p>
         </div>
-        <button
-          aria-label="Settings"
-          className="rounded-full border p-2 text-muted-foreground hover:bg-accent"
-          onClick={() => navigate("/settings")}
-        >
-          ⚙️
-        </button>
+        <SettingsButton/>
       </header>
 
       <Separator className="my-4" />
