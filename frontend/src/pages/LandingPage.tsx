@@ -30,7 +30,7 @@ export default function LandingPage() {
   const name = trainerId === 1 ? "Sarah" : "Tom";
 
   return (
-    <div className="min-h-[100dvh] flex flex-col items-center justify-between bg-[#F6FAF8] px-6 py-10">
+    <div className="min-h-[100dvh] flex flex-col items-center justify-between px-6 py-10">
       {/* Top greeting */}
       <header className="mt-4 text-center">
         <h1 className="text-4xl font-bold tracking-tight">Hi, {firstName} !</h1>

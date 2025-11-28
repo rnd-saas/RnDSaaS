@@ -139,7 +139,7 @@ export default function OnboardingManager() {
             localStorage.setItem("trainerId", String(trainerId)); // fallback for refresh/direct visit
             localStorage.setItem("firstName", firstName);
           } catch {}
-          navigate("/landing", { state: { trainerId, firstName } });
+          navigate("/landing");
     }
 
     return (

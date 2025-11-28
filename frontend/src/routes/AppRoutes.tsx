@@ -12,8 +12,8 @@ import ProfilePage from "@/pages/Profile/ProfilePage.tsx";
 import ProgressPage from "@/pages/Progress/ProgressPage.tsx";
 import SocialPage from "@/pages/Social/SocialPage.tsx";
 import MoodPage from "@/pages/Mood/MoodPage";
-import CalendarPage from "@/pages/CalendarPage.tsx";
-import AchievementPage from "@/pages/AchievementPage.tsx";
+import CalendarPage from "@/pages/Profile/CalendarPage.tsx";
+import AchievementPage from "@/pages/Profile/AchievementPage.tsx";
 import OnboardingInvitePage from "@/pages/Onboarding/OnboardingInvitePage.tsx";
 
 import PlannedWorkoutPage from "@/pages/Workout/PlannedWorkoutPage.tsx";

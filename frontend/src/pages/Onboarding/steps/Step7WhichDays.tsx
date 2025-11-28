@@ -4,7 +4,7 @@ import {Controller, useFormContext} from "react-hook-form";
 import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
 
 export default function Step7WhichDays() {
-    const { control } = useFormContext<Inputs>();
+    const { control, getValues } = useFormContext<Inputs>();
     const dayOptions = [
         { id: "monday", label: "Monday", value: "0" },
         { id: "tuesday", label: "Tuesday", value: "1" },
@@ -14,7 +14,7 @@ export default function Step7WhichDays() {
         { id: "saturday", label: "Saturday", value: "5" },
         { id: "sunday", label: "Sunday", value: "6" },
     ];
-
+    const minDays = Number(getValues("strDaysPerWeek"))|| 1;
     return (
         <FieldGroup>
             <FieldSet>
@@ -24,7 +24,12 @@ export default function Step7WhichDays() {
                 <FieldDescription>
                     Which days of the week are you available to train most often?<br/>(multiple options possible)
                 </FieldDescription>
-                <Controller name="strAvailableDays" control={control} defaultValue={[]} rules={{ required: "Please select at least one day" }}
+                <Controller name="strAvailableDays" control={control} defaultValue={[]}
+                    rules={{
+                        validate: (value: string[]) => {
+                            return value.length >= minDays || `Please select at least ${minDays} days`;
+                        }
+                    }}
                     render={({ field }) => {
                         const selected = field.value || [];
                         const toggleValue = (val: string) => {

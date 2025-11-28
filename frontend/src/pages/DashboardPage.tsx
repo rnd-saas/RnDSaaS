@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import AchievementList from "@/pages/Profile/ProfileComponents/AchievementList.tsx";
+import SettingsButton from "@/components/settingsButton.tsx";
 
 const ADVICE_TIPS: string[] = [
   "Fill half your plate with colorful vegetables.",
@@ -122,13 +123,7 @@ export default function DashboardPage() {
           </h1>
           <p className="text-sm text-muted-foreground">{today}</p>
         </div>
-        <button
-          aria-label="Settings"
-          className="rounded-full border p-2 text-muted-foreground hover:bg-accent"
-          onClick={() => navigate("/settings")}
-        >
-          ⚙️
-        </button>
+        <SettingsButton />
       </header>
 
       <Separator className="my-4" />

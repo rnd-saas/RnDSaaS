@@ -6,6 +6,7 @@ import WorkoutDisplay from "@/pages/Profile/ProfileComponents/WorkoutDisplay.tsx
 import AchievementList from "@/pages/Profile/ProfileComponents/AchievementList.tsx";
 import {Label} from "@/components/ui/label.tsx";
 import {Button} from "@/components/ui/button.tsx";
+import SettingsButton from "@/components/settingsButton.tsx";
 
 export default function ProfilePage() {
     const navigate = useNavigate();
@@ -18,16 +19,24 @@ export default function ProfilePage() {
 
     return (
         <div className="w-full max-w-lg min-h-[75vh] min-w-[30vw] flex flex-col items-center space-y-6">
-            <Avatar className="w-32 h-32">
-                <AvatarImage src={avatarPlaceholder} />
-                <AvatarFallback className="text-3xl">CN</AvatarFallback>
-            </Avatar>
-            <h2 className="text-3xl font-semibold tracking-tight">{userName}</h2>
+                <header className="flex items-start justify-between">
+                    <div>
+                        <Avatar className="w-32 h-32">
+                            <AvatarImage src={avatarPlaceholder}/>
+                            <AvatarFallback className="text-3xl">CN</AvatarFallback>
+                        </Avatar>
+                        <h2 className="text-3xl font-semibold tracking-tight">{userName}</h2>
+                    </div>
+                    <div className="absolute top-4 right-4">
+                        <SettingsButton/>
+                    </div>
+                </header>
+
             <main>
                 {profileComponents.map((g) => (
                     <div className={"mb-10"}>
                         <Label className={"my-5"}>{g.label}</Label>
-                        <g.component />
+                        <g.component/>
                         <Button variant={"outline"} className={"h-6 w-full my-4 p-4"} onClick={() => navigate(g.destination)}>{g.buttonText}</Button>
                     </div>
                 ))}
