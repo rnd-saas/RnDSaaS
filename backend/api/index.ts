@@ -1,7 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import serverless from 'serverless-http';
 
-// 延迟加载 Express 应用，避免冷启动时的阻塞
 let app: any = null;
 let appLoadError: Error | null = null;
 
@@ -10,16 +8,8 @@ async function getApp() {
     if (appLoadError) throw appLoadError;
 
     try {
-        console.log('Loading Express app...');
-        const startTime = Date.now();
-        
-        // 动态导入，避免阻塞
         const { default: expressApp } = await import('../src/app');
         app = expressApp;
-        
-        const loadTime = Date.now() - startTime;
-        console.log(`Express app loaded successfully in ${loadTime}ms`);
-        
         return app;
     } catch (error) {
         console.error('Failed to load Express app:', error);
@@ -28,11 +18,8 @@ async function getApp() {
     }
 }
 
-// 创建 serverless handler，但添加超时保护
 const createHandler = () => {
     return async (req: VercelRequest, res: VercelResponse) => {
-        const startTime = Date.now();
-        
         try {
             const urlPath = (req.url || '').split('?')[0];
 
@@ -58,17 +45,43 @@ const createHandler = () => {
             }
 
             const expressApp = await getApp();
-            const handler = serverless(expressApp);
-            
-            const loadTime = Date.now() - startTime;
-            console.log(`Request processed in ${loadTime}ms`);
-            
-            return handler(req, res);
+
+            await new Promise<void>((resolve, reject) => {
+                const cleanup = () => {
+                    res.off('finish', onFinish);
+                    res.off('close', onClose);
+                    res.off('error', onError);
+                };
+
+                const onFinish = () => {
+                    cleanup();
+                    resolve();
+                };
+                const onClose = () => {
+                    cleanup();
+                    resolve();
+                };
+                const onError = (err: Error) => {
+                    cleanup();
+                    reject(err);
+                };
+
+                res.on('finish', onFinish);
+                res.on('close', onClose);
+                res.on('error', onError);
+
+                try {
+                    expressApp(req, res);
+                } catch (err) {
+                    cleanup();
+                    reject(err as Error);
+                }
+            });
+
+            return;
             
         } catch (error) {
             console.error('Handler error:', error);
-            
-            // 如果应用加载失败，返回降级响应
             res.status(500).json({
                 error: 'Service temporarily unavailable',
                 message: 'Failed to initialize application',

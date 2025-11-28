@@ -34,9 +34,9 @@ type DashboardResponse = {
 };
 
 const DEFAULT_ACHIEVEMENTS = [
-    { id: 'workouts-100', title: '100 Workouts', sub: 'Completed', emoji: '💪' },
-    { id: 'streak-7', title: '7 Days', sub: 'Streak', emoji: '📆' },
-    { id: 'consecutive-12', title: 'Consecutive', sub: 'Workout 12', emoji: '🔥' }
+        { id: 'workouts-100', title: '100 Workouts', sub: 'Completed', emoji: '💪' },
+        { id: 'streak-7', title: '7 Days', sub: 'Streak', emoji: '📆' },
+        { id: 'consecutive-12', title: 'Consecutive', sub: 'Workout 12', emoji: '🔥' }
 ];
 
 const WORKOUT_TARGET = 100;
@@ -69,9 +69,9 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
             nextPlanResult
         ] = await Promise.all([
             supabase
-                .from('user_info')
-                .select('preferred_name, trainer')
-                .eq('user_id', userId)
+            .from('user_info')
+            .select('preferred_name, trainer')
+            .eq('user_id', userId)
                 .maybeSingle(),
             supabase
                 .from('workouts')

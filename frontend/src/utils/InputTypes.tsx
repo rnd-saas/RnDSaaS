@@ -27,10 +27,21 @@ export const PreferredSplitValues = {
 export type PreferredSplit = typeof PreferredSplitValues[keyof typeof PreferredSplitValues];
 
 export const GymComfortLevelValues = {
-    Anxious: "anxious",
+    Interested: "interested",
+    Distressed: "distressed",
+    Excited: "excited",
+    Upset: "upset",
+    Strong: "strong",
+    Guilty: "guilty",
+    Scared: "scared",
+    Hostile: "hostile",
+    Enthusiastic: "enthusiastic",
+    Proud: "proud",
+    Irritable: "irritable",
+    Alert: "alert",
+    Ashamed: "ashamed",
+    Inspired: "inspired",
     Nervous: "nervous",
-    Fine: "fine",
-    Comfortable: "comfortable",
-    NeverBeen: "never-been"
+    Determined: "determined"
 } as const;
 export type GymComfortLevel = typeof GymComfortLevelValues[keyof typeof GymComfortLevelValues];

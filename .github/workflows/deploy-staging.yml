@@ -3,7 +3,7 @@ name: Deploy Staging
 on:
   push:
     branches:
-      - vercel-cor308-1
+      - deploy_dbFix
 
 jobs:
   deploy:

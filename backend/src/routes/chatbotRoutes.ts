@@ -87,8 +87,14 @@ router.get('/profile', requireAuth, async (req: AuthedRequest, res) => {
             });
         }
 
+        console.log('[chatbot] Loading trainer profile for user', userId);
         const trainerId = await determineTrainerId(userId);
         const persona = resolvePersona(trainerId);
+        console.log('[chatbot] Resolved trainer profile', {
+            userId,
+            trainerId: persona.id,
+            avatarKey: persona.avatarKey
+        });
 
         return res.json({
             trainerId: persona.id,
@@ -125,10 +131,13 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
         });
     }
 
+    console.log('[chatbot] Incoming conversation for user', userId);
     const resolvedTrainerId = await determineTrainerId(userId);
+    console.log('[chatbot] Default trainer from DB', resolvedTrainerId);
     const requestedTrainerId = parseResult.data.trainerId ?? resolvedTrainerId;
     const { messages, metadata } = parseResult.data;
     const persona = resolvePersona(requestedTrainerId);
+    console.log('[chatbot] Using persona', persona.name, '(', persona.id, ')');
     const normalizedMessages = normalizeMessages(messages);
 
     const onboardingSummary =
@@ -187,6 +196,7 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
                 metadata?.language
             )
         };
+        console.warn('[chatbot] Falling back to canned response for user', userId);
     }
 
     return res.json({
@@ -202,14 +212,18 @@ function resolvePersona(trainerId: number): TrainerPersona {
 
 async function determineTrainerId(userId: string): Promise<number> {
     try {
+        const start = Date.now();
         const { data: userInfo, error } = await supabase
             .from('user_info')
             .select('trainer')
             .eq('user_id', userId)
             .maybeSingle();
+        console.log('[chatbot] user_info trainer lookup duration', Date.now() - start, 'ms');
 
         if (!error && userInfo && typeof userInfo.trainer === 'boolean') {
-            return userInfo.trainer ? 1 : 0;
+            const trainerId = userInfo.trainer ? 1 : 0;
+            console.log('[chatbot] user_info trainer match', trainerId);
+            return trainerId;
         }
     } catch (err) {
         console.warn('Unable to read trainer from user_info:', err);
@@ -223,12 +237,15 @@ async function determineTrainerId(userId: string): Promise<number> {
             .maybeSingle();
 
         if (!settingsError && userSettings && typeof userSettings.trainer === 'number') {
-            return userSettings.trainer === 1 ? 1 : 0;
+            const trainerId = userSettings.trainer === 1 ? 1 : 0;
+            console.log('[chatbot] user_settings trainer match', trainerId);
+            return trainerId;
         }
     } catch (err) {
         console.warn('Unable to read trainer from user_settings:', err);
     }
 
+    console.log('[chatbot] Falling back to default trainer');
     return 0;
 }
 

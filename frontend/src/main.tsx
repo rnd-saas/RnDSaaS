@@ -7,7 +7,6 @@ import { Toaster } from "sonner"
 
 // Initialize Google Analytics
 initAnalytics();
-
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />

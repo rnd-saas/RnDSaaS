@@ -90,6 +90,12 @@
   --color-grey-background: var(--basic-colours-zinc-100);
   --color-grey-text: var(--basic-colours-zinc-700);
   --color-text: var(--basic-colours-green-950);
+  --intuitive-names-app-background: var(--color-background);
+  --intuitive-names-app-primary: var(--color-primary);
+  --intuitive-names-grey-background: var(--color-grey-background);
+  --intuitive-names-grey-text: var(--color-grey-text);
+  --intuitive-names-secondary-text: var(--basic-colours-zinc-600);
+  --intuitive-names-error-message: var(--color-error-message);
   --shawdow-card: 0px 4px 9.899999618530273px 0px rgba(228, 228, 231, 1);
   --typography-size-2xl: 32px;
   --typography-size-base: 14px;

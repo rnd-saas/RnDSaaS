@@ -17,17 +17,22 @@ export async function requireAuth(
         const token = authHeader?.replace('Bearer ', '');
 
         if (!token) {
+            console.warn('[auth] Missing access token for request', req.path);
             return res.status(401).json({
                 error: { message: 'Missing access token' }
             });
         }
 
+        const start = Date.now();
+        console.log('[auth] Verifying token for request', req.path);
         const {
             data: { user },
             error
         } = await supabase.auth.getUser(token);
+        console.log('[auth] Verification completed in', Date.now() - start, 'ms');
 
         if (error || !user) {
+            console.warn('[auth] Invalid or expired token detected', error?.message);
             return res.status(401).json({
                 error: { message: 'Invalid or expired token' }
             });

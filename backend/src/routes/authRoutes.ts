@@ -4,8 +4,9 @@
  */
 
 import { Router } from 'express';
-import { supabase } from '../db/supabase';
+import { supabase, supabaseAuth } from '../db/supabase';
 import { requireAuth } from '../middleware/requireAuth';
+import withTimeout from '../utils/withTimeout';
 
 const router = Router();
 
@@ -23,11 +24,26 @@ router.post('/login', async (req, res) => {
             });
         }
 
-        // Authenticate user using Supabase Auth
-        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
+        let authData: any = null;
+        let authError: any = null;
+        try {
+            const result = await withTimeout(
+                new Promise<any>(async (resolve, reject) => {
+                    try {
+                        const r = await supabaseAuth.auth.signInWithPassword({ email, password });
+                        resolve(r);
+                    } catch (e) {
+                        reject(e);
+                    }
+                }),
+                8000
+            );
+            authData = result.data;
+            authError = result.error;
+        } catch (err: any) {
+            console.error('[auth:login] signInWithPassword error or timeout', err?.message || err);
+            return res.status(502).json({ error: { message: 'Authentication upstream failed or timed out' } });
+        }
 
         if (authError) {
             console.error('Login auth error:', authError);
@@ -67,25 +83,58 @@ router.post('/login', async (req, res) => {
         }
 
         // Get user details from users table
-        const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', authData.user.id)
-            .single();
+        let userData: any = null;
+        let userError: any = null;
+        try {
+            const result = await withTimeout(
+                new Promise<any>(async (resolve, reject) => {
+                    try {
+                        const r = await supabase.from('users').select('*').eq('id', authData.user.id).single();
+                        resolve(r);
+                    } catch (e) {
+                        reject(e);
+                    }
+                }),
+                6000
+            );
+            userData = result.data;
+            userError = result.error;
+        } catch (err: any) {
+            console.error('[auth:login] users table query error or timeout', err?.message || err);
+            // fallback to creating a user record below if needed
+            userData = null;
+            userError = { message: 'users query failed or timed out' };
+        }
 
         if (userError || !userData) {
             // Create a record in users table if it doesn't exist
-            const { data: newUser, error: createError } = await supabase
-                .from('users')
-                .insert([{
-                    id: authData.user.id,
-                    username: authData.user.email?.split('@')[0] || 'user',
-                    display_name: authData.user.user_metadata?.display_name || authData.user.email || 'User'
-                }])
-                .select()
-                .single();
+            let newUser: any = null;
+            let createError: any = null;
+            try {
+                const result = await withTimeout(
+                    new Promise<any>(async (resolve, reject) => {
+                        try {
+                            const r = await supabase.from('users').insert([{
+                                id: authData.user.id,
+                                username: authData.user.email?.split('@')[0] || 'user',
+                                display_name: authData.user.user_metadata?.display_name || authData.user.email || 'User'
+                            }]).select().single();
+                            resolve(r);
+                        } catch (e) {
+                            reject(e);
+                        }
+                    }),
+                    6000
+                );
+                newUser = result.data;
+                createError = result.error;
+            } catch (err: any) {
+                console.error('[auth:login] create users record error or timeout', err?.message || err);
+                createError = { message: 'create users failed or timed out' };
+            }
 
             if (createError || !newUser) {
+                console.error('[auth:login] failed to create fallback user record', createError);
                 return res.status(500).json({ 
                     error: { message: 'Failed to create user profile' } 
                 });
@@ -122,20 +171,17 @@ router.post('/login', async (req, res) => {
  */
 router.post('/register', async (req, res) => {
     try {
-        console.log('📝 Registration request received');
         const { email, password, username, display_name } = req.body;
 
         if (!email || !password) {
-            console.log('❌ Missing email or password');
             return res.status(400).json({ 
                 error: { message: 'Email and password are required' } 
             });
         }
 
-        console.log('🔐 Attempting to create user with Supabase Auth...');
         // Create user using Supabase Auth
         // Note: If email confirmation is enabled in Supabase, users need to verify their email before logging in
-        const { data: authData, error: authError } = await supabase.auth.signUp({
+        const { data: authData, error: authError } = await supabaseAuth.auth.signUp({
             email,
             password,
             options: {
@@ -169,12 +215,9 @@ router.post('/register', async (req, res) => {
             });
         }
 
-    console.log('✅ User created in Supabase Auth:', authData.user.id);
-
-    const session = authData.session;
+        const session = authData.session;
 
         // Create user record in users table
-        console.log('📊 Creating user profile in database...');
         const { data: userData, error: userError } = await supabase
             .from('users')
             .insert([{
@@ -207,8 +250,6 @@ router.post('/register', async (req, res) => {
                 message: 'Registration successful (profile creation pending)'
             });
         }
-
-        console.log('✅ User profile created successfully');
 
         // Check if email confirmation is needed
         const needsEmailConfirmation = !authData.session && authData.user && !authData.user.email_confirmed_at;
@@ -249,7 +290,7 @@ router.post('/logout', async (req, res) => {
         const token = authHeader?.replace('Bearer ', '');
 
         if (token) {
-            await supabase.auth.signOut();
+            await supabaseAuth.auth.signOut();
         }
 
         res.json({ message: 'Logout successful' });
