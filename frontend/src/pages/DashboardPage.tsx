@@ -298,7 +298,13 @@ export default function DashboardPage() {
           </Card>
         </section>
 
-        <p className="mt-3 text-[15px] text-amber-600">Need help calming down?</p>
+        <button
+          type="button"
+          onClick={() => navigate("/chatbot")}
+          className="mt-3 text-[15px] text-amber-600 underline-offset-4 hover:underline text-left"
+        >
+          Need help calming down?
+        </button>
 
         {/* Streak - Only show if streak_display is enabled */}
         {streakDisplay && (
