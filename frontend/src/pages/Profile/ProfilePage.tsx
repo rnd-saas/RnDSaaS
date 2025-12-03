@@ -80,7 +80,7 @@ export default function ProfilePage() {
         ))}
       </main>
 
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-14 right-6 z-50">
         <div className="shadow-lg rounded-full">
           <ChatbotButton variant={"default"} />
         </div>
