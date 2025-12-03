@@ -295,7 +295,7 @@ export default function WorkoutList({ exerciseId }: { exerciseId: string }) {
 
                     updateExerciseSet(exerciseId, setNumber, updatePayload);
 
-                    if (isChecked) {
+                    if (isChecked && loggedExercise?.restTimeSeconds !== 0) {
                       console.log(loggedExercise.exerciseInfo);
 
                       navigate(`${loggedExercise?.exerciseInfo!.slug}/rest`);
