@@ -49,8 +49,10 @@ export default function AppRoutes() {
         <Route path="/onboarding-invite" element={<OnboardingInvitePage />} />
         <Route path="/landing" element={<LandingPage />} />
         <Route path="/chatbot" element={<ChatbotPage />} />
-        <Route path="/workout/rest" element={<RestTimer />} />
-        <Route path="/workout/exercise" element={<WorkoutTimer />} />
+        <Route
+          path="/workout/:workoutId/:exerciseSlug/rest"
+          element={<RestTimer />}
+        />
         <Route path="/mood" element={<MoodPage />} />
         <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/achievements" element={<AchievementPage />} />

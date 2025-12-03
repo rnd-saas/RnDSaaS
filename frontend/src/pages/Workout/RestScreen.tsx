@@ -15,6 +15,7 @@ export default function RestScreen({
   onMinus,
   onPlus,
   onSkip,
+  onSwitchToExercise,
 }: RestScreenProps) {
   return (
     <>

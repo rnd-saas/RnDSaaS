@@ -13,13 +13,7 @@ export default function RestTimer() {
         (ex) => ex.exerciseInfo.slug === exerciseSlug
       )?.restTimeSeconds
   );
-  const [timeLeft, setTimeLeft] = useState(restTime ?? 45);
-
-  useEffect(() => {
-    if (restTime !== undefined && timeLeft === 45) {
-        setTimeLeft(restTime);
-    }
-  }, [restTime]);
+  const [timeLeft, setTimeLeft] = useState(restTime);
 
   useEffect(() => {
     if (timeLeft <= 0) {
