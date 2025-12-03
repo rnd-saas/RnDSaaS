@@ -18,10 +18,10 @@ export default function Achievement({
     >
       <CardContent className="flex flex-col items-center justify-center gap-2 py-4">
         <div className="text-4xl">{image}</div>
-        <div className="text-center text-sm font-medium leading-tight">
+        <div className="text-center body-stlyles font-medium leading-tight">
           {title}
         </div>
-        <div className="text-center text-xs text-muted-foreground -mt-1">
+        <div className="text-center caption-styles text-muted-foreground -mt-1">
           {sub}
         </div>
       </CardContent>
