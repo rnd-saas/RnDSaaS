@@ -6,6 +6,7 @@ import tomAvatar from '@/assets/tom_avatar.png';
 import {useLocation} from "react-router-dom";
 import ChatbotButton from "@/components/chatbotButton.tsx";
 import AccountSettings from "@/pages/Settings/SettingGroups/AccountSettings.tsx";
+import SettingsButton from "@/components/settingsButton.tsx";
 
 export default function SettingsPage() {
     const settingsComponents = [

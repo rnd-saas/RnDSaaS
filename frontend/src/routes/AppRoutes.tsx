@@ -1,4 +1,4 @@
-﻿﻿﻿import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+﻿﻿import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import DefaultPage from "@/pages/DefaultPage.tsx";
 import OnboardingManager from "@/pages/Onboarding/OnboardingManager.tsx";
@@ -22,17 +22,17 @@ import AppLayout from "@/routes/AppLayout";
 import RestTimer from "@/pages/Workout/RestTimer";
 import WorkoutTimer from "@/pages/Workout/WorkoutTimer";
 import ProfilePage from "@/pages/Profile/ProfilePage.tsx";
+import ProgressPage from "@/pages/Progress/ProgressPage.tsx";
 import SocialPage from "@/pages/Social/SocialPage.tsx";
 import SocialCreatePostPage from "@/pages/Social/SocialCreatePostPage.tsx";
 import SocialManageFriendsPage from "@/pages/Social/SocialManageFriendsPage.tsx";
 import MoodPage from "@/pages/Mood/MoodPage";
-import CalendarPage from "@/pages/CalendarPage.tsx";
-import AchievementPage from "@/pages/AchievementPage.tsx";
+import CalendarPage from "@/pages/Profile/CalendarPage.tsx";
+import AchievementPage from "@/pages/Profile/AchievementPage.tsx";
 import SubscriptionPage from "@/pages/SubscriptionPage.tsx";
 import PaymentSuccessPage from "@/pages/Payment/SuccessPage.tsx";
 import PaymentCancelPage from "@/pages/Payment/CancelPage.tsx";
 import OnboardingInvitePage from "@/pages/Onboarding/OnboardingInvitePage.tsx";
-
 
 export default function AppRoutes() {
     return (
@@ -47,7 +47,6 @@ export default function AppRoutes() {
                 <Route path="/workout/rest" element={<RestTimer />} />
                 <Route path="/workout/exercise" element={<WorkoutTimer />} />
                 <Route path="/mood" element={<MoodPage />} />
-
                 <Route path="/calendar" element={<CalendarPage />} />
                 <Route path="/achievements" element={<AchievementPage />} />
                 <Route path="/subscription" element={<SubscriptionPage />} />
@@ -57,12 +56,11 @@ export default function AppRoutes() {
                 <Route element={<AppLayout />}>
                     <Route path="/dashboard" element={<DashboardPage />} />
                     <Route path="/settings" element={<SettingsPage />} />
-                    {/* Uncomment when ready */}
-                    {/* <Route path="/workout" element={<WorkoutPage />} /> */}
                     <Route path="/social" element={<SocialPage />} />
                     <Route path="/social/post" element={<SocialCreatePostPage />} />
                     <Route path="/social/manage" element={<SocialManageFriendsPage />} />
-                     <Route path="/profile" element={<ProfilePage />} />
+                    <Route path="/profile" element={<ProfilePage />} />
+                    <Route path="/progress" element={<ProgressPage />} />
                 </Route>
             </Routes>
         </BrowserRouter>

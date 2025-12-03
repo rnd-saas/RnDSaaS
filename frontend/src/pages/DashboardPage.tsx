@@ -7,6 +7,8 @@ import { Separator } from "@/components/ui/separator";
 import { dashboardService, settingsService, moodService } from "@/lib/api";
 import type { DashboardData, DashboardAchievement } from "@/lib/api/types";
 import AchievementList from "@/pages/Profile/ProfileComponents/AchievementList.tsx";
+import {Button} from "@/components/ui/button.tsx";
+import SettingsButton from "@/components/settingsButton.tsx";
 
 const ACHIEVEMENTS_PER_PAGE = 3;
 
@@ -242,13 +244,7 @@ export default function DashboardPage() {
           <h1 className="text-3xl font-semibold tracking-tight">Hi, {firstName}!</h1>
           <p className="text-sm text-muted-foreground">{today}</p>
         </div>
-        <button
-          aria-label="Settings"
-          className="rounded-full border p-2 text-muted-foreground hover:bg-accent"
-          onClick={() => navigate("/settings")}
-        >
-          ⚙️
-        </button>
+        <SettingsButton/>
       </header>
 
       <Separator className="my-4" />
@@ -388,7 +384,7 @@ export default function DashboardPage() {
 
 /* ---------- Small bits ---------- */
 
-function GoalRow({ label, value, target }: { label: string; value: number; target: number }) {
+export function GoalRow({ label, value, target }: { label: string; value: number; target: number }) {
   const pct = Math.max(0, Math.min(100, (value / target) * 100));
   return (
     <div className="space-y-1.5">
