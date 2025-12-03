@@ -1,11 +1,7 @@
-// src/pages/LandingPage.tsx
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import tomImage from "@/assets/onboarding_welcome/onboarding-tom.png";
 import sarahImage from "@/assets/onboarding_welcome/onboarding-sarah.png";
-
-// If you don't already have a global declaration for pngs, add one project-wide:
-// src/types/assets.d.ts -> declare module "*.png";
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -16,10 +12,10 @@ console.log("LandingPage localStorage.firstName:", localStorage.getItem("firstNa
 
   // Prefer router state; fall back to localStorage; default to Tom (0)
   const trainerId =
-        state?.trainerId ??
-        (Number(localStorage.getItem("trainerId")) || 0);
+    state?.trainerId ?? (Number(localStorage.getItem("trainerId")) || 0);
 
-    const firstName = state?.firstName ?? localStorage.getItem("firstName") ?? "Friend";
+  const firstName =
+    state?.firstName ?? localStorage.getItem("firstName") ?? "Friend";
 
   const avatarSrc = trainerId === 1 ? sarahImage : tomImage;
   const name = trainerId === 1 ? "Sarah" : "Tom";
@@ -29,7 +25,9 @@ console.log("LandingPage localStorage.firstName:", localStorage.getItem("firstNa
       {/* Top greeting */}
       <header className="mt-4 text-center">
         <h1 className="text-4xl font-bold tracking-tight">Hi, {firstName} !</h1>
-        <p className="mt-2 text-lg text-muted-foreground">Great to see you back</p>
+        <p className="mt-2 text-lg text-muted-foreground">
+          Great to see you back
+        </p>
       </header>
 
       {/* Avatar */}
@@ -44,15 +42,15 @@ console.log("LandingPage localStorage.firstName:", localStorage.getItem("firstNa
       {/* Actions */}
       <footer className="w-full max-w-xs space-y-4 mb-10">
         <Button
-          className="w-full rounded-2xl h-12 text-base"
+          className="w-full rounded-2xl h-12 text-sm"
           /*</footer>onClick={() => navigate("/dashboard",  { state: { firstName, trainerId } })}*/
         >
           Ready to work out?
         </Button>
         <button
           type="button"
-          className="w-full h-10 text-base text-muted-foreground"
-          onClick={() => navigate("/dashboard",  { state: { firstName, trainerId } })}
+          className="w-full h-10 text-sm text-muted-foreground"
+          onClick={() => navigate("/dashboard")}
         >
           Not now, I need a sec
         </button>

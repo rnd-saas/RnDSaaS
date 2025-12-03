@@ -13,7 +13,7 @@ export default function Step5Experience() {
         { id: "expert", top: "Expert", bottom: "(4–5 years)", value: "3" },
     ];
     return (
-        <FieldSet>
+        <FieldSet className="w-[60vw] lg:w-[30vw] lg:ml-[30vw]">
             <FieldLegend>Experience</FieldLegend>
             <FieldDescription>
                 How experienced are you with training?

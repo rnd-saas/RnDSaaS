@@ -9,15 +9,15 @@ import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
 export default function Step0Welcome() {
     const { control, trigger } = useFormContext<Inputs>();
     return (
-        <FieldSet>
+        <FieldSet className="w-[60vw] lg:w-[30vw] lg:ml-[30vw]">
             <FieldLegend>Hello!</FieldLegend>
             <FieldDescription>
                 Pick who you'd like to work out with!
             </FieldDescription>
-            <Carousel className="w-full max-w-xs">
+            <Carousel className="w-[60vw] ml-[10vw] md:ml-[20vw] lg:ml-[0vw] max-w-xs">
                 <Controller control={control} name="strTrainer" defaultValue="0" rules={{onChange: () => trigger("strTrainer"), required: "Trainer is required" }}
                     render={({ field }) => (
-                        <RadioGroup value={field.value} onValueChange={field.onChange} className="flex flex-row space-x-4">
+                        <RadioGroup value={field.value} onValueChange={field.onChange} className="flex flex-row items-center">
                             <CarouselContent>
                                 <CarouselItem>
                                     <Field className="flex items-center flex-col" orientation="horizontal">

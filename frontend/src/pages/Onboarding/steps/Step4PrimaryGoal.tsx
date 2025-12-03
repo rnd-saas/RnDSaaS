@@ -17,7 +17,7 @@ export default function Step4PrimaryGoal() {
         { value: PrimaryGoalValues.GeneralFitness, label: "Just get active and consistent" },
     ];
     return (
-        <FieldSet>
+        <FieldSet  className="w-[60vw] lg:w-[30vw] lg:ml-[30vw]">
             <FieldLegend >Primary Goal</FieldLegend>
             <FieldDescription>
                 What is your primary goal right now?

@@ -9,8 +9,8 @@ export default function OnboardingInvitePage() {
 
     return (
         <div className="flex flex-col items-center justify-between">
-            <header className="mb-10 text-center">
-                <h1 className="mb-4">Glad to have you!</h1>
+            <header className="my-10 text-center">
+                <h1 className="h1-styles">Glad to have you!</h1>
                 <p>
                     You're on the way to your fitness goals.
                     <br/>
@@ -24,7 +24,7 @@ export default function OnboardingInvitePage() {
                     className="max-h-[55vh]"
                 />
             </main>
-            <footer className="w-full max-w-xs space-y-8 mb-5">
+            <footer className="w-full max-w-xs space-y-8 my-5 flex flex-col items-center justify-center text-center">
                 <Button onClick={() => navigate("/onboarding")}>
                     Take onboarding?
                 </Button>

@@ -1,13 +1,12 @@
 import { NavLink } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import {Label} from "@/components/ui/label.tsx";
+import { Button } from "@/components/button";
 
 // SVGs as React components (Vite + svgr)
-import {HomeIcon} from "lucide-react";
-import {ContactRound} from "lucide-react";
-import {UserRound} from "lucide-react";
-import {ChartColumnIncreasing} from "lucide-react";
-import {DumbbellIcon} from "lucide-react";
+import { HomeIcon } from "lucide-react";
+import { ContactRound } from "lucide-react";
+import { UserRound } from "lucide-react";
+import { ChartColumnIncreasing } from "lucide-react";
+import { DumbbellIcon } from "lucide-react";
 
 type NavItem = {
   to: string;
@@ -26,8 +25,8 @@ const NAV_ITEMS: NavItem[] = [
 
 export function BottomNav() {
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-20 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="mx-auto flex max-w-screen-sm items-center justify-around px-6 py-3">
+    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-border/40 bg-background/80 backdrop-blur-md shadow-[0_-1px_3px_rgba(0,0,0,0.05)] supports-[backdrop-filter]:bg-background/60">
+      <div className="mx-auto flex max-w-screen-sm items-center justify-around px-6 py-2">
         {NAV_ITEMS.map((item) => (
           <NavTab key={item.to} {...item} />
         ))}
@@ -38,22 +37,19 @@ export function BottomNav() {
 
 function NavTab({ to, icon: Icon, end, description }: NavItem) {
   return (
-      <div>
-        <NavLink to={to} end={end} className="contents">
-          {({ isActive }) => (
-            <Button
-              variant={isActive ? "default" : "ghost"}
-              size="icon"
-              className={`h-12 w-12 rounded-full flex items-center justify-center ${
-                isActive ? "" : "text-muted-foreground"
-              }`}
-              aria-current={isActive ? "page" : undefined}
-            >
-              <Icon className={"!h-6 !w-6"}/>
-            </Button>
-          )}
-        </NavLink>
-        <Label className={"text-[var(--color-grey-text)]"}>{description}</Label>
-      </div>
+    <NavLink className="flex flex-col items-center contents " to={to} end={end}>
+      {({ isActive }) => (
+        <Button
+          variant={isActive ? "default" : "ghost"}
+          size="icon"
+          className={`h-7 w-7 rounded-2xl flex items-center justify-center ${
+            isActive ? "" : "text-zinc-500"
+          }`}
+          aria-current={isActive ? "page" : undefined}
+        >
+          <Icon className={"h-4! w-4!"} />
+        </Button>
+      )}
+    </NavLink>
   );
 }

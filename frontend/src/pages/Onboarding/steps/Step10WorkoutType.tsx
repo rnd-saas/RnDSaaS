@@ -16,7 +16,7 @@ export default function Step10WorkoutType() {
         { value: PreferredSplitValues.Other, label: "Other" },
     ];
     return (
-        <FieldGroup>
+        <FieldGroup  className="w-[60vw] lg:w-[30vw] lg:ml-[30vw]">
             <FieldSet>
                 <FieldLegend>Workout type</FieldLegend>
                 <FieldDescription>

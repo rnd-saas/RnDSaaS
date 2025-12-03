@@ -8,7 +8,7 @@ export default function Step2Data() {
     const { register, control } = useFormContext<Inputs>();
 
     return (
-        <FieldSet>
+        <FieldSet   className="w-[60vw] lg:w-[30vw] lg:ml-[30vw]">
             <FieldLegend>Your data</FieldLegend>
             <FieldDescription>
                 What is your current data?
@@ -17,7 +17,7 @@ export default function Step2Data() {
                 <Field>
                     <FieldLabel htmlFor="weight">Weight</FieldLabel>
                     <div className="flex items-center gap-2">
-                        <Input id="weight" type="number" className="w-20"
+                        <Input id="weight" type="number" className="min-w-[20vw] md:min-w-[10vw]"
                                {...register("weight", { required: "Weight value is required", valueAsNumber:true })}/>
                         <Controller name="weightUnit" control={control} defaultValue="kg" rules={{ required: "Weight unit is required" }}
                             render={({ field }) => (
@@ -38,7 +38,7 @@ export default function Step2Data() {
                 <Field>
                     <FieldLabel htmlFor="height">Height</FieldLabel>
                     <div className="flex items-center gap-2">
-                        <Input id="height" type="number" className="w-20"
+                        <Input id="height" type="number" className="min-w-[20vw] md:min-w-[10vw]"
                                {...register("height", { required: "Height value is required", valueAsNumber:true })}/>
                         <Controller name="heightUnit" control={control} defaultValue="cm" rules={{ required: "Height unit is required" }}
                             render={({ field }) => (

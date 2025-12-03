@@ -14,7 +14,7 @@ export default function Step8SessionLength() {
         { id: "no-preference", label: "No preference", value: "no-preference" },
     ];
     return (
-        <FieldSet>
+        <FieldSet className="w-[60vw] lg:w-[30vw] lg:ml-[30vw]">
             <FieldLegend>Session length</FieldLegend>
             <FieldDescription>
                 How long do you want each session to be?
