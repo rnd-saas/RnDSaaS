@@ -15,7 +15,7 @@ export default function Step11ComfortLevel() {
         { value: GymComfortLevel.NeverBeen, label: "I have never been" },
     ];
     return (
-        <FieldGroup>
+        <FieldGroup className="w-[60vw] lg:w-[30vw] lg:ml-[30vw]">
             <FieldSet>
                 <FieldLegend>Comfort level</FieldLegend>
                 <FieldDescription>

@@ -14,7 +14,7 @@ export default function Step3Gender() {
         { value: Gender.PreferNotToSay, label: "Prefer not to say" },
     ];
     return (
-        <FieldSet>
+        <FieldSet  className="w-[60vw] lg:w-[30vw] lg:ml-[30vw]">
             <FieldLegend>Gender</FieldLegend>
             <FieldDescription>
                 Which gender should we tailor the program for?

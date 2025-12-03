@@ -10,25 +10,25 @@ import PersonalData from "@/pages/Progress/ProgressComponents/PersonalData.tsx";
 export default function ProgressPage() {
     const progressComponents = [
         { value:"achievements", component: AchievementList, label: "Recent Achievements" },
-        { value:"goals", component: Goals, label:"Your goals" },
         { value:"moods", component: Moods, label:"This week's mood" },
-        { value:"workouts", component: Workouts, label:"This week's workouts" },
+        { value:"goals", component: Goals, label:"Your goals" },
         { value:"calendar", component: WorkoutDisplay, label:"Planned workouts" },
         { value:"data", component: PersonalData, label:"Your data" },
+        { value:"workouts", component: Workouts, label:"This week's workouts" },
     ];
 
     return (
-        <div className="w-full max-w-lg min-h-[75vh] min-w-[30vw] flex flex-col items-center space-y-6">
+        <div className="w-[85vw] min-h-[75vh] flex flex-col items-center my-5 mx-auto">
             <h2 className="text-3xl font-semibold tracking-tight">Progress</h2>
-            <main>
+            <main className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
                 {progressComponents.map((g) => (
-                    <div key={g.value} className={"mb-10"}>
-                        <Label className={"my-5"}>{g.label}</Label>
-                        <g.component />
+                    <div key={g.value} className="mb-5">
+                        <Label className="my-5">{g.label}</Label>
+                        <g.component/>
                     </div>
                 ))}
             </main>
-            <ChatbotButton variant={"primary"}/>
+            <ChatbotButton variant="primary"/>
         </div>
     )
 }

@@ -39,7 +39,7 @@ export default function AchievementPage(){
                     <BackButton/>
                 </div>
             </header>
-            <Card className="w-full lg:min-w-[50vw] min-w-[70vw] py-4">
+            <Card className="w-[90vw] lg:min-w-[50vw] min-w-[70vw] hover:scale-none mx-auto">
                 <div className="space-y-4 m-8">
                     <div className="grid gap-4
                             grid-cols-[repeat(auto-fit,minmax(20vw,1fr))]

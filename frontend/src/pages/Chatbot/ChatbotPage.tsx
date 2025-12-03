@@ -61,7 +61,7 @@ export default function ChatbotPage() {
 
     return (
         <div className="w-full min-w-[50vw] min-h-[90vh] relative flex flex-col">
-            <header className="px-6 pt-11 pb-4">
+            <header className="px-6 sticky top-0 pt-11 pb-4 bg-white z-10">
                 <div className="flex items-center justify-between">
                     <BackButton/>
                     <div className="flex items-center gap-3">
@@ -115,7 +115,7 @@ export default function ChatbotPage() {
                     <div ref={messagesEndRef} />
                 </div>
             </main>
-            <footer className="px-6 py-8 rounded-tl-[48px] fixed bottom-10 w-[90vw] lg:w-[60vw] inset-x-0 mx-auto">
+            <footer className="px-6 mb-0 rounded-tl-[48px] bg-white sticky bottom-0 w-[90vw] lg:w-[60vw] inset-x-0 mx-auto">
                 <div className="flex items-center gap-4">
                     <div className="flex-1 flex items-center justify-between px-5 py-2.5 rounded-[48px] border-[1.5px] border-solid">
                         <Input placeholder="Type a message ... " onChange={handleInputChange} value={inputValue} onKeyDown={handleKeyDown}
@@ -126,6 +126,10 @@ export default function ChatbotPage() {
                         <Send className="h-[18px] w-[18px]" />
                     </Button>
                 </div>
+                <p className="text-muted/50 mt-2 mb-0 p-0 leading-none">
+                    Disclaimer: AI-generated content. Not a substitute for professional medical or mental health advice.
+                    <a className={"ml-1 text-primary underline-offset-2 hover:underline hover:text-primary-hover active:text-primary-pressed"} href={`tel:1813`}>Dial support</a>
+                </p>
             </footer>
         </div>
     )

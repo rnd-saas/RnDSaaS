@@ -18,26 +18,28 @@ export default function ProfilePage() {
     const userName = state?.firstName ?? localStorage.getItem("firstName") ?? "User";
 
     return (
-        <div className="w-full max-w-lg min-h-[75vh] min-w-[30vw] flex flex-col items-center space-y-6">
-                <header className="flex items-start justify-between">
-                    <div>
-                        <Avatar className="w-32 h-32">
-                            <AvatarImage src={avatarPlaceholder}/>
-                            <AvatarFallback className="text-3xl">CN</AvatarFallback>
-                        </Avatar>
-                        <h2 className="text-3xl font-semibold tracking-tight">{userName}</h2>
-                    </div>
-                    <div className="absolute top-4 right-4">
-                        <SettingsButton/>
-                    </div>
-                </header>
+        <div className="min-h-[75vh] w-[45vw] flex flex-col items-center space-y-6 mx-auto">
+
+            <header className="flex items-start justify-between">
+                <div>
+                    <Avatar className="w-32 h-32">
+                        <AvatarImage src={avatarPlaceholder}/>
+                        <AvatarFallback className="text-3xl">CN</AvatarFallback>
+                    </Avatar>
+                    <h2 className="text-3xl font-semibold tracking-tight">{userName}</h2>
+                </div>
+                <div className="absolute top-4 right-4">
+                    <SettingsButton/>
+                </div>
+            </header>
 
             <main>
                 {profileComponents.map((g) => (
                     <div className={"mb-10"}>
                         <Label className={"my-5"}>{g.label}</Label>
                         <g.component/>
-                        <Button variant={"outline"} className={"h-6 w-full my-4 p-4"} onClick={() => navigate(g.destination)}>{g.buttonText}</Button>
+                        <Button variant={"outline"} className={"h-6 w-full my-4 p-4"}
+                                onClick={() => navigate(g.destination)}>{g.buttonText}</Button>
                     </div>
                 ))}
             </main>

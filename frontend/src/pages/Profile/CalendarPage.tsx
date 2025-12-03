@@ -46,10 +46,10 @@ export default function CalendarPage(){
                     <BackButton/>
                 </div>
             </header>
-            <Card className="w-fit py-4">
+            <Card className="max-w-[90vw] w-fit py-4 mx-auto hover:scale-none">
                 <CardContent className="px-4">
                     <Calendar mode="single" defaultMonth={date} selected={date} onSelect={setDate}
-                        className="rounded-lg border shadow-sm [--cell-size:--spacing(11)] md:[--cell-size:--spacing(12)]"
+                              className="rounded-lg border shadow-sm [--cell-size:theme(spacing.8)] sm:[--cell-size:theme(spacing.10)] md:[--cell-size:theme(spacing.12)]"
                         components={{
                             DayButton: ({ children, modifiers, day, ...props }) => {
                                 const date = day.date;
@@ -67,18 +67,12 @@ export default function CalendarPage(){
                     />
                 </CardContent>
                 <CardFooter className="flex flex-col items-start gap-3 border-t px-4 !pt-4">
-                    {/*<div className="flex w-full items-center justify-between px-1">*/}
-                    {/*    <Button variant="ghost" size="icon" className="size-6" title="Add Event" onClick={createNewWorkout}>*/}
-                    {/*        <PlusIcon />*/}
-                    {/*        <span className="sr-only">Add Event</span>*/}
-                    {/*    </Button>*/}
-                    {/*</div>*/}
                     <div className="flex w-full flex-col gap-2">
                         {selectedDateWorkouts.length > 0 ? (
                             selectedDateWorkouts.map((event) => (
                                 <div
                                     key={event.title}
-                                    className="bg-muted after:bg-primary/70 relative rounded-md p-2 pl-6 text-sm after:absolute after:inset-y-2 after:left-2 after:w-1 after:rounded-full"
+                                    className="bg-primary/10 after:bg-primary/70 relative rounded-md p-2 pl-6 text-sm after:absolute after:inset-y-2 after:left-2 after:w-1 after:rounded-full"
                                 >
                                     <div className="font-medium">{event.title}</div>
                                 </div>

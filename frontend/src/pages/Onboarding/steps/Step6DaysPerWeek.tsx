@@ -7,12 +7,12 @@ import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
 export default function Step6DaysPerWeek() {
     const { control } = useFormContext<Inputs>();
     return (
-        <FieldSet>
+        <FieldSet  className="w-[60vw] lg:w-[30vw] lg:ml-[30vw]">
             <FieldLegend>Days per week</FieldLegend>
             <FieldDescription>
                 How many days per week would you like to train?
             </FieldDescription>
-            <div className="flex justify-center">
+            <div>
                 <Controller control={control} name="strDaysPerWeek" defaultValue="" rules={{ required: "Please provide your preferred number of workout days" }}
                     render={({ field }) => (
                         <Select value={field.value} onValueChange={field.onChange}>

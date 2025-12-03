@@ -16,7 +16,7 @@ export default function Step7WhichDays() {
     ];
     const minDays = Number(getValues("strDaysPerWeek"))|| 1;
     return (
-        <FieldGroup>
+        <FieldGroup  className="w-[60vw] lg:w-[30vw] lg:ml-[30vw]">
             <FieldSet>
                 <FieldLegend variant="label">
                     Availability

@@ -7,7 +7,7 @@ export default function Step1Nickname() {
     const { register} = useFormContext<Inputs>();
 
     return (
-        <FieldSet>
+        <FieldSet className="w-[60vw] lg:w-[30vw] lg:ml-[30vw]">
             <FieldLegend>Nickname</FieldLegend>
             <FieldDescription>
                 What would you like to be called?
@@ -15,7 +15,7 @@ export default function Step1Nickname() {
             <FieldGroup>
                 <Field>
                     <FieldLabel htmlFor="nickname">Name:</FieldLabel>
-                    <Input id="nickname" type="text" className="w-40"
+                    <Input id="nickname" type="text"
                            {...register("nickname", { required: "Please provide a name" })}/>
                 </Field>
             </FieldGroup>

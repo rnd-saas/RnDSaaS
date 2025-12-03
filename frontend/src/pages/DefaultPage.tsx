@@ -49,7 +49,7 @@ export default function DefaultPage() {
       </header>
       <main className="flex-1 flex flex-col items-center justify-center w-full">
         <Card className={"p-10"}>
-          <h1>Hello!</h1>
+          <h1 className="h1-styles">Hello!</h1>
           <img
             src={tomImage}
             alt={`waving`}

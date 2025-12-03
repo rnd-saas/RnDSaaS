@@ -1,23 +1,14 @@
-// src/pages/LandingPage.tsx
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import tomImage from "@/assets/onboarding_welcome/onboarding-tom.png";
 import sarahImage from "@/assets/onboarding_welcome/onboarding-sarah.png";
 
-// If you don't already have a global declaration for pngs, add one project-wide:
-// src/types/assets.d.ts -> declare module "*.png";
-
 export default function LandingPage() {
   const navigate = useNavigate();
-  const { state } = useLocation() as {
-    state?: { trainerId?: number; firstName?: string };
-  };
+  const { state } = useLocation() as { state?: { trainerId?: number; firstName?: string } };
 
   console.log("LandingPage state:", state);
-  console.log(
-    "LandingPage localStorage.firstName:",
-    localStorage.getItem("firstName")
-  );
+console.log("LandingPage localStorage.firstName:", localStorage.getItem("firstName"));
 
   // Prefer router state; fall back to localStorage; default to Tom (0)
   const trainerId =
@@ -59,9 +50,7 @@ export default function LandingPage() {
         <button
           type="button"
           className="w-full h-10 text-sm text-muted-foreground"
-          onClick={() =>
-            navigate("/dashboard", { state: { firstName, trainerId } })
-          }
+          onClick={() => navigate("/dashboard")}
         >
           Not now, I need a sec
         </button>

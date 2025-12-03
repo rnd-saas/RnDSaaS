@@ -25,14 +25,14 @@ export default function Step11Emotions() {
         { value: "Determined"}
     ];
     return (
-        <FieldSet>
+        <FieldSet className="w-[100vw] lg:w-[30vw] lg:ml-[30vw]">
             <FieldLegend>Emotions</FieldLegend>
             <FieldDescription>
                 How does going to the gym make you feel
             </FieldDescription>
             <Controller control={control} name="emotions" defaultValue={[]} rules={{required: "Please choose at least one emotion" }}
                 render={({ field}) => (
-                    <ToggleGroup type="multiple" variant="outline" spacing={2} size="sm" className="w-[75vw] flex-wrap" value={field.value}
+                    <ToggleGroup type="multiple" variant="outline" spacing={2} size="sm" className="w-[75vw] lg:w-[30vw] flex-wrap" value={field.value}
                                  onValueChange={(value) => {
                                      field.onChange(value);
                                      trigger("emotions");

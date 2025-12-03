@@ -145,16 +145,24 @@ export default function OnboardingManager() {
     return (
         <FormProvider {...methods}>
             <div className="flex items-center justify-center p-4">
-                <form onSubmit={methods.handleSubmit(onSubmit)} className="w-full max-w-md min-h-[75vh] min-w-[75vw]">
-                    <div className="absolute top-0 left-0 w-full p-2">
-                        <FormProgress currentStep={formStep} totalSteps={stepComponents.length - 1}/>
+                <form
+                    onSubmit={methods.handleSubmit(onSubmit)}
+                    className="w-full max-w-md min-h-[75vh] min-w-[75vw] flex flex-col items-center gap-6"
+                >
+                    <div className="w-full p-2">
+                        <FormProgress
+                            currentStep={formStep}
+                            totalSteps={stepComponents.length - 1}
+                        />
                     </div>
-                    <div className="w-full flex justify-center">
+
+                    <div className="w-[90vw] flex justify-start ml-10">
                         <CurrentStep/>
                     </div>
-                    <div className={"p-4"}>
+
+                    <div className="p-4">
                         {getStepErrors(formStep).map((error, i) => (
-                            <p key={i} className="text-[var(--color-error-message)]">
+                            <p key={i}>
                                 {error?.message}
                             </p>
                         ))}
@@ -165,5 +173,5 @@ export default function OnboardingManager() {
                 </form>
             </div>
         </FormProvider>
-)
+    )
 }
