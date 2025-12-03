@@ -136,6 +136,24 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
     console.log('[chatbot] Default trainer from DB', resolvedTrainerId);
     const requestedTrainerId = parseResult.data.trainerId ?? resolvedTrainerId;
     const { messages, metadata } = parseResult.data;
+
+    // Safety Check: Crisis Intervention
+    const lastUserMessage = findLastUserMessage(messages);
+    if (lastUserMessage) {
+        const safetyResponse = checkCrisisKeywords(lastUserMessage.content);
+        if (safetyResponse) {
+            return res.json({
+                message: {
+                    role: 'assistant',
+                    content: safetyResponse,
+                    trainerId: requestedTrainerId
+                },
+                usage: null,
+                fallback: true
+            });
+        }
+    }
+
     const persona = resolvePersona(requestedTrainerId);
     console.log('[chatbot] Using persona', persona.name, '(', persona.id, ')');
     const normalizedMessages = normalizeMessages(messages);
@@ -326,11 +344,19 @@ function buildSystemPrompt({
     const summary = onboardingSummary ? onboardingSummary : 'Limited user context provided.';
 
     return [
-        `You are ${persona.name}, a fitness coach with specialties in ${persona.specialties.join(', ')}.`,
+        `You are ${persona.name}, a supportive, non-judgmental fitness partner.`,
+        `You are NOT a doctor, therapist, or dietitian. Do NOT diagnose mental health issues or prescribe medical treatments.`,
+        `Specialties: ${persona.specialties.join(', ')}.`,
         `Tone: ${persona.tone}. Voice: ${persona.voice}.`,
-        `Always respond in ${lang.description}.`,
-        'Keep the reply under 200 words unless the user explicitly requests a detailed plan.',
-        'Provide actionable, safe advice that references proper form, recovery, and progression cues.',
+        `Language: Always respond in ${lang.description}.`,
+        
+        `CRITICAL GUIDELINES FOR SOCIAL ANXIETY & FITNESS:`,
+        `1. Tone: Gentle, inclusive, low-pressure. Use validating statements (e.g., "It's normal to feel nervous").`,
+        `2. NO Toxic Positivity: Avoid phrases like "Just do it" or "Don't worry". Acknowledge the difficulty.`,
+        `3. Gymtimidation: If user fears judgment, validate them. Suggest home workouts or off-peak times. Start small (e.g., 5 min stretch).`,
+        `4. Body Image/Eating: If user mentions extreme fasting or self-hate, do NOT encourage weight loss. Pivot to health/feeling good. If extreme, suggest professional help.`,
+        
+        `Keep the reply concise (under 100 words) unless the user explicitly requests a detailed plan.`,
         `User context: ${summary}`
     ].join('\n');
 }
@@ -381,6 +407,24 @@ function buildGeminiPrompt(
     ]
         .filter(Boolean)
         .join('\n\n');
+}
+
+function checkCrisisKeywords(content: string): string | null {
+    const lower = content.toLowerCase();
+    const crisisKeywords = [
+        'suicide', 'kill myself', 'want to die', 'end it all', 'self-harm',
+        '自杀', '不想活了', '去死', '结束生命', '割腕'
+    ];
+    
+    if (crisisKeywords.some(kw => lower.includes(kw))) {
+        // Check if Chinese
+        if (/[\u4e00-\u9fa5]/.test(content)) {
+            return "我只是一个AI健身助手，无法处理严重的心理危机。如果你感到绝望或想要伤害自己，请立即寻求专业医生的帮助，或拨打心理援助热线。\n\n中国心理危机干预热线：400-161-9995";
+        } else {
+            return "I am an AI fitness assistant and cannot provide the crisis support you need. If you are feeling overwhelmed or thinking of harming yourself, please contact a professional or a crisis hotline immediately.\n\nInternational Suicide Hotlines: https://blog.opencounseling.com/suicide-hotlines/";
+        }
+    }
+    return null;
 }
 
 function inferLanguage(language?: string): { code: 'zh' | 'en'; description: string } {
