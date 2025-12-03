@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Check } from "lucide-react";
 import { useWorkoutStore } from "@/lib/state/workoutStore";
 import { usePlannedWorkout } from "@/api/workouts";
+import { useNavigate } from "react-router-dom";
 
 // const workoutData = [
 //   { set: 1, reps: 12, kg: 60 },
@@ -30,7 +31,10 @@ export default function WorkoutList({ exerciseId }: { exerciseId: string }) {
     state.getExercise(exerciseId)
   );
 
+  const workoutId = useWorkoutStore((state) => state.loggedWorkout?.workoutId);
+
   const updateExerciseSet = useWorkoutStore((state) => state.updateExerciseSet); // needs be used like this, otherwise no reactive updates will be possible.
+  const navigate = useNavigate();
 
   // if (!loggedExercise) return;
   setTableHeadersByLogMode(tableHeaders, loggedExercise?.exerciseInfo.logMode);
@@ -290,6 +294,12 @@ export default function WorkoutList({ exerciseId }: { exerciseId: string }) {
                     }
 
                     updateExerciseSet(exerciseId, setNumber, updatePayload);
+
+                    if (isChecked) {
+                      console.log(loggedExercise.exerciseInfo);
+
+                      navigate(`${loggedExercise?.exerciseInfo!.slug}/rest`);
+                    }
                   }}
                   className="bg-300 border-text data-[state=unchecked]:text-white data-[state=checked]:bg-zinc-700 data-[state=checked]:border-green-500 data-[state=checked]:text-white"
                 />
