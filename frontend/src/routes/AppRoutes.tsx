@@ -10,13 +10,13 @@ import { trackPageView } from "@/lib/analytics";
 
 // Component to track page views on route changes
 function PageViewTracker() {
-    const location = useLocation();
+  const location = useLocation();
 
-    useEffect(() => {
-        trackPageView(location.pathname + location.search);
-    }, [location]);
+  useEffect(() => {
+    trackPageView(location.pathname + location.search);
+  }, [location]);
 
-    return null;
+  return null;
 }
 import AppLayout from "@/routes/AppLayout";
 import RestTimer from "@/pages/Workout/RestTimer";
@@ -34,35 +34,47 @@ import PaymentSuccessPage from "@/pages/Payment/SuccessPage.tsx";
 import PaymentCancelPage from "@/pages/Payment/CancelPage.tsx";
 import OnboardingInvitePage from "@/pages/Onboarding/OnboardingInvitePage.tsx";
 
+import PlannedWorkoutPage from "@/pages/Workout/PlannedWorkoutPage.tsx";
+import ActiveWorkoutPage from "@/pages/Workout/ActiveWorkoutPage.tsx";
+import ExercisePage from "@/pages/ExercisePage.tsx";
+import WorkoutEvaluationPage from "@/pages/Workout/WorkoutEvaluationPage.tsx";
+
 export default function AppRoutes() {
-    return (
-        <BrowserRouter>
-            <PageViewTracker />
-            <Routes>
-                <Route path="/" element={<DefaultPage />} />
-                <Route path="/onboarding" element={<OnboardingManager/>}/>
-                <Route path="/onboarding-invite" element={<OnboardingInvitePage/>}/>
-                <Route path="/landing" element={<LandingPage />} />
-                <Route path="/chatbot" element={<ChatbotPage />} />
-                <Route path="/workout/rest" element={<RestTimer />} />
-                <Route path="/workout/exercise" element={<WorkoutTimer />} />
-                <Route path="/mood" element={<MoodPage />} />
-                <Route path="/calendar" element={<CalendarPage />} />
-                <Route path="/achievements" element={<AchievementPage />} />
-                <Route path="/subscription" element={<SubscriptionPage />} />
-                <Route path="/payment/success" element={<PaymentSuccessPage />} />
-                <Route path="/payment/cancel" element={<PaymentCancelPage />} />
-                {/* App layout with persistent bottom nav */}
-                <Route element={<AppLayout />}>
-                    <Route path="/dashboard" element={<DashboardPage />} />
-                    <Route path="/settings" element={<SettingsPage />} />
-                    <Route path="/social" element={<SocialPage />} />
-                    <Route path="/social/post" element={<SocialCreatePostPage />} />
-                    <Route path="/social/manage" element={<SocialManageFriendsPage />} />
-                    <Route path="/profile" element={<ProfilePage />} />
-                    <Route path="/progress" element={<ProgressPage />} />
-                </Route>
-            </Routes>
-        </BrowserRouter>
-    );
+  return (
+    <BrowserRouter>
+      <PageViewTracker />
+      <Routes>
+        <Route path="/" element={<DefaultPage />} />
+        <Route path="/onboarding" element={<OnboardingManager />} />
+        <Route path="/onboarding-invite" element={<OnboardingInvitePage />} />
+        <Route path="/landing" element={<LandingPage />} />
+        <Route path="/chatbot" element={<ChatbotPage />} />
+        <Route path="/workout/rest" element={<RestTimer />} />
+        <Route path="/workout/exercise" element={<WorkoutTimer />} />
+        <Route path="/mood" element={<MoodPage />} />
+        <Route path="/calendar" element={<CalendarPage />} />
+        <Route path="/achievements" element={<AchievementPage />} />
+        <Route path="/subscription" element={<SubscriptionPage />} />
+        <Route path="/payment/success" element={<PaymentSuccessPage />} />
+        <Route path="/payment/cancel" element={<PaymentCancelPage />} />
+        {/* App layout with persistent bottom nav */}
+        <Route element={<AppLayout />}>
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/workout" element={<PlannedWorkoutPage />} />
+          <Route path="/social" element={<SocialPage />} />
+          <Route path="/social/post" element={<SocialCreatePostPage />} />
+          <Route path="/social/manage" element={<SocialManageFriendsPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/progress" element={<ProgressPage />} />
+        </Route>
+        <Route path="/workout/:id" element={<ActiveWorkoutPage />} />
+        <Route
+          path="/workout/:id/evaluation"
+          element={<WorkoutEvaluationPage />}
+        />
+        <Route path="/exercise/:exerciseSlug" element={<ExercisePage />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
