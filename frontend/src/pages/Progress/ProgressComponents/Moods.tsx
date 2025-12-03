@@ -2,7 +2,7 @@ import {MoodOptions} from "@/utils/MoodOptions.tsx";
 import {CartesianGrid, ResponsiveContainer, Scatter, ScatterChart, XAxis, YAxis} from "recharts";
 
 export default function Moods(){
-    const moodEmojis = {
+    const moodEmojis: Record<number, string> = {
         [MoodOptions.anxious]: "😰",
         [MoodOptions.insecure]: "😟",
         [MoodOptions.nervous]: "😐",
@@ -39,7 +39,7 @@ export default function Moods(){
                         dataKey="x"
                         name="Day"
                         ticks={dayTicks}
-                        tickFormatter={ts => new Date(ts).toLocaleDateString(undefined, { weekday: "short" })}
+                        tickFormatter={(ts: number) => new Date(ts).toLocaleDateString(undefined, { weekday: "short" })}
                         type="number"
                         domain={["dataMin", "dataMax"]}
                     />
@@ -47,7 +47,7 @@ export default function Moods(){
                         dataKey="y"
                         name="Mood"
                         domain={[0, 4]}
-                        tickFormatter={val => moodEmojis[val]}
+                        tickFormatter={(val: number) => moodEmojis[val]}
                     />
                     <Scatter name="Mood" data={data} />
                 </ScatterChart>

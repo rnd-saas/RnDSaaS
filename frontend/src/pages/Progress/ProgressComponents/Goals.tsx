@@ -38,9 +38,9 @@ export default function Goals(){
         setAddSelection("");
     };
 
-    const handleRemoveGoal = (value: number) => {
+    const handleRemoveGoal = (label: string) => {
         setSelected(prev =>
-            prev.filter(goal => goal.label !== selectedGoals.find(g => g.value === value)?.label)
+            prev.filter(goal => goal.label !== label)
         );
         setRemoveSelection("");
     };
@@ -69,7 +69,7 @@ export default function Goals(){
                     </SelectTrigger>
                     <SelectContent>
                         {selectedGoals.map(g => (
-                            <SelectItem value={g.value}>{g.label}</SelectItem>
+                            <SelectItem value={g.label}>{g.label}</SelectItem>
                         ))}
                     </SelectContent>
                 </Select>

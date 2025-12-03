@@ -6,15 +6,23 @@ import Moods from "@/pages/Progress/ProgressComponents/Moods.tsx";
 import Workouts from "@/pages/Progress/ProgressComponents/Workouts.tsx";
 import WorkoutDisplay from "@/pages/Profile/ProfileComponents/WorkoutDisplay.tsx";
 import PersonalData from "@/pages/Progress/ProgressComponents/PersonalData.tsx";
+import { useEffect, useState } from "react";
+import { profileService, type ProfileResponse } from "@/lib/api";
 
 export default function ProgressPage() {
+    const [profile, setProfile] = useState<ProfileResponse | null>(null);
+
+    useEffect(() => {
+        profileService.getProfile().then(setProfile).catch(console.error);
+    }, []);
+
     const progressComponents = [
-        { value:"achievements", component: AchievementList, label: "Recent Achievements" },
-        { value:"goals", component: Goals, label:"Your goals" },
-        { value:"moods", component: Moods, label:"This week's mood" },
-        { value:"workouts", component: Workouts, label:"This week's workouts" },
-        { value:"calendar", component: WorkoutDisplay, label:"Planned workouts" },
-        { value:"data", component: PersonalData, label:"Your data" },
+        { value:"achievements", render: () => <AchievementList achievements={profile?.achievements ?? []} />, label: "Recent Achievements" },
+        { value:"goals", render: () => <Goals />, label:"Your goals" },
+        { value:"moods", render: () => <Moods />, label:"This week's mood" },
+        { value:"workouts", render: () => <Workouts />, label:"This week's workouts" },
+        { value:"calendar", render: () => <WorkoutDisplay weeks={profile?.workoutGrid} />, label:"Planned workouts" },
+        { value:"data", render: () => <PersonalData />, label:"Your data" },
     ];
 
     return (
@@ -24,7 +32,7 @@ export default function ProgressPage() {
                 {progressComponents.map((g) => (
                     <div key={g.value} className={"mb-10"}>
                         <Label className={"my-5"}>{g.label}</Label>
-                        <g.component />
+                        {g.render()}
                     </div>
                 ))}
             </main>

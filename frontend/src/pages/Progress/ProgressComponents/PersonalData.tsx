@@ -14,23 +14,23 @@ export default function PersonalData(){
         {label: "bmi", value: 15, date: "2025-11-04T09:00:00"},
         {label: "bmi", value: 14, date: "2025-11-06T09:00:00"},
     ]);
-    const toChart = (values) =>
+    const toChart = (values: {date: string, value: number}[]) =>
         values.map((d) => ({ x: new Date(d.date).getTime(), y: d.value }));
 
     const dataTracked = [
         {value: "weight", values: weightValues, setFn: setWeightValues, data: toChart(weightValues)},
         {value: "bmi", values: bmiValues, setFn: setBmiValues, data: toChart(bmiValues)}
     ];
-    const allXValues = dataTracked.flatMap(item => item.data.map(p => p.x));
+    const allXValues = dataTracked.flatMap(item => item.data.map((p: {x: number}) => p.x));
     const minDate = new Date(Math.min(...allXValues));
     const maxDate = new Date(Math.max(...allXValues));
-    const dayTicks = []; const current = new Date(minDate);
+    const dayTicks: number[] = []; const current = new Date(minDate);
     current.setHours(0, 0, 0, 0); while (current <= maxDate) {
         dayTicks.push(current.getTime());
         current.setDate(current.getDate() + 1);
     }
 
-    const handleAddValue = (item, enteredValue) => {
+    const handleAddValue = (item: any, enteredValue: string) => {
         if (!enteredValue) return;
 
         const newEntry = {
@@ -39,7 +39,7 @@ export default function PersonalData(){
             date: new Date().toISOString() // Now
         };
 
-        item.setFn(prev => [...prev, newEntry]);
+        item.setFn((prev: any[]) => [...prev, newEntry]);
     };
 
     return(
@@ -52,7 +52,7 @@ export default function PersonalData(){
                             <CartesianGrid/>
                             <XAxis dataKey="x" name="Date" type="number" domain={["dataMin", "dataMax"]}
                                    ticks={dayTicks}
-                                   tickFormatter={(ts) => new Date(ts).toLocaleDateString(undefined, {weekday: "short",})}
+                                   tickFormatter={(ts: number) => new Date(ts).toLocaleDateString(undefined, {weekday: "short",})}
                             />
                             <YAxis dataKey="y" name={item.value} domain={[0, "dataMax+5"]} />
                             <Scatter name={item.value} data={item.data}/>
@@ -63,8 +63,9 @@ export default function PersonalData(){
                         <Input id={item.value} type="number" className="w-20"
                             onKeyDown={(e) => {
                                 if (e.key === "Enter") {
-                                    handleAddValue(item, e.target.value);
-                                    e.target.value = ""; // Clear input
+                                    const target = e.target as HTMLInputElement;
+                                    handleAddValue(item, target.value);
+                                    target.value = ""; // Clear input
                                 }
                             }}
                         />

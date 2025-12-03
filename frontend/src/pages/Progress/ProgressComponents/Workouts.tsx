@@ -21,7 +21,7 @@ export default function Workouts(){
 
     const minDate = new Date(Math.min(...data.map(d => d.time)));
     const maxDate = new Date(Math.max(...data.map(d => d.time)));
-    const dayTicks = [];
+    const dayTicks: number[] = [];
     const current = new Date(minDate);
     current.setHours(0, 0, 0, 0);
     while (current <= maxDate) {
@@ -37,7 +37,7 @@ export default function Workouts(){
                         dataKey="time"
                         name="Day"
                         ticks={dayTicks}
-                        tickFormatter={ts => new Date(ts).toLocaleDateString(undefined, { weekday: "short" })}
+                        tickFormatter={(ts: number) => new Date(ts).toLocaleDateString(undefined, { weekday: "short" })}
                         type="number"
                         domain={["dataMin", "dataMax"]}
                     />
@@ -47,7 +47,7 @@ export default function Workouts(){
                         domain={[0, 'dataMax+10']}
                     />
                     <Tooltip
-                        labelFormatter={ts => new Date(ts).toLocaleDateString()}
+                        labelFormatter={(ts: number) => new Date(ts).toLocaleDateString()}
                     />
                     <Bar dataKey="duration"/>
                 </BarChart>

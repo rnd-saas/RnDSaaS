@@ -7,7 +7,6 @@ import { Separator } from "@/components/ui/separator";
 import { dashboardService, settingsService, moodService } from "@/lib/api";
 import type { DashboardData, DashboardAchievement } from "@/lib/api/types";
 import AchievementList from "@/pages/Profile/ProfileComponents/AchievementList.tsx";
-import {Button} from "@/components/ui/button.tsx";
 import SettingsButton from "@/components/settingsButton.tsx";
 
 const ACHIEVEMENTS_PER_PAGE = 3;
