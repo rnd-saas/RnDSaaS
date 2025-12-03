@@ -54,6 +54,7 @@ try {
     const socialRoutes = require('./routes/socialRoutes').default;
     const achievementRoutes = require('./routes/achievementRoutes').default;
     const paymentRoutes = require('./routes/paymentRoutes').default;
+    const workoutRoutes = require('./routes/workoutRoutes').default;
     
     app.use('/api/auth', authRoutes);
     app.use('/api/users', userRoutes);
@@ -67,6 +68,7 @@ try {
     app.use('/api/social', socialRoutes);
     app.use('/api/achievements', achievementRoutes);
     app.use('/api/payment', paymentRoutes);
+    app.use('/api/workouts', workoutRoutes);
     
     console.log('✅ API routes loaded');
 } catch (error: any) {

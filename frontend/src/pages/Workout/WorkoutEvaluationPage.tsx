@@ -6,8 +6,10 @@ import { ChevronLeft, Info } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useWorkoutStore } from "@/lib/state/workoutStore";
-import { useSaveWorkoutEvaluation } from "@/api/workouts";
+import { useUpdateWorkoutEvaluation, useAiFeedback } from "@/api/workouts";
+import { useLocation } from "react-router-dom";
 import type { WorkoutEvaluation } from "@/lib/types/Workout";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import imgDead from "@/assets/workout-evaluation/dead.png";
 import imgSad from "@/assets/workout-evaluation/sad.png";
@@ -17,6 +19,9 @@ import imgVeryHappy from "@/assets/workout-evaluation/very-happy.png";
 
 export default function WorkoutEvaluationPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const workoutId = location.state?.workoutId;
+  
   const [difficulty, setDifficulty] = useState(0);
   const [feeling, setFeeling] = useState<string | null>(null);
   const [feelingNotes, setFeelingNotes] = useState("");
@@ -24,7 +29,8 @@ export default function WorkoutEvaluationPage() {
 
   const loggedWorkout = useWorkoutStore((state) => state.loggedWorkout);
   const resetWorkout = useWorkoutStore((state) => state.resetWorkout);
-  const { mutate: saveEvaluation, isPending } = useSaveWorkoutEvaluation();
+  const { mutate: updateEvaluation, isPending } = useUpdateWorkoutEvaluation();
+  const { data: aiFeedback, isLoading: isAiLoading } = useAiFeedback(workoutId);
 
   const feelingMap: Record<string, number> = {
     dead: 1,
@@ -35,27 +41,44 @@ export default function WorkoutEvaluationPage() {
   };
 
   const handleSkip = () => {
+    if (!workoutId) {
+      // If no workoutId (e.g. direct access), just go home
+      resetWorkout();
+      navigate("/dashboard", { replace: true });
+      return;
+    }
+
     const evaluation: WorkoutEvaluation = {
-      workoutId: loggedWorkout?.workoutId || "unknown",
-      feedbackAi: "",
+      workoutId: workoutId,
+      feedbackAi: aiFeedback || "",
       difficultyRating: 0, // Default neutral
       comfortRating: 3, // Default neutral
       createdAt: new Date(),
       skipped: true,
     };
 
-    saveEvaluation(evaluation, {
-      onSuccess: () => {
-        resetWorkout();
-        navigate("/dashboard", { replace: true });
-      },
-    });
+    updateEvaluation(
+      { workoutId, evaluation },
+      {
+        onSuccess: () => {
+          resetWorkout();
+          navigate("/dashboard", { replace: true });
+        },
+      }
+    );
   };
 
   const handleSubmit = () => {
+    if (!workoutId) {
+      // If no workoutId (e.g. direct access), just go home
+      resetWorkout();
+      navigate("/dashboard", { replace: true });
+      return;
+    }
+
     const evaluation: WorkoutEvaluation = {
-      workoutId: loggedWorkout?.workoutId || "unknown",
-      feedbackAi: "Great job! You crushed it!", // Placeholder
+      workoutId: workoutId,
+      feedbackAi: aiFeedback || "Great job! You crushed it!", // Use AI feedback if available
       difficultyRating: (difficulty || 0) as 0 | 1 | 2 | 3 | 4 | 5,
       comfortRating: (feeling ? feelingMap[feeling] : 3) as
         | 0
@@ -70,13 +93,17 @@ export default function WorkoutEvaluationPage() {
       skipped: false,
     };
 
-    saveEvaluation(evaluation, {
-      onSuccess: () => {
-        resetWorkout();
-        navigate("/dashboard", { replace: true });
-      },
-    });
+    updateEvaluation(
+      { workoutId, evaluation },
+      {
+        onSuccess: () => {
+          resetWorkout();
+          navigate("/dashboard", { replace: true });
+        },
+      }
+    );
   };
+// ...existing code...
 
   return (
     <div className="min-h-screen bg-background">
@@ -109,10 +136,17 @@ export default function WorkoutEvaluationPage() {
               </PopoverContent>
             </Popover>
           </div>
-          <p className="text-sm text-black font-['Nunito_Sans'] leading-normal">
-            This is some AI feedback of your workout. You performed very well
-            today!
-          </p>
+          {isAiLoading ? (
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-[90%]" />
+              <Skeleton className="h-4 w-[80%]" />
+            </div>
+          ) : (
+            <p className="text-sm text-black font-['Nunito_Sans'] leading-normal">
+              {aiFeedback || "Generating feedback..."}
+            </p>
+          )}
         </div>
 
         {/* Difficulty Level */}

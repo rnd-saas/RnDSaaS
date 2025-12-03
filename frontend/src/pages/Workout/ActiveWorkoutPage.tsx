@@ -9,7 +9,7 @@ import {
   ChevronLeft,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { usePlannedWorkout } from "@/api/workouts";
+import { usePlannedWorkout, useSubmitWorkout } from "@/api/workouts";
 import type { PlannedExercise, PlannedWorkout } from "@/lib/types/Workout";
 import { useWorkoutStore } from "@/lib/state/workoutStore";
 import { useParams, useNavigate } from "react-router-dom";
@@ -27,6 +27,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/alert-dialog";
+import { toast } from "sonner";
 
 // GENERAL NOTE: first render is test, second render is actual first render due to strict mode in dev.
 // Note: the first render will have null for loggedWorkout since the workout is only started in useEffect after first render.
@@ -52,9 +53,43 @@ export default function ActiveWorkoutPage() {
     (state) => state.calculateTotalSetsFinished
   );
 
+  const { mutate: submitWorkout, isPending: isSubmitting } = useSubmitWorkout();
+
+  const onFinishConfirmed = () => {
+    if (!loggedWorkout) return;
+
+    submitWorkout(loggedWorkout, {
+      onSuccess: (data) => {
+        // Check for achievements
+        if (data.newAchievements && data.newAchievements.length > 0) {
+          data.newAchievements.forEach((achievement: any) => {
+            toast.success(`Achievement Unlocked: ${achievement.name}!`, {
+              description: achievement.description,
+              duration: 5000,
+              icon: achievement.icon || "🏆",
+            });
+          });
+        }
+
+        // data is the created workout object from backend, containing the new ID
+        navigate(`/workout/${id}/evaluation`, { 
+          replace: true,
+          state: { workoutId: data.id } 
+        });
+      },
+      onError: (error) => {
+        console.error("Failed to submit workout", error);
+        // Handle error (maybe show toast)
+        toast.error("Failed to save workout. Please try again.");
+      }
+    });
+  };
+
   const handleFinishWorkout = () => {
     if (!loggedWorkout?.exercises) {
-      navigate(`/workout/${id}/evaluation`, { replace: true });
+      // If no exercises, maybe just navigate or show error?
+      // Assuming we still want to finish even if empty?
+      onFinishConfirmed();
       return;
     }
 
@@ -63,7 +98,7 @@ export default function ActiveWorkoutPage() {
     );
 
     if (allSetsCompleted) {
-      navigate(`/workout/${id}/evaluation`, { replace: true });
+      onFinishConfirmed();
     } else {
       setIsFinishDialogOpen(true);
     }
@@ -293,8 +328,9 @@ export default function ActiveWorkoutPage() {
                 variant="secondary"
                 className="flex-1 text-md "
                 onClick={handleFinishWorkout}
+                disabled={isSubmitting}
               >
-                Finish Workout
+                {isSubmitting ? "Saving..." : "Finish Workout"}
               </Button>
               <AlertDialog
                 open={isFinishDialogOpen}
@@ -311,9 +347,7 @@ export default function ActiveWorkoutPage() {
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                     <AlertDialogAction
-                      onClick={() =>
-                        navigate(`/workout/${id}/evaluation`, { replace: true })
-                      }
+                      onClick={onFinishConfirmed}
                     >
                       Finish
                     </AlertDialogAction>
