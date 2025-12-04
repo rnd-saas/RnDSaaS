@@ -1,4 +1,4 @@
-﻿﻿import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+﻿import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import DefaultPage from "@/pages/DefaultPage.tsx";
 import OnboardingManager from "@/pages/Onboarding/OnboardingManager.tsx";
@@ -38,6 +38,7 @@ import PlannedWorkoutPage from "@/pages/Workout/PlannedWorkoutPage.tsx";
 import ActiveWorkoutPage from "@/pages/Workout/ActiveWorkoutPage.tsx";
 import ExercisePage from "@/pages/ExercisePage.tsx";
 import WorkoutEvaluationPage from "@/pages/Workout/WorkoutEvaluationPage.tsx";
+import WorkoutPlanChatbotPage from "@/pages/Workout/WorkoutPlanChatbotPage.tsx";
 
 export default function AppRoutes() {
   return (
@@ -49,6 +50,7 @@ export default function AppRoutes() {
         <Route path="/onboarding-invite" element={<OnboardingInvitePage />} />
         <Route path="/landing" element={<LandingPage />} />
         <Route path="/chatbot" element={<ChatbotPage />} />
+        <Route path="/workout/plan-chatbot" element={<WorkoutPlanChatbotPage />} />
         <Route
           path="/workout/:workoutId/:exerciseSlug/rest"
           element={<RestTimer />}

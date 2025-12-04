@@ -110,6 +110,7 @@ export default function WorkoutPage() {
             size={isLarge ? "default" : "icon"}
             variant="default"
             className="lg:flex-1 lg:h-9"
+            onClick={() => navigate("/workout/plan-chatbot")}
           >
             <MessageSquareMore size={isLarge ? 32 : 24} />
             <p className="lg:inline hidden button-styles text-base">

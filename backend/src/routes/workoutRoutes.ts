@@ -80,4 +80,27 @@ router.get('/:id/ai-feedback', requireAuth, async (req: any, res) => {
   }
 });
 
+router.get('/program/active', requireAuth, async (req: any, res) => {
+  try {
+    const userId = req.user.id;
+    const program = await workoutService.getActiveWorkoutProgram(userId);
+    res.json(program);
+  } catch (error: any) {
+    console.error('Error fetching active program:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/program/update', requireAuth, async (req: any, res) => {
+  try {
+    const userId = req.user.id;
+    const newProgramData = req.body;
+    const result = await workoutService.updateActiveWorkoutProgram(userId, newProgramData);
+    res.json(result);
+  } catch (error: any) {
+    console.error('Error updating active program:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 export default router;

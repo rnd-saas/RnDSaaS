@@ -5,6 +5,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { z } from 'zod';
 import { requireAuth } from '../middleware/requireAuth';
 import { supabase } from '../db/supabase';
+import { EXERCISE_NAMES, EXERCISE_LIBRARY } from '../services/workoutPlanGenerator';
 
 const router = Router();
 
@@ -61,7 +62,8 @@ const requestSchema = z.object({
     metadata: z
         .object({
             language: z.string().optional(),
-            onboardingSummary: z.string().optional()
+            onboardingSummary: z.string().optional(),
+            workoutPlanContext: z.any().optional()
         })
         .optional()
 });
@@ -161,10 +163,14 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
     const onboardingSummary =
         metadata?.onboardingSummary ?? (await fetchOnboardingSummary(userId));
 
+    const availableDays = await fetchUserAvailableDays(userId);
+
     const systemPrompt = buildSystemPrompt({
         persona,
         onboardingSummary,
-        language: metadata?.language
+        language: metadata?.language,
+        workoutPlanContext: metadata?.workoutPlanContext,
+        availableDays
     });
 
     let assistantMessage: ChatResponseMessage | null = null;
@@ -331,17 +337,72 @@ async function fetchOnboardingSummary(userId: string): Promise<string | null> {
     }
 }
 
+async function fetchUserAvailableDays(userId: string): Promise<number[]> {
+    try {
+        const { data, error } = await supabase
+            .from('user_info')
+            .select('available_days')
+            .eq('user_id', userId)
+            .maybeSingle();
+        
+        if (error || !data || !Array.isArray(data.available_days)) {
+            return [];
+        }
+        return data.available_days;
+    } catch (err) {
+        console.warn('Failed to fetch available days:', err);
+        return [];
+    }
+}
+
 function buildSystemPrompt({
     persona,
     onboardingSummary,
-    language
+    language,
+    workoutPlanContext,
+    availableDays
 }: {
     persona: TrainerPersona;
     onboardingSummary?: string | null;
     language?: string;
+    workoutPlanContext?: any;
+    availableDays?: number[];
 }): string {
     const lang = inferLanguage(language);
     const summary = onboardingSummary ? onboardingSummary : 'Limited user context provided.';
+    
+    let planContext = '';
+    if (workoutPlanContext) {
+        const exerciseList = EXERCISE_LIBRARY.map((ex) => `- ${ex.name} (Log Mode: ${ex.logMode})`).join('\n');
+        const daysConstraint = availableDays && availableDays.length > 0 
+            ? `\nCRITICAL: Only schedule sessions on these day_numbers: ${availableDays.join(', ')} (0=Sun ... 6=Sat).`
+            : '';
+
+        const template = `{
+  "program_name": "Modified Program Name",
+  "program_description": "Brief description of the changes made",
+  "proposed_plan": [
+    {
+      "day_number": 0,
+      "plan_name": "Example Plan Name",
+      "plan_description": "Brief description",
+      "plan_duration_estimate": 45,
+      "plan_exercises": [
+        {
+          "exercise_name": "${EXERCISE_NAMES[0]}",
+          "sequence_no": 1,
+          "target_sets": 3,
+          "metric": "reps",
+          "target_value": 12,
+          "rest_seconds": 60
+        }
+      ]
+    }
+  ]
+}`;
+
+        planContext = `\nCURRENT WORKOUT PLAN CONTEXT:\n${JSON.stringify(workoutPlanContext, null, 2)}\n\nIf the user asks to modify the plan, you MUST output the NEW plan in a JSON block with the key "proposed_plan".\n\nSTRICT CONSTRAINTS FOR MODIFICATIONS:\n1. Use ONLY the allowed exercise list below. Do NOT invent new names.\n2. ${daysConstraint}\n3. Ensure exercise_ids are valid UUIDs if reusing, or use slugs/names from the allowed list if new.\n4. Metric MUST be one of: 'reps', 'weight', 'distance', 'duration_s', 'height'. (Use 'duration_s' for time-based exercises).\n\nAllowed exercises:\n${exerciseList}\n\nJSON Structure Template for "proposed_plan":\n${template}`;
+    }
 
     return [
         `You are ${persona.name}, a supportive, non-judgmental fitness partner.`,
@@ -357,7 +418,8 @@ function buildSystemPrompt({
         `4. Body Image/Eating: If user mentions extreme fasting or self-hate, do NOT encourage weight loss. Pivot to health/feeling good. If extreme, suggest professional help.`,
         
         `Keep the reply concise (under 100 words) unless the user explicitly requests a detailed plan.`,
-        `User context: ${summary}`
+        `User context: ${summary}`,
+        planContext
     ].join('\n');
 }
 

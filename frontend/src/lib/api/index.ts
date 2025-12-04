@@ -42,3 +42,6 @@ export const profileService = profileServiceFunctions;
 import * as socialServiceFunctions from './socialService';
 export const socialService = socialServiceFunctions;
 
+// Export workout service
+export { workoutService } from './workoutService';
+
