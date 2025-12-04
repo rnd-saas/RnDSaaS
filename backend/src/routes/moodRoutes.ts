@@ -95,5 +95,50 @@ router.post('/today', requireAuth, async (req: AuthedRequest, res) => {
     }
 });
 
+// GET /api/mood/week - Get mood data for the current week
+router.get('/week', requireAuth, async (req: AuthedRequest, res) => {
+    try {
+        const userId = req.user?.id;
+        if (!userId) {
+            return res.status(401).json({ error: { message: 'Unauthenticated' } });
+        }
+
+        // Calculate start of week (Monday)
+        const today = new Date();
+        const dayOfWeek = today.getDay();
+        const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - daysToMonday);
+        startOfWeek.setHours(0, 0, 0, 0);
+
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+        endOfWeek.setHours(23, 59, 59, 999);
+
+        const { data: moods, error } = await supabase
+            .from('daily_mood')
+            .select('day, mood')
+            .eq('user_id', userId)
+            .gte('day', startOfWeek.toISOString().slice(0, 10))
+            .lte('day', endOfWeek.toISOString().slice(0, 10))
+            .order('day', { ascending: true });
+
+        if (error) {
+            console.error('Failed to fetch week moods:', error);
+            return res.status(500).json({ error: { message: 'Failed to load moods' } });
+        }
+
+        const moodData = (moods || []).map((m) => ({
+            date: m.day,
+            mood: m.mood
+        }));
+
+        res.json({ moods: moodData });
+    } catch (err: any) {
+        console.error('Unexpected error fetching week moods:', err);
+        return res.status(500).json({ error: { message: 'Failed to load moods' } });
+    }
+});
+
 export default router;
 

@@ -1,5 +1,7 @@
 import {MoodOptions} from "@/utils/MoodOptions.tsx";
 import {CartesianGrid, ResponsiveContainer, Scatter, ScatterChart, XAxis, YAxis} from "recharts";
+import {useState, useEffect} from "react";
+import {progressService} from "@/lib/api";
 
 export default function Moods(){
     const moodEmojis: Record<number, string> = {
@@ -9,19 +11,40 @@ export default function Moods(){
         [MoodOptions.fine]: "🙂",
         [MoodOptions.comfortable]: "😄",
     };
-    const latestMoods = [
-        {date: "2025-11-02T09:00:00", mood: MoodOptions.insecure},
-        {date: "2025-11-02T11:00:00", mood: MoodOptions.fine},
-        {date: "2025-11-04T15:00:00", mood: MoodOptions.anxious},
-        {date: "2025-11-05T16:00:00", mood: MoodOptions.comfortable},
-    ];
-    const data = latestMoods.map((d) => ({
-        x: new Date(d.date).getTime(),
-        y: d.mood,
-    }));
+    const [data, setData] = useState<Array<{x: number; y: number}>>([]);
+    const [loading, setLoading] = useState(true);
 
-    const minDate = new Date(Math.min(...data.map(d => d.x)));
-    const maxDate = new Date(Math.max(...data.map(d => d.x)));
+    useEffect(() => {
+        loadMoods();
+    }, []);
+
+    const loadMoods = async () => {
+        try {
+            setLoading(true);
+            const response = await progressService.getWeekMoods();
+            const moodData = response.moods.map((d) => ({
+                x: new Date(d.date).getTime(),
+                y: d.mood,
+            }));
+            setData(moodData);
+        } catch (error) {
+            console.error('Failed to load moods:', error);
+            setData([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return <div className="h-[25vh] w-full flex items-center justify-center">Loading...</div>;
+    }
+
+    if (data.length === 0) {
+        return <div className="h-[25vh] w-full flex items-center justify-center text-gray-500">No mood data available</div>;
+    }
+
+    const minDate = data.length > 0 ? new Date(Math.min(...data.map(d => d.x))) : new Date();
+    const maxDate = data.length > 0 ? new Date(Math.max(...data.map(d => d.x))) : new Date();
     const dayTicks = [];
     const current = new Date(minDate);
     current.setHours(0, 0, 0, 0);

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { requireAuth } from '../middleware/requireAuth';
 import { workoutService } from '../services/workoutService';
 import { aiFeedbackService } from '../services/aiFeedbackService';
+import { supabase } from '../db/supabase';
 
 const router = Router();
 
@@ -76,6 +77,56 @@ router.get('/:id/ai-feedback', requireAuth, async (req: any, res) => {
     res.json({ feedback });
   } catch (error: any) {
     console.error('Error generating AI feedback:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /api/workouts/week - Get workout history for the current week
+router.get('/week', requireAuth, async (req: any, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Calculate start of week (Monday)
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - daysToMonday);
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    const { data: workouts, error } = await supabase
+      .from('workouts')
+      .select('id, started_at, ended_at, duration_s')
+      .eq('user_id', userId)
+      .gte('started_at', startOfWeek.toISOString())
+      .lte('started_at', endOfWeek.toISOString())
+      .order('started_at', { ascending: true });
+
+    if (error) {
+      console.error('Failed to fetch week workouts:', error);
+      return res.status(500).json({ error: 'Failed to load workouts' });
+    }
+
+    const workoutData = (workouts || []).map((w) => {
+      // Use duration_s if available, otherwise calculate from started_at and ended_at
+      let duration = w.duration_s || 0;
+      if (!duration && w.ended_at && w.started_at) {
+        duration = Math.round((new Date(w.ended_at).getTime() - new Date(w.started_at).getTime()) / 1000 / 60);
+      }
+
+      return {
+        date: w.started_at,
+        length: duration
+      };
+    });
+
+    res.json({ workouts: workoutData });
+  } catch (error: any) {
+    console.error('Error fetching week workouts:', error);
     res.status(500).json({ error: error.message });
   }
 });

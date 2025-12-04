@@ -42,3 +42,7 @@ export const profileService = profileServiceFunctions;
 import * as socialServiceFunctions from './socialService';
 export const socialService = socialServiceFunctions;
 
+// Export progress service functions
+import * as progressServiceFunctions from './progressService';
+export const progressService = progressServiceFunctions;
+

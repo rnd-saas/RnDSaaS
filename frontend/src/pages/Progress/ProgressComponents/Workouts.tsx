@@ -6,21 +6,44 @@
     XAxis,
     YAxis
 } from "recharts";
+import {useState, useEffect} from "react";
+import {progressService} from "@/lib/api";
 
 export default function Workouts(){
-    const latestWorkouts = [
-        {date: "2025-11-02T09:00:00", length:45},
-        {date: "2025-11-02T11:00:00", length: 15},
-        {date: "2025-11-04T15:00:00", length: 60},
-        {date: "2025-11-05T16:00:00", length: 75},
-    ];
-    const data = latestWorkouts.map((d) => ({
-        time: new Date(d.date).getTime(),
-        duration: d.length,
-    }));
+    const [data, setData] = useState<Array<{time: number; duration: number}>>([]);
+    const [loading, setLoading] = useState(true);
 
-    const minDate = new Date(Math.min(...data.map(d => d.time)));
-    const maxDate = new Date(Math.max(...data.map(d => d.time)));
+    useEffect(() => {
+        loadWorkouts();
+    }, []);
+
+    const loadWorkouts = async () => {
+        try {
+            setLoading(true);
+            const response = await progressService.getWeekWorkouts();
+            const workoutData = response.workouts.map((d) => ({
+                time: new Date(d.date).getTime(),
+                duration: d.length,
+            }));
+            setData(workoutData);
+        } catch (error) {
+            console.error('Failed to load workouts:', error);
+            setData([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return <div className="h-[25vh] w-full flex items-center justify-center">Loading...</div>;
+    }
+
+    if (data.length === 0) {
+        return <div className="h-[25vh] w-full flex items-center justify-center text-gray-500">No workout data available</div>;
+    }
+
+    const minDate = data.length > 0 ? new Date(Math.min(...data.map(d => d.time))) : new Date();
+    const maxDate = data.length > 0 ? new Date(Math.max(...data.map(d => d.time))) : new Date();
     const dayTicks: number[] = [];
     const current = new Date(minDate);
     current.setHours(0, 0, 0, 0);
