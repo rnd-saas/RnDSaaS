@@ -26,7 +26,7 @@ export default function CalendarPage(){
                 if (err instanceof ApiError) {
                     setError(err.message);
                 } else {
-                    setError("无法加载锻炼历史");
+                    setError("cannot load history workouts");
                 }
             } finally {
                 if (active) {
@@ -80,11 +80,11 @@ export default function CalendarPage(){
                     <BackButton/>
                 </div>
             </header>
-            <Card className="w-fit py-4">
+            <Card className="max-w-[90vw] w-fit py-4 mx-auto hover:scale-none">
                 <CardContent className="px-4">
                     <Calendar mode="single" defaultMonth={date} selected={date} onSelect={setDate}
-                        className="rounded-lg border shadow-sm [--cell-size:--spacing(11)] md:[--cell-size:--spacing(12)]"
-                        components={{
+                              className="rounded-lg border shadow-sm [--cell-size:theme(spacing.8)] sm:[--cell-size:theme(spacing.10)] md:[--cell-size:theme(spacing.12)]"
+                              components={{
                             DayButton: ({ children, modifiers, day, ...props }) => {
                                 const dayDate = day.date;
                                 const isWorkoutPlanned = workoutDates.some(workoutDate => isSameDay(workoutDate, dayDate));

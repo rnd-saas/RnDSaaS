@@ -47,9 +47,9 @@ export default function RegisterDialog({onSwitchToLogin}:RegisterDialogProps) {
             setSuccess(true);
 
             if (response.needsEmailConfirmation) {
-                setTimeout(() => navigate('/onboarding', { state: { needsEmailConfirmation: true } }), 1200);
+                setTimeout(() => navigate('/onboarding-invite', { state: { needsEmailConfirmation: true } }), 1200);
             } else {
-                navigate('/onboarding');
+                navigate('/onboarding-invite');
             }
         } catch (err) {
             trackFormSubmit('register', false);

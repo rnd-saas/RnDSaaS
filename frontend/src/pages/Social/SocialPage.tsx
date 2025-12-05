@@ -98,7 +98,7 @@ export default function SocialPage() {
   const userResults = hasQuery ? searchResults : [];
 
   return (
-    <div className="w-full max-w-md min-h-[75vh] flex flex-col items-center space-y-6">
+    <div className="w-full mx-auto w-[90vw] md:w-[75vw] lg:w-[40vw] min-h-[75vh] flex flex-col items-center space-y-6">
 
       {/* ✅ TOP ROW: search bar + buttons */}
       <div className="w-full px-4 mt-4 flex items-center gap-2">
@@ -158,7 +158,7 @@ export default function SocialPage() {
           >
             <div className="flex items-center gap-3 text-left">
               <Avatar className="h-10 w-10">
-                <AvatarFallback>
+                <AvatarFallback className="bg-white">
                   {initialsFromName(user.display_name)}
                 </AvatarFallback>
               </Avatar>
@@ -248,11 +248,11 @@ export default function SocialPage() {
             : "";
 
           return (
-            <Card key={post.id} className="bg-white shadow-sm">
+            <Card key={post.id} className="bg-white hover:scale-none shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between py-3">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
-                    <AvatarFallback>
+                    <AvatarFallback className={"bg-primary/10"}>
                       {initialsFromName(authorName)}
                     </AvatarFallback>
                   </Avatar>

@@ -76,7 +76,7 @@ export default function SocialCreatePostPage() {
       <Separator className="my-2" />
 
       {/* Post Composer */}
-      <Card className="bg-gradient-to-br from-background to-muted/20 shadow-lg border-2 border-border/50 !py-3">
+      <Card className="bg-gradient-to-br from-background to-muted/20 shadow-lg border-2 border-border/50 !py-3 hover:scale-none ">
         <CardHeader className="pb-0.5 !px-4">
           <div className="flex items-center gap-2">
             <div className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-amber-400/20 to-amber-600/20 shrink-0">
@@ -192,7 +192,7 @@ export default function SocialCreatePostPage() {
       </Card>
 
       {/* Tips card */}
-      <Card className="bg-muted/40 border-dashed !py-3">
+      <Card className="bg-muted/10 border-dashed hover:scale-none !py-3">
         <CardContent className="pt-3 text-left !px-4">
           <div className="space-y-2 text-sm text-muted-foreground text-left">
             <p className="font-medium text-foreground mb-2 text-left">💡 Post ideas:</p>
