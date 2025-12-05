@@ -148,9 +148,9 @@ export const MiniCalendarNavigation = ({
 
   if (asChild) {
     return (
-      <Slot.Root onClick={handleClick} {...props}>
+      <Slot onClick={handleClick} {...props}>
         {children}
-      </Slot.Root>
+      </Slot>
     );
   }
 
@@ -199,7 +199,7 @@ export const MiniCalendarDay = ({
   ...props
 }: MiniCalendarDayProps) => {
   const { selectedDate, onDateSelect } = useMiniCalendar();
-  const { month, day } = formatDate(date);
+  const { day } = formatDate(date);
   const isSelected = selectedDate && isSameDay(date, selectedDate);
   const isTodayDate = isToday(date);
 

@@ -35,7 +35,7 @@ export function BottomNav() {
   );
 }
 
-function NavTab({ to, icon: Icon, end, description }: NavItem) {
+function NavTab({ to, icon: Icon, end }: NavItem) {
   return (
     <NavLink className="flex flex-col items-center contents " to={to} end={end}>
       {({ isActive }) => (

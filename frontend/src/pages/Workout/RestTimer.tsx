@@ -13,7 +13,7 @@ export default function RestTimer() {
         (ex) => ex.exerciseInfo.slug === exerciseSlug
       )?.restTimeSeconds
   );
-  const [timeLeft, setTimeLeft] = useState(restTime);
+  const [timeLeft, setTimeLeft] = useState(restTime ?? 60);
 
   useEffect(() => {
     if (timeLeft <= 0) {
@@ -44,7 +44,6 @@ export default function RestTimer() {
           onMinus={() => setTimeLeft((t) => Math.max(0, t - 15))}
           onPlus={() => setTimeLeft((t) => t + 15)}
           onSkip={() => navigate(`/workout/${workoutId}`)}
-          onSwitchToExercise={() => navigate(`/workout/${workoutId}`)}
         />
       </div>
     </div>

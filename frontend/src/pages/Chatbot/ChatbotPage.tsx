@@ -199,15 +199,18 @@ export default function ChatbotPage() {
 
     //hides customer support unless reported
     useEffect(() => {
-        window.tidioChatApi.hide();
+        if ((window as any).tidioChatApi) {
+            (window as any).tidioChatApi.hide();
+        }
     }, []);
     const handleReport = (payload = {}) => {
-        if (window.tidioChatApi) {
+        const api = (window as any).tidioChatApi;
+        if (api) {
             // API is ready, emit the event
-            window.tidioChatApi.display(true);
-            window.tidioChatApi.open();
-            tidioChatApi.messageFromOperator('What would you like to report?');
-            window.tidioChatApi.track("reported");
+            api.display(true);
+            api.open();
+            api.messageFromOperator('What would you like to report?');
+            api.track("reported");
             console.log("tried to report")
         } else {
             // Retry shortly after if API is not ready

@@ -7,7 +7,7 @@ export function PlannedExerciseNote({
 }: {
   bgColor?: string;
   exerciseId?: string;
-}): JSX.Element {
+}) {
   const ref = useRef<HTMLTextAreaElement>(null);
   const updateExercise = useWorkoutStore((state) => state.updateExercise);
 
@@ -46,7 +46,9 @@ export function PlannedExerciseNote({
         bgColor ?? "bg-[--var(basic-colours-green-50)]"
       } px-3 py-2 text-sm shadow-card outline-none resize-none overflow-hidden`}
       onBlur={(e) => {
-        updateExercise(exerciseId, { notes: e.target.value });
+        if (exerciseId) {
+          updateExercise(exerciseId, { notes: e.target.value });
+        }
       }}
     />
   );

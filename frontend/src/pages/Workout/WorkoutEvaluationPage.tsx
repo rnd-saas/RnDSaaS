@@ -27,7 +27,6 @@ export default function WorkoutEvaluationPage() {
   const [feelingNotes, setFeelingNotes] = useState("");
   const [workoutNotes, setWorkoutNotes] = useState("");
 
-  const loggedWorkout = useWorkoutStore((state) => state.loggedWorkout);
   const resetWorkout = useWorkoutStore((state) => state.resetWorkout);
   const { mutate: updateEvaluation, isPending } = useUpdateWorkoutEvaluation();
   const { data: aiFeedback, isLoading: isAiLoading } = useAiFeedback(workoutId);

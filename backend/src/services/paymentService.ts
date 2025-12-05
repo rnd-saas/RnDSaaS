@@ -2,10 +2,12 @@ import { stripe } from '../utils/stripe';
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
-export const createCheckoutSession = async (userId: string, userEmail: string, priceId: string, referrerId?: string) => {
+export const createCheckoutSession = async (userId: string, userEmail: string, priceId: string, referrerId?: string, origin?: string) => {
   try {
     // Optional: Retrieve or create customer in Stripe to link with your DB user
     // const customer = await stripe.customers.create({ email: userEmail, metadata: { userId } });
+
+    const baseUrl = origin || FRONTEND_URL;
 
     const sessionConfig: any = {
       payment_method_types: ['card'],
@@ -19,8 +21,8 @@ export const createCheckoutSession = async (userId: string, userEmail: string, p
       subscription_data: {
         trial_period_days: 14,
       },
-      success_url: `${FRONTEND_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${FRONTEND_URL}/payment/cancel`,
+      success_url: `${baseUrl}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/payment/cancel`,
       customer_email: userEmail,
       metadata: {
         userId,
