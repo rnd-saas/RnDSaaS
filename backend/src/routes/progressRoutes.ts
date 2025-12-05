@@ -22,12 +22,26 @@ router.get('/data', requireAuth, async (req: AuthedRequest, res) => {
             return res.status(400).json({ error: { message: 'Invalid type. Must be "weight" or "bmi".' } });
         }
 
-        // Get historical data from user_progress_history table
+        // Calculate start of week (Monday) - 7 days ago
+        const today = new Date();
+        const dayOfWeek = today.getDay();
+        const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - daysToMonday);
+        startOfWeek.setHours(0, 0, 0, 0);
+
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+        endOfWeek.setHours(23, 59, 59, 999);
+
+        // Get historical data from user_progress_history table for the current week
         const { data: historyData, error: historyError } = await supabase
             .from('user_progress_history')
             .select('value, recorded_at')
             .eq('user_id', userId)
             .eq('data_type', type)
+            .gte('recorded_at', startOfWeek.toISOString())
+            .lte('recorded_at', endOfWeek.toISOString())
             .order('recorded_at', { ascending: true });
 
         if (historyError) {

@@ -32,6 +32,27 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
             (goals || []).map(async (goal) => {
                 const currentValue = await calculateGoalProgress(userId, goal.goals || '');
                 
+                // Record progress in goal_progress table
+                if (currentValue > 0) {
+                    try {
+                        const { error } = await supabase
+                            .from('goal_progress')
+                            .insert({
+                                goal_id: goal.id,
+                                current_value: currentValue,
+                                recorded_at: new Date().toISOString()
+                            });
+                        
+                        if (error) {
+                            // Ignore errors (e.g., duplicate entries)
+                            console.warn('Failed to record goal progress:', error);
+                        }
+                    } catch (err: any) {
+                        // Ignore errors (e.g., duplicate entries)
+                        console.warn('Failed to record goal progress:', err);
+                    }
+                }
+                
                 return {
                     id: goal.id,
                     label: goal.goals || '',
@@ -110,6 +131,74 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
     }
 });
 
+// PUT /api/goals/:id - Update a goal (target value, etc.)
+router.put('/:id', requireAuth, async (req: AuthedRequest, res) => {
+    try {
+        const userId = req.user?.id;
+        const goalId = req.params.id;
+
+        if (!userId) {
+            return res.status(401).json({ error: { message: 'Unauthenticated' } });
+        }
+
+        const { target, status } = req.body;
+
+        // Verify the goal belongs to the user
+        const { data: goal, error: fetchError } = await supabase
+            .from('goals')
+            .select('id')
+            .eq('id', goalId)
+            .eq('user_id', userId)
+            .single();
+
+        if (fetchError || !goal) {
+            return res.status(404).json({ error: { message: 'Goal not found' } });
+        }
+
+        // Build update object
+        const updateData: any = {};
+        if (target !== undefined) {
+            updateData.target_value = target;
+        }
+        if (status !== undefined) {
+            updateData.status = status;
+        }
+
+        if (Object.keys(updateData).length === 0) {
+            return res.status(400).json({ error: { message: 'No fields to update' } });
+        }
+
+        const { data: updatedGoal, error } = await supabase
+            .from('goals')
+            .update(updateData)
+            .eq('id', goalId)
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Failed to update goal:', error);
+            return res.status(500).json({ error: { message: 'Failed to update goal' } });
+        }
+
+        // Calculate current progress
+        const currentValue = await calculateGoalProgress(userId, updatedGoal.goals || '');
+
+        res.json({
+            id: updatedGoal.id,
+            label: updatedGoal.goals || '',
+            goalType: updatedGoal.goal_type || '',
+            value: currentValue,
+            target: updatedGoal.target_value || 0,
+            unit: updatedGoal.unit || '',
+            status: updatedGoal.status || 'active',
+            createdAt: updatedGoal.created_at
+        });
+    } catch (error: any) {
+        console.error('Error updating goal:', error);
+        res.status(500).json({ error: { message: 'Internal server error' } });
+    }
+});
+
 // DELETE /api/goals/:id - Delete a goal
 router.delete('/:id', requireAuth, async (req: AuthedRequest, res) => {
     try {
@@ -177,10 +266,10 @@ async function calculateGoalProgress(userId: string, goalLabel: string): Promise
         }
 
         if (normalizedLabel.includes('exercises discovered')) {
-            // Get all workout IDs for this user first
+            // Count distinct workout plan types (plan_id) that the user has completed
             const { data: workouts, error: workoutsError } = await supabase
                 .from('workouts')
-                .select('id')
+                .select('plan_id')
                 .eq('user_id', userId);
             
             if (workoutsError || !workouts) {
@@ -188,23 +277,9 @@ async function calculateGoalProgress(userId: string, goalLabel: string): Promise
                 return 0;
             }
 
-            const workoutIds = workouts.map(w => w.id);
-            if (workoutIds.length === 0) {
-                return 0;
-            }
-
-            const { data: exercises, error: exercisesError } = await supabase
-                .from('workout_exercises')
-                .select('exercise_id')
-                .in('workout_id', workoutIds);
-
-            if (exercisesError) {
-                console.error('Error counting exercises:', exercisesError);
-                return 0;
-            }
-
-            const uniqueExercises = new Set(exercises?.map(e => e.exercise_id).filter(Boolean) || []);
-            return uniqueExercises.size;
+            // Count distinct plan_id values (excluding null)
+            const uniquePlans = new Set(workouts?.map(w => w.plan_id).filter(Boolean) || []);
+            return uniquePlans.size;
         }
 
         if (normalizedLabel.includes('longest streak') || normalizedLabel.includes('streak')) {

@@ -22,11 +22,42 @@ export default function Moods(){
         try {
             setLoading(true);
             const response = await progressService.getWeekMoods();
-            const moodData = response.moods.map((d) => ({
-                x: new Date(d.date).getTime(),
-                y: d.mood,
-            }));
-            setData(moodData);
+            
+            // Create a map of date -> mood for quick lookup
+            const moodMap = new Map<number, number>();
+            response.moods.forEach((d) => {
+                const date = new Date(d.date);
+                date.setHours(0, 0, 0, 0);
+                moodMap.set(date.getTime(), d.mood);
+            });
+            
+            // Calculate start of week (Monday)
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - daysToMonday);
+            startOfWeek.setHours(0, 0, 0, 0);
+            
+            // Fill all 7 days of the week with data (only include days with mood data)
+            const weekData: Array<{x: number; y: number}> = [];
+            for (let i = 0; i < 7; i++) {
+                const currentDate = new Date(startOfWeek);
+                currentDate.setDate(startOfWeek.getDate() + i);
+                currentDate.setHours(0, 0, 0, 0);
+                const time = currentDate.getTime();
+                
+                // Only include days that have mood data
+                const mood = moodMap.get(time);
+                if (mood !== undefined) {
+                    weekData.push({
+                        x: time,
+                        y: mood
+                    });
+                }
+            }
+            
+            setData(weekData);
         } catch (error) {
             console.error('Failed to load moods:', error);
             setData([]);
@@ -43,15 +74,26 @@ export default function Moods(){
         return <div className="h-[25vh] w-full flex items-center justify-center text-gray-500">No mood data available</div>;
     }
 
-    const minDate = data.length > 0 ? new Date(Math.min(...data.map(d => d.x))) : new Date();
-    const maxDate = data.length > 0 ? new Date(Math.max(...data.map(d => d.x))) : new Date();
-    const dayTicks = [];
-    const current = new Date(minDate);
+    // Calculate start of week (Monday) for consistent X-axis ticks
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - daysToMonday);
+    startOfWeek.setHours(0, 0, 0, 0);
+    
+    // Generate ticks for all 7 days of the week
+    const dayTicks: number[] = [];
+    const current = new Date(startOfWeek);
     current.setHours(0, 0, 0, 0);
-    while (current <= maxDate) {
+    for (let i = 0; i < 7; i++) {
         dayTicks.push(current.getTime());
         current.setDate(current.getDate() + 1);
     }
+    
+    const minDate = startOfWeek;
+    const maxDate = new Date(startOfWeek);
+    maxDate.setDate(startOfWeek.getDate() + 6);
 
     return(
         <div className="h-[25vh] w-full">
@@ -64,7 +106,7 @@ export default function Moods(){
                         ticks={dayTicks}
                         tickFormatter={(ts: number) => new Date(ts).toLocaleDateString(undefined, { weekday: "short" })}
                         type="number"
-                        domain={["dataMin", "dataMax"]}
+                        domain={[minDate.getTime(), maxDate.getTime()]}
                     />
                     <YAxis
                         dataKey="y"

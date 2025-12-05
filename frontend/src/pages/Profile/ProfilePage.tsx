@@ -29,6 +29,8 @@ export default function ProfilePage() {
                 setIsLoading(true);
                 const data = await profileService.getProfile();
                 if (!active) return;
+                console.log('[ProfilePage] Received profile data:', data);
+                console.log('[ProfilePage] WorkoutGrid:', data.workoutGrid);
                 setProfile(data);
             } catch (err) {
                 if (!active) return;
@@ -116,7 +118,7 @@ export default function ProfilePage() {
                 ))}
             </main>
 
-            <ChatbotButton variant={"primary"} />
+            <ChatbotButton variant={"default"} />
         </div>
     );
 }

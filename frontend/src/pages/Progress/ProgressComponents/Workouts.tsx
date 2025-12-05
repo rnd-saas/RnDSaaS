@@ -21,11 +21,37 @@ export default function Workouts(){
         try {
             setLoading(true);
             const response = await progressService.getWeekWorkouts();
-            const workoutData = response.workouts.map((d) => ({
-                time: new Date(d.date).getTime(),
-                duration: d.length,
-            }));
-            setData(workoutData);
+            
+            // Create a map of date -> duration for quick lookup
+            const workoutMap = new Map<number, number>();
+            response.workouts.forEach((d) => {
+                const date = new Date(d.date);
+                date.setHours(0, 0, 0, 0);
+                workoutMap.set(date.getTime(), d.length);
+            });
+            
+            // Calculate start of week (Monday)
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - daysToMonday);
+            startOfWeek.setHours(0, 0, 0, 0);
+            
+            // Fill all 7 days of the week with data (0 for days without workouts)
+            const weekData: Array<{time: number; duration: number}> = [];
+            for (let i = 0; i < 7; i++) {
+                const currentDate = new Date(startOfWeek);
+                currentDate.setDate(startOfWeek.getDate() + i);
+                currentDate.setHours(0, 0, 0, 0);
+                const time = currentDate.getTime();
+                weekData.push({
+                    time,
+                    duration: workoutMap.get(time) || 0
+                });
+            }
+            
+            setData(weekData);
         } catch (error) {
             console.error('Failed to load workouts:', error);
             setData([]);
@@ -72,7 +98,7 @@ export default function Workouts(){
                     <Tooltip
                         labelFormatter={(ts: number) => new Date(ts).toLocaleDateString()}
                     />
-                    <Bar dataKey="duration"/>
+                    <Bar dataKey="duration" barSize={15}/>
                 </BarChart>
             </ResponsiveContainer>
         </div>

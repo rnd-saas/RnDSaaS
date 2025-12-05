@@ -1,13 +1,18 @@
-import {GoalRow} from "@/pages/DashboardPage.tsx";
 import {useState, useEffect} from "react";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
+import {Input} from "@/components/ui/input.tsx";
+import {Button} from "@/components/ui/button.tsx";
+import {Progress} from "@/components/ui/progress.tsx";
 import {progressService} from "@/lib/api";
+import {Pencil, Check, X} from "lucide-react";
 
 export default function Goals(){
     const [currentAddSelection, setAddSelection]  = useState("")
     const [currentRemoveSelection, setRemoveSelection]  = useState("")
     const [selectedGoals, setSelected] = useState<Array<{ label: string; value: number; target: number; id?: number }>>([]);
     const [loading, setLoading] = useState(true);
+    const [editingGoalId, setEditingGoalId] = useState<number | null>(null);
+    const [editTarget, setEditTarget] = useState<string>("");
 
     const possibleGoals = [
         { label: "Workouts completed", value: "workoutsCompleted", target: 5 },
@@ -79,6 +84,34 @@ export default function Goals(){
         }
     };
 
+    const handleStartEdit = (goalId: number, currentTarget: number) => {
+        setEditingGoalId(goalId);
+        setEditTarget(currentTarget.toString());
+    };
+
+    const handleCancelEdit = () => {
+        setEditingGoalId(null);
+        setEditTarget("");
+    };
+
+    const handleSaveEdit = async (goalId: number) => {
+        const targetValue = Number(editTarget);
+        if (isNaN(targetValue) || targetValue <= 0) {
+            alert('Please enter a valid target value greater than 0');
+            return;
+        }
+
+        try {
+            await progressService.updateGoal(goalId, { target: targetValue });
+            await loadGoals();
+            setEditingGoalId(null);
+            setEditTarget("");
+        } catch (error) {
+            console.error('Failed to update goal:', error);
+            alert('Failed to update goal. Please try again.');
+        }
+    };
+
     if (loading) {
         return <div className="flex items-center justify-center py-4">Loading goals...</div>;
     }
@@ -90,7 +123,64 @@ export default function Goals(){
                     <p className="text-sm text-muted-foreground">No goals yet. Add one below!</p>
                 ) : (
                     selectedGoals.map((g, index) => (
-                        <GoalRow key={g.id || index} label={g.label} value={g.value} target={g.target}/>
+                        <div key={g.id || index} className="space-y-1.5">
+                            <div className="flex items-center justify-between text-[15px]">
+                                <span className="list-item ml-6 list-disc marker:text-foreground/80">{g.label}:</span>
+                                <div className="flex items-center gap-2">
+                                    {editingGoalId === g.id ? (
+                                        <>
+                                            <Input
+                                                type="number"
+                                                value={editTarget}
+                                                onChange={(e) => setEditTarget(e.target.value)}
+                                                className="w-20 h-7 text-sm"
+                                                min="1"
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        handleSaveEdit(g.id!);
+                                                    } else if (e.key === 'Escape') {
+                                                        handleCancelEdit();
+                                                    }
+                                                }}
+                                                autoFocus
+                                            />
+                                            <Button
+                                                size="sm"
+                                                variant="ghost"
+                                                className="h-7 w-7 p-0"
+                                                onClick={() => handleSaveEdit(g.id!)}
+                                            >
+                                                <Check className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                size="sm"
+                                                variant="ghost"
+                                                className="h-7 w-7 p-0"
+                                                onClick={handleCancelEdit}
+                                            >
+                                                <X className="h-4 w-4" />
+                                            </Button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span className="tabular-nums">{g.value} / {g.target}</span>
+                                            <Button
+                                                size="sm"
+                                                variant="ghost"
+                                                className="h-7 w-7 p-0"
+                                                onClick={() => handleStartEdit(g.id!, g.target)}
+                                            >
+                                                <Pencil className="h-4 w-4" />
+                                            </Button>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                            <Progress 
+                                value={Math.max(0, Math.min(100, (g.value / g.target) * 100))} 
+                                className="h-2 rounded-full mt-1.5" 
+                            />
+                        </div>
                     ))
                 )}
             </section>

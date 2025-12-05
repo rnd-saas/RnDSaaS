@@ -61,7 +61,7 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
                 .select('id, started_at')
                 .eq('user_id', userId)
                 .order('started_at', { ascending: false })
-                .limit(100)  // Increased from 42 to 100 to ensure we cover all workouts in the last 21 days
+                .limit(100)  // Get last 100 workouts to ensure we cover all workouts in the displayed range
         ]);
 
         console.log(`[Profile] Query results:`, {
@@ -295,14 +295,24 @@ function buildWorkoutGrid(
     const workoutDates = new Set<string>();
     rows?.forEach((row) => {
         if (row.started_at) {
+            // Parse the ISO string and convert to local date
+            // This ensures we get the correct local date regardless of UTC offset
             const date = new Date(row.started_at);
             if (!isNaN(date.getTime())) {
-                // Normalize to midnight (same as CalendarPage) to ensure consistent date comparison
-                date.setHours(0, 0, 0, 0);
-                workoutDates.add(date.toISOString().slice(0, 10));
+                // Get local date components (not UTC)
+                const year = date.getFullYear();
+                const month = date.getMonth() + 1;
+                const day = date.getDate();
+                const formattedDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                workoutDates.add(formattedDate);
+                
+                // Debug logging
+                console.log(`[buildWorkoutGrid] Found workout: started_at=${row.started_at}, localDate=${formattedDate}`);
             }
         }
     });
+    
+    console.log(`[buildWorkoutGrid] Total workout dates: ${workoutDates.size}`, Array.from(workoutDates));
 
     // Find the Monday of the week that contains (today - 18 days)
     // This ensures the calendar grid starts on Monday, matching CalendarPage
@@ -328,16 +338,26 @@ function buildWorkoutGrid(
         current.setDate(start.getDate() + i);
         current.setHours(0, 0, 0, 0);
 
-        const iso = current.toISOString().slice(0, 10);
+        // Use local date string instead of ISO to avoid timezone issues
+        const year = current.getFullYear();
+        const month = String(current.getMonth() + 1).padStart(2, '0');
+        const day = String(current.getDate()).padStart(2, '0');
+        const dateStr = `${year}-${month}-${day}`;
+        
         let state: WorkoutDay['state'] = 'rest';
-        if (current > today) {
+        // Compare dates using getTime() to ensure accurate comparison
+        // Both dates are normalized to midnight local time, so comparison should be accurate
+        const currentTime = current.getTime();
+        const todayTime = today.getTime();
+        if (currentTime > todayTime) {
             state = 'future';
-        } else if (workoutDates.has(iso)) {
+        } else if (workoutDates.has(dateStr)) {
             state = 'worked';
+            console.log(`[buildWorkoutGrid] Matched workout date: ${dateStr}`);
         }
 
         cells.push({
-            date: iso,
+            date: dateStr,
             state,
             isCurrent: current.getTime() === today.getTime()
         });
@@ -347,6 +367,11 @@ function buildWorkoutGrid(
     for (let i = 0; i < cells.length; i += 7) {
         grid.push(cells.slice(i, i + 7));
     }
+
+    // Debug: Log the final grid
+    console.log(`[buildWorkoutGrid] Final grid:`, grid.map(week => 
+        week.map(day => `${day.date}:${day.state}`).join(', ')
+    ).join(' | '));
 
     const streak = calculateStreak(workoutDates);
 

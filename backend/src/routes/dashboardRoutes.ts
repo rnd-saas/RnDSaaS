@@ -75,7 +75,7 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
                 .maybeSingle(),
             supabase
                 .from('workouts')
-                .select('id, started_at', { count: 'exact' })
+                .select('id, started_at, plan_id', { count: 'exact' })
                 .eq('user_id', userId)
                 .order('started_at', { ascending: false })
                 .limit(100),
@@ -116,9 +116,13 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
                 .filter((iso): iso is string => Boolean(iso))
                 .map((iso) => iso.slice(0, 10))
         );
-        const workoutIds = workouts.map((row) => row.id).filter((id): id is string => Boolean(id));
-
-        const exercisesDiscovered = await countUniqueExercises(workoutIds);
+        // Count distinct workout plan types (plan_id) that the user has completed
+        const uniquePlans = new Set(
+            workouts
+                .map((row) => row.plan_id)
+                .filter((id): id is string => Boolean(id))
+        );
+        const exercisesDiscovered = uniquePlans.size;
         const streakDays = calculateStreak(workoutDates);
         const achievements = await buildAchievements(achievementRowsResult.data ?? null);
         const totalXp = calculateExperience(totalWorkouts, streakDays);
@@ -164,29 +168,7 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
     }
 });
 
-async function countUniqueExercises(workoutIds: string[]): Promise<number> {
-    if (workoutIds.length === 0) {
-        return 0;
-    }
-
-    const { data, error } = await supabase
-        .from('workout_exercises')
-        .select('exercise_id')
-        .in('workout_id', workoutIds);
-
-    if (error) {
-        console.warn('Failed to fetch workout exercises for dashboard:', error);
-        return 0;
-    }
-
-    const uniqueExercises = new Set(
-        data
-            .map((row) => row.exercise_id)
-            .filter((id): id is string => Boolean(id))
-    );
-
-    return uniqueExercises.size;
-}
+// Removed countUniqueExercises function - now using plan_id count directly
 
 async function buildAchievements(
     rows?: Array<{ id: string; achievement_id: string | null; unlocked_at: string | null }> | null

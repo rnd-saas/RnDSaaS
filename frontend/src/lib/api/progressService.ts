@@ -64,6 +64,16 @@ export async function createGoal(data: {
 }
 
 /**
+ * Update a goal (target value, status, etc.)
+ */
+export async function updateGoal(goalId: number, data: {
+    target?: number;
+    status?: string;
+}): Promise<Goal> {
+    return apiClient.put<Goal>(`/api/goals/${goalId}`, data);
+}
+
+/**
  * Delete a goal
  */
 export async function deleteGoal(goalId: number): Promise<void> {
