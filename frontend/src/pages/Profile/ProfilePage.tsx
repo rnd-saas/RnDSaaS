@@ -5,12 +5,10 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import WorkoutDisplay from "@/pages/Profile/ProfileComponents/WorkoutDisplay.tsx";
 import AchievementList from "@/pages/Profile/ProfileComponents/AchievementList.tsx";
-import { Label } from "@/components/ui/label.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { profileService, type ProfileResponse, ApiError } from "@/lib/api";
 import SettingsButton from "@/components/settingsButton.tsx";
 import { Separator } from "@/components/ui/separator";
-import {useEffect} from "react";
 
 export default function ProfilePage() {
     const navigate = useNavigate();
@@ -127,7 +125,7 @@ export default function ProfilePage() {
             </div>
 
             <div className="px-1">
-              <g.content/>
+                {g.content}
             </div>
 
             <div className="flex justify-center md:justify-start">

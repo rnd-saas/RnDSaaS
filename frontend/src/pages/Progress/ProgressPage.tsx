@@ -136,7 +136,7 @@ export default function ProgressPage() {
             </div>
 
             <div className="px-1">
-                {g.render()}
+                {section.render()}
             </div>
           </div>
         ))}
