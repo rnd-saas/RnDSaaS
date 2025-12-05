@@ -18,7 +18,7 @@ type DashboardResponse = {
     trainer: boolean | null;
     goal: {
         workoutsCompleted: DashboardStat;
-        exercisesDiscovered: DashboardStat;
+        exercisesCompleted: DashboardStat;
         longestStreak: DashboardStat;
     };
     level: {
@@ -62,7 +62,8 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
             userInfoResult,
             workoutsResult,
             achievementRowsResult,
-            nextPlanResult
+            nextPlanResult,
+            userStatsResult
         ] = await Promise.all([
             supabase
             .from('user_info')
@@ -88,6 +89,11 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
                 .gte('scheduled_date', new Date().toISOString().slice(0, 10))
                 .order('scheduled_date', { ascending: true })
                 .limit(1)
+                .maybeSingle(),
+            supabase
+                .from('view_user_stats_aggregated')
+                .select('exercise_complete_count')
+                .eq('user_id', userId)
                 .maybeSingle()
         ]);
 
@@ -103,6 +109,9 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
         if (nextPlanResult.error) {
             console.warn('Failed to fetch upcoming plan for dashboard', nextPlanResult.error);
         }
+        if (userStatsResult.error) {
+            console.warn('Failed to fetch user stats from view', userStatsResult.error);
+        }
 
         const workouts = workoutsResult.data ?? [];
         const totalWorkouts = workoutsResult.count ?? workouts.length;
@@ -112,13 +121,10 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
                 .filter((iso): iso is string => Boolean(iso))
                 .map((iso) => iso.slice(0, 10))
         );
-        // Count distinct workout plan types (plan_id) that the user has completed
-        const uniquePlans = new Set(
-            workouts
-                .map((row) => row.plan_id)
-                .filter((id): id is string => Boolean(id))
-        );
-        const exercisesDiscovered = uniquePlans.size;
+        // Get exercise completed count from view_user_stats_aggregated
+        const exercisesCompleted = userStatsResult.data?.exercise_complete_count 
+            ? Number(userStatsResult.data.exercise_complete_count) 
+            : 0;
         const streakDays = calculateStreak(workoutDates);
         const achievements = await buildAchievements(achievementRowsResult.data ?? null);
         const totalXp = calculateExperience(totalWorkouts, streakDays);
@@ -138,9 +144,9 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
                     current: totalWorkouts,
                     target: Math.max(WORKOUT_TARGET, totalWorkouts || WORKOUT_TARGET)
                 },
-                exercisesDiscovered: {
-                    current: exercisesDiscovered,
-                    target: Math.max(EXERCISE_TARGET, exercisesDiscovered || EXERCISE_TARGET)
+                exercisesCompleted: {
+                    current: exercisesCompleted,
+                    target: Math.max(EXERCISE_TARGET, exercisesCompleted || EXERCISE_TARGET)
                 },
                 longestStreak: {
                     current: streakDays,

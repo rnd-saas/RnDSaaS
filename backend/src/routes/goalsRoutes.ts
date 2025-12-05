@@ -265,21 +265,20 @@ async function calculateGoalProgress(userId: string, goalLabel: string): Promise
             return count || 0;
         }
 
-        if (normalizedLabel.includes('exercises discovered')) {
-            // Count distinct workout plan types (plan_id) that the user has completed
-            const { data: workouts, error: workoutsError } = await supabase
-                .from('workouts')
-                .select('plan_id')
-                .eq('user_id', userId);
+        if (normalizedLabel.includes('exercises completed') || normalizedLabel.includes('exercises discovered')) {
+            // Get exercise completed count from view_user_stats_aggregated
+            const { data: userStats, error: statsError } = await supabase
+                .from('view_user_stats_aggregated')
+                .select('exercise_complete_count')
+                .eq('user_id', userId)
+                .maybeSingle();
             
-            if (workoutsError || !workouts) {
-                console.error('Error fetching workouts:', workoutsError);
+            if (statsError) {
+                console.error('Error fetching exercise completed count from view:', statsError);
                 return 0;
             }
 
-            // Count distinct plan_id values (excluding null)
-            const uniquePlans = new Set(workouts?.map(w => w.plan_id).filter(Boolean) || []);
-            return uniquePlans.size;
+            return userStats?.exercise_complete_count ? Number(userStats.exercise_complete_count) : 0;
         }
 
         if (normalizedLabel.includes('longest streak') || normalizedLabel.includes('streak')) {
