@@ -29,7 +29,7 @@ export default function LoggedExerciseItem({
 }) {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-  const { data, isLoading, error } = usePlannedWorkout(new Date());
+  const { data, isLoading } = usePlannedWorkout(new Date());
 
   // Access the store actions and the specific logged exercise
   const updateExercise = useWorkoutStore((state) => state.updateExercise);

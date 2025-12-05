@@ -119,7 +119,7 @@ export default function ProgressPage() {
                     </div>
                 ))}
             </main>
-            <ChatbotButton variant={"primary"}/>
+            <ChatbotButton variant={"default"}/>
         </div>
     )
 }

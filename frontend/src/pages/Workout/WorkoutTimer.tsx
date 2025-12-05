@@ -103,7 +103,6 @@ export default function WorkoutTimer() {
             onMinus={() => adjustSeconds(-15)}
             onPlus={() => adjustSeconds(15)}
             onSkip={skipRest}               // ← restore previous workout time
-            onSwitchToExercise={startExercise}
           />
         )}
       </div>

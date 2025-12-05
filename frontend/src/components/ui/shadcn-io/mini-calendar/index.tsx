@@ -2,7 +2,6 @@
 
 import { useControllableState } from "@radix-ui/react-use-controllable-state";
 import { addDays, format, isSameDay, isToday } from "date-fns";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { Slot } from "@radix-ui/react-slot";
 import {
   type ButtonHTMLAttributes,
@@ -15,6 +14,7 @@ import {
 } from "react";
 import { Button } from "@/components/WorkoutComponents/calendar-button";
 import { cn } from "@/lib/utils";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
 // Context for sharing state between components
 type MiniCalendarContextType = {
@@ -148,9 +148,9 @@ export const MiniCalendarNavigation = ({
 
   if (asChild) {
     return (
-      <Slot.Root onClick={handleClick} {...props}>
+      <Slot onClick={handleClick} {...props}>
         {children}
-      </Slot.Root>
+      </Slot>
     );
   }
 
@@ -198,8 +198,8 @@ export const MiniCalendarDay = ({
   className,
   ...props
 }: MiniCalendarDayProps) => {
-  const { selectedDate, onDateSelect } = useMiniCalendar();
-  const { month, day } = formatDate(date);
+  const { onDateSelect, selectedDate } = useMiniCalendar();
+  const { day } = formatDate(date);
   const isSelected = selectedDate && isSameDay(date, selectedDate);
   const isTodayDate = isToday(date);
 

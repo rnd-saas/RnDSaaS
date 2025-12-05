@@ -11,7 +11,7 @@ interface ActiveWorkoutState {
   elapsedTimeSeconds: number;
   workoutId: string;
   loggedWorkout: LoggedWorkout | null;
-  startWorkout: (id: string, loggedExercises) => void;
+  startWorkout: (id: string, loggedExercises: LoggedExercise[]) => void;
   resumeWorkout: () => void;
   pauseWorkout: () => void;
   resetWorkout: () => void;

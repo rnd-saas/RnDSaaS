@@ -7,7 +7,6 @@ type RestScreenProps = {
   onMinus?: () => void;
   onPlus?: () => void;
   onSkip?: () => void;
-  onSwitchToExercise?: () => void;
 };
 
 export default function RestScreen({
@@ -15,7 +14,6 @@ export default function RestScreen({
   onMinus,
   onPlus,
   onSkip,
-  onSwitchToExercise,
 }: RestScreenProps) {
   return (
     <>

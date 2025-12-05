@@ -19,7 +19,7 @@ export default function WorkoutPage() {
   const { data, isLoading, error } = usePlannedWorkout(selectedDate);
   const navigate = useNavigate();
 
-  const plannedWorkout: PlannedWorkout | null = data;
+  const plannedWorkout: PlannedWorkout | null = data ?? null;
   // Store today's ID for when user clicks on "Start Workout"
   const [todayWorkoutId, setTodayWorkoutId] = useState<string | null>(null);
   if (
@@ -60,7 +60,7 @@ export default function WorkoutPage() {
     workoutContentBlock = (
       <div className="flex flex-col items-center justify-start flex-1 gap-5 md:gap-[30px] w-full">
         {plannedWorkout.exercises.map((exercise: PlannedExercise) => (
-          <PlannedExerciseItem key={exercise.exercise_id} exercise={exercise} />
+          <PlannedExerciseItem key={exercise.exerciseId} exercise={exercise} />
         ))}
       </div>
     );
@@ -81,7 +81,9 @@ export default function WorkoutPage() {
             </h3>
             <MiniCalendar
               className="border-0 bg-background my-0 md:p-4 lg:py-1 py-2"
-              onValueChange={setSelectedDate}
+              onValueChange={(date) => {
+                if (date) setSelectedDate(date);
+              }}
               value={selectedDate}
               defaultStartDate={startOfWeek(selectedDate!, { weekStartsOn: 1 })}
               days={7}
