@@ -20,11 +20,11 @@ router.get('/planned', requireAuth, async (req: any, res) => {
       return res.status(400).json({ error: 'Invalid date format' });
     }
 
-    const plans = await workoutService.getWorkoutPlanForDate(userId, date);
+    const { plan, isCompleted } = await workoutService.getWorkoutPlanForDate(userId, date);
     
     // If multiple plans match, we might want to return the most relevant one.
     // For now, return the first one or null if none.
-    const plan = plans && plans.length > 0 ? plans[0] : null;
+    // const plan = plans && plans.length > 0 ? plans[0] : null;
 
     // We need to format the response to match what the frontend expects.
     // The frontend expects `PlannedWorkout` type.
@@ -35,7 +35,11 @@ router.get('/planned', requireAuth, async (req: any, res) => {
     // or just return the plan and let the frontend handle it.
     // But the frontend expects a full object with exercises.
     
-    res.json(plan);
+    if (plan) {
+        res.json({ ...plan, isCompleted });
+    } else {
+        res.json({ isCompleted });
+    }
   } catch (error: any) {
     console.error('Error fetching planned workout:', error);
     res.status(500).json({ error: error.message });
@@ -150,6 +154,25 @@ router.post('/program/update', requireAuth, async (req: any, res) => {
     res.json(result);
   } catch (error: any) {
     console.error('Error updating active program:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/exercise/:slug', requireAuth, async (req: any, res) => {
+  try {
+    const { slug } = req.params;
+    const { data, error } = await supabase
+      .from('exercises')
+      .select('*')
+      .eq('slug', slug)
+      .single();
+
+    if (error) throw error;
+    if (!data) return res.status(404).json({ error: 'Exercise not found' });
+
+    res.json(data);
+  } catch (error: any) {
+    console.error('Error fetching exercise:', error);
     res.status(500).json({ error: error.message });
   }
 });

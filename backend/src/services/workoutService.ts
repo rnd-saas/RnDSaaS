@@ -9,6 +9,22 @@ export const workoutService = {
     
     const formattedDate = date.toISOString().split('T')[0];
 
+    // Check for completed workout (with feedback)
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0,0,0,0);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23,59,59,999);
+
+    const { data: completedWorkouts } = await supabase
+        .from('workout_feedback')
+        .select('id, workouts!inner(user_id, ended_at)')
+        .eq('workouts.user_id', userId)
+        .gte('workouts.ended_at', startOfDay.toISOString())
+        .lte('workouts.ended_at', endOfDay.toISOString())
+        .limit(1);
+    
+    const isCompleted = !!(completedWorkouts && completedWorkouts.length > 0);
+
     // 1. Get active program ID
     const { data: activeProgram } = await supabase
         .from('workout_programs')
@@ -18,7 +34,7 @@ export const workoutService = {
         .maybeSingle();
 
     if (!activeProgram) {
-        return []; // No active program, so no planned workout
+        return { plan: null, isCompleted }; // No active program
     }
 
     // 2. Get plan for this program and day
@@ -39,7 +55,7 @@ export const workoutService = {
       throw error;
     }
 
-    return data;
+    return { plan: data?.[0] || null, isCompleted };
   },
 
   async saveCompletedWorkout(userId: string, workoutData: any) {

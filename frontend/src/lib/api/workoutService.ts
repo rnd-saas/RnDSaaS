@@ -9,6 +9,17 @@ export const workoutService = {
             
             if (!response) return null;
 
+            // If response has no ID but has isCompleted, it means no plan but maybe completed
+            if (!response.id && response.isCompleted !== undefined) {
+                return {
+                    workoutId: '',
+                    date: date,
+                    exercises: [],
+                    muscleGroups: [],
+                    isCompleted: response.isCompleted
+                };
+            }
+
             const exercises: PlannedExercise[] = response.exercises?.map((item: any) => {
                 const sets: TargetSet[] = [];
                 for (let i = 1; i <= item.target_sets; i++) {
@@ -44,7 +55,8 @@ export const workoutService = {
                 workoutId: response.id,
                 date: new Date(response.scheduled_date || date),
                 exercises,
-                muscleGroups: [] // TODO: Aggregate from exercises
+                muscleGroups: [], // TODO: Aggregate from exercises
+                isCompleted: response.isCompleted
             };
         } catch (error) {
             console.error('Error fetching planned workout:', error);
@@ -70,5 +82,29 @@ export const workoutService = {
 
     async updateActiveWorkoutProgram(newProgramData: any): Promise<any> {
         return await apiClient.post('/api/workouts/program/update', newProgramData);
+    },
+
+    async getExerciseBySlug(slug: string): Promise<ExerciseInformation | null> {
+        try {
+            const response = await apiClient.get<any>(`/api/workouts/exercise/${slug}`);
+            if (!response) return null;
+
+            return {
+                exerciseId: response.id,
+                name: response.name,
+                description: response.description,
+                slug: response.slug,
+                difficultyLevel: response.difficulty,
+                logMode: response.log_mode,
+                muscleGroups: [], // TODO: Add muscle groups to DB schema if needed
+                createdAt: new Date(response.created_at),
+                updatedAt: new Date(response.updated_at),
+                tutorialUrl: response.youtube_url,
+                instructions: response.cues
+            };
+        } catch (error) {
+            console.error('Error fetching exercise:', error);
+            return null;
+        }
     }
 };

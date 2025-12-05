@@ -1,6 +1,3 @@
-import {
-  dummyExercise,
-} from "@/lib/data/dummyPlannedWorkout";
 import type {
   PlannedWorkout,
   ExerciseInformation,
@@ -28,11 +25,7 @@ export function usePlannedWorkout(date: Date) {
 }
 
 async function fetchExercise(exerciseSlug: string) {
-  await new Promise<ExerciseInformation>((resolve) => setTimeout(resolve, 500));
-
-  // In a real implementation, you would fetch data from a backend service here
-  // For now, we return a dummy exercise based on the slug
-  return dummyExercise;
+  return await workoutService.getExerciseBySlug(exerciseSlug);
 }
 
 export function useExercise(exerciseSlug: string) {

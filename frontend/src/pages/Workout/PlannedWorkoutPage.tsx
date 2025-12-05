@@ -41,6 +41,15 @@ export default function WorkoutPage() {
     workoutContentBlock = (
       <div className="p-4 text-sm text-red-600">Failed to load workout.</div>
     );
+  } else if (plannedWorkout?.isCompleted) {
+    workoutContentBlock = (
+      <div className="flex flex-col items-center justify-center p-8 text-center gap-4 mt-10">
+        <h3 className="text-2xl font-bold text-green-700">Workout Completed!</h3>
+        <p className="text-muted-foreground max-w-xs">
+          Great job crushing your workout today. Rest up and get ready for the next one!
+        </p>
+      </div>
+    );
   } else if (!plannedWorkout || !plannedWorkout.exercises?.length) {
     workoutContentBlock = (
       <div className="p-4 text-sm text-muted-foreground">
@@ -100,11 +109,11 @@ export default function WorkoutPage() {
           <Button
             variant="default"
             className={`flex-1 text-base lg:hidden ${
-              !todayWorkoutId && "pointer-events-none opacity-50"
+              (!todayWorkoutId || plannedWorkout?.isCompleted) && "pointer-events-none opacity-50"
             }`}
             onClick={handleWorkoutStart}
           >
-            Start Workout
+            {plannedWorkout?.isCompleted ? "Completed" : "Start Workout"}
           </Button>
           <Button
             size={isLarge ? "default" : "icon"}
