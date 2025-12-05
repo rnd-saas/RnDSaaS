@@ -3,6 +3,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {Input} from "@/components/ui/input.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Progress} from "@/components/ui/progress.tsx";
+import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog.tsx";
 import {progressService} from "@/lib/api";
 import {Pencil, Check, X} from "lucide-react";
 
@@ -13,6 +14,8 @@ export default function Goals(){
     const [loading, setLoading] = useState(true);
     const [editingGoalId, setEditingGoalId] = useState<number | null>(null);
     const [editTarget, setEditTarget] = useState<string>("");
+    const [completedGoal, setCompletedGoal] = useState<{ label: string; value: number; target: number; id?: number } | null>(null);
+    const [showCompletedDialog, setShowCompletedDialog] = useState(false);
 
     const possibleGoals = [
         { label: "Workouts completed", value: "workoutsCompleted", target: 5 },
@@ -36,6 +39,26 @@ export default function Goals(){
                 id: g.id
             }));
             setSelected(goals);
+            
+            // Check for completed or exceeded goals (value >= target)
+            const completedOrExceeded = goals.find(g => g.value >= g.target);
+            
+            if (completedOrExceeded) {
+                const storageKey = `completed_goal_${completedOrExceeded.id}`;
+                try {
+                    const hasShown = localStorage.getItem(storageKey);
+                    if (!hasShown) {
+                        setCompletedGoal(completedOrExceeded);
+                        setShowCompletedDialog(true);
+                        // Mark as shown (will be cleared when target is updated)
+                        localStorage.setItem(storageKey, 'true');
+                    }
+                } catch (e) {
+                    // If localStorage fails, still show the dialog
+                    setCompletedGoal(completedOrExceeded);
+                    setShowCompletedDialog(true);
+                }
+            }
         } catch (error) {
             console.error('Failed to load goals:', error);
         } finally {
@@ -103,9 +126,18 @@ export default function Goals(){
 
         try {
             await progressService.updateGoal(goalId, { target: targetValue });
+            // Clear completed goal flag when target is updated
+            const completedKey = `completed_goal_${goalId}`;
+            try {
+                localStorage.removeItem(completedKey);
+            } catch (e) {
+                // Ignore localStorage errors
+            }
             await loadGoals();
             setEditingGoalId(null);
             setEditTarget("");
+            setShowCompletedDialog(false);
+            setCompletedGoal(null);
         } catch (error) {
             console.error('Failed to update goal:', error);
             alert('Failed to update goal. Please try again.');
@@ -118,6 +150,46 @@ export default function Goals(){
 
     return(
         <div>
+            {/* Congratulations dialog for completed/exceeded goals */}
+            <Dialog open={showCompletedDialog} onOpenChange={setShowCompletedDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Congratulations! 🎉</DialogTitle>
+                        <DialogDescription>
+                            {completedGoal && (
+                                <>
+                                    {completedGoal.value > completedGoal.target ? (
+                                        <>
+                                            You've exceeded your goal for <strong>{completedGoal.label}</strong>! 
+                                            You've completed <strong>{completedGoal.value}</strong> out of your target of <strong>{completedGoal.target}</strong>.
+                                        </>
+                                    ) : (
+                                        <>
+                                            You've completed your goal for <strong>{completedGoal.label}</strong>! 
+                                            You've reached your target of <strong>{completedGoal.target}</strong>.
+                                        </>
+                                    )}
+                                    <br /><br />
+                                    Please set a new goal to continue tracking your progress.
+                                </>
+                            )}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex justify-end gap-2 mt-4">
+                        <Button onClick={() => {
+                            if (completedGoal?.id) {
+                                handleStartEdit(completedGoal.id, completedGoal.target);
+                            }
+                            setShowCompletedDialog(false);
+                        }}>
+                            Set New Goal
+                        </Button>
+                        <Button variant="outline" onClick={() => setShowCompletedDialog(false)}>
+                            Close
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
             <section className="space-y-3 mb-4">
                 {selectedGoals.length === 0 ? (
                     <p className="text-sm text-muted-foreground">No goals yet. Add one below!</p>

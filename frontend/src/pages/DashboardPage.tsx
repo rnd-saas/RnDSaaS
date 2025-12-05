@@ -385,9 +385,9 @@ export function GoalRow({ label, value, target }: { label: string; value: number
     <div className="space-y-1.5">
       <div className="flex items-center justify-between text-[15px]">
         <span className="list-item ml-6 list-disc marker:text-foreground/80">{label}:</span>
-        <span className="tabular-nums">{value}</span>
+        <span className="tabular-nums">{value} / {target}</span>
       </div>
-      <Progress value={pct} className="h-2 rounded-full" />
+      <Progress value={pct} className="h-2 rounded-full mt-1.5" />
     </div>
   );
 }

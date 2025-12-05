@@ -63,7 +63,8 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
             workoutsResult,
             achievementRowsResult,
             nextPlanResult,
-            userStatsResult
+            userStatsResult,
+            goalsResult
         ] = await Promise.all([
             supabase
             .from('user_info')
@@ -94,7 +95,12 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
                 .from('view_user_stats_aggregated')
                 .select('exercise_complete_count')
                 .eq('user_id', userId)
-                .maybeSingle()
+                .maybeSingle(),
+            supabase
+                .from('goals')
+                .select('goals, target_value')
+                .eq('user_id', userId)
+                .eq('status', 'active')
         ]);
 
         if (userInfoResult.error) {
@@ -111,6 +117,9 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
         }
         if (userStatsResult.error) {
             console.warn('Failed to fetch user stats from view', userStatsResult.error);
+        }
+        if (goalsResult.error) {
+            console.warn('Failed to fetch goals for dashboard', goalsResult.error);
         }
 
         const workouts = workoutsResult.data ?? [];
@@ -130,6 +139,31 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
         const totalXp = calculateExperience(totalWorkouts, streakDays);
         const level = resolveLevel(totalXp);
 
+        // Get target values from user's goals, fallback to defaults if not set
+        const goals = goalsResult.data ?? [];
+        const workoutsGoal = goals.find(g => 
+            g.goals?.toLowerCase().includes('workouts completed') || 
+            g.goals?.toLowerCase().includes('workout')
+        );
+        const exercisesGoal = goals.find(g => 
+            g.goals?.toLowerCase().includes('exercises completed') || 
+            g.goals?.toLowerCase().includes('exercises discovered')
+        );
+        const streakGoal = goals.find(g => 
+            g.goals?.toLowerCase().includes('longest streak') || 
+            g.goals?.toLowerCase().includes('streak')
+        );
+
+        const workoutsTarget = workoutsGoal?.target_value 
+            ? Number(workoutsGoal.target_value) 
+            : Math.max(WORKOUT_TARGET, totalWorkouts || WORKOUT_TARGET);
+        const exercisesTarget = exercisesGoal?.target_value 
+            ? Number(exercisesGoal.target_value) 
+            : Math.max(EXERCISE_TARGET, exercisesCompleted || EXERCISE_TARGET);
+        const streakTarget = streakGoal?.target_value 
+            ? Number(streakGoal.target_value) 
+            : STREAK_TARGET;
+
         const nextPlan = nextPlanResult.data;
         const nextWorkout =
             nextPlan?.name && nextPlan?.scheduled_date
@@ -142,15 +176,15 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
             goal: {
                 workoutsCompleted: {
                     current: totalWorkouts,
-                    target: Math.max(WORKOUT_TARGET, totalWorkouts || WORKOUT_TARGET)
+                    target: workoutsTarget
                 },
                 exercisesCompleted: {
                     current: exercisesCompleted,
-                    target: Math.max(EXERCISE_TARGET, exercisesCompleted || EXERCISE_TARGET)
+                    target: exercisesTarget
                 },
                 longestStreak: {
                     current: streakDays,
-                    target: STREAK_TARGET
+                    target: streakTarget
                 }
             },
             level,
