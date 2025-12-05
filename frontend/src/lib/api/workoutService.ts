@@ -1,0 +1,110 @@
+import apiClient from './client';
+import type { PlannedWorkout, PlannedExercise, TargetSet, ExerciseInformation } from '../types/Workout';
+
+export const workoutService = {
+    async getPlannedWorkout(date: Date): Promise<PlannedWorkout | null> {
+        try {
+            const dateStr = date.toISOString();
+            const response = await apiClient.get<any>('/api/workouts/planned', { date: dateStr });
+            
+            if (!response) return null;
+
+            // If response has no ID but has isCompleted, it means no plan but maybe completed
+            if (!response.id && response.isCompleted !== undefined) {
+                return {
+                    workoutId: '',
+                    date: date,
+                    exercises: [],
+                    muscleGroups: [],
+                    isCompleted: response.isCompleted
+                };
+            }
+
+            const exercises: PlannedExercise[] = response.exercises?.map((item: any) => {
+                const sets: TargetSet[] = [];
+                for (let i = 1; i <= item.target_sets; i++) {
+                    const set: TargetSet = { setNumber: i };
+                    if (item.metric === 'reps') set.targetReps = Number(item.target_value);
+                    else if (item.metric === 'weight') set.targetWeightKg = Number(item.target_value);
+                    else if (item.metric === 'duration_s') set.targetTimeSeconds = Number(item.target_value);
+                    else if (item.metric === 'distance') set.targetDistanceMeters = Number(item.target_value);
+                    sets.push(set);
+                }
+
+                const exerciseInfo: ExerciseInformation = {
+                    exerciseId: item.exercise.id,
+                    name: item.exercise.name,
+                    description: item.exercise.description,
+                    slug: item.exercise.slug,
+                    difficultyLevel: item.exercise.difficulty,
+                    logMode: item.exercise.log_mode,
+                    muscleGroups: [], // TODO: Map from backend if available
+                    createdAt: new Date(item.exercise.created_at),
+                    updatedAt: new Date(item.exercise.updated_at)
+                };
+
+                return {
+                    exerciseId: item.exercise.id,
+                    sets,
+                    restTimeSeconds: Number(item.rest_seconds),
+                    exerciseInfo
+                };
+            }) || [];
+
+            return {
+                workoutId: response.id,
+                date: new Date(response.scheduled_date || date),
+                exercises,
+                muscleGroups: [], // TODO: Aggregate from exercises
+                isCompleted: response.isCompleted
+            };
+        } catch (error) {
+            console.error('Error fetching planned workout:', error);
+            return null;
+        }
+    },
+
+    async saveCompletedWorkout(data: any): Promise<any> {
+        return await apiClient.post('/api/workouts/complete', data);
+    },
+
+    async updateWorkoutEvaluation(workoutId: string, data: any): Promise<any> {
+        return await apiClient.put(`/api/workouts/${workoutId}/evaluation`, data);
+    },
+
+    async getAiFeedback(workoutId: string): Promise<{ feedback: string }> {
+        return await apiClient.get(`/api/workouts/${workoutId}/ai-feedback`);
+    },
+
+    async getActiveWorkoutProgram(): Promise<any> {
+        return await apiClient.get('/api/workouts/program/active');
+    },
+
+    async updateActiveWorkoutProgram(newProgramData: any): Promise<any> {
+        return await apiClient.post('/api/workouts/program/update', newProgramData);
+    },
+
+    async getExerciseBySlug(slug: string): Promise<ExerciseInformation | null> {
+        try {
+            const response = await apiClient.get<any>(`/api/workouts/exercise/${slug}`);
+            if (!response) return null;
+
+            return {
+                exerciseId: response.id,
+                name: response.name,
+                description: response.description,
+                slug: response.slug,
+                difficultyLevel: response.difficulty,
+                logMode: response.log_mode,
+                muscleGroups: [], // TODO: Add muscle groups to DB schema if needed
+                createdAt: new Date(response.created_at),
+                updatedAt: new Date(response.updated_at),
+                tutorialUrl: response.youtube_url,
+                instructions: response.cues
+            };
+        } catch (error) {
+            console.error('Error fetching exercise:', error);
+            return null;
+        }
+    }
+};

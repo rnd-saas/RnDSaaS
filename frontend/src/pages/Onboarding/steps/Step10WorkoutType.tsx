@@ -1,6 +1,7 @@
 ﻿import {Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet} from "@/components/ui/field.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
-import {PreferredSplit} from "@/utils/InputTypes.tsx";
+import {PreferredSplitValues} from "@/utils/InputTypes.tsx";
+import type {PreferredSplit} from "@/utils/InputTypes.tsx";
 import {Controller, useFormContext} from "react-hook-form";
 import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
 
@@ -8,11 +9,11 @@ import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
 export default function Step10WorkoutType() {
     const { control } = useFormContext<Inputs>();
     const splitOptions: { value: PreferredSplit; label: string }[]  = [
-        { value: PreferredSplit.DontKnow, label: "Suggest something for me" },
-        { value: PreferredSplit.FullBody, label: "Full body" },
-        { value: PreferredSplit.UpperLower, label: "Upper-lower body" },
-        { value: PreferredSplit.PushPullLegs, label: "Push-pull-Legs" },
-        { value: PreferredSplit.Other, label: "Other" },
+        { value: PreferredSplitValues.DontKnow, label: "Suggest something for me" },
+        { value: PreferredSplitValues.FullBody, label: "Full body" },
+        { value: PreferredSplitValues.UpperLower, label: "Upper-lower body" },
+        { value: PreferredSplitValues.PushPullLegs, label: "Push-pull-Legs" },
+        { value: PreferredSplitValues.Other, label: "Other" },
     ];
     return (
         <FieldGroup  className="w-[60vw] lg:w-[30vw] lg:ml-[30vw]">
@@ -21,12 +22,18 @@ export default function Step10WorkoutType() {
                 <FieldDescription>
                     Which type of workouts would you like to do?
                 </FieldDescription>
-                <Controller name="preferredSplit" control={control} defaultValue={undefined} rules={{ required: "Please select at least one option" }}
+                <Controller
+                    name="preferredSplit"
+                    control={control}
+                    defaultValue={[]}
+                    rules={{
+                        validate: (value) => (value && value.length > 0) || "Please select at least one option",
+                    }}
                     render={({ field }) => {
-                        const selected = field.value || [];
-                        const toggleValue = (val: string) => {
+                        const selected: PreferredSplit[] = field.value || [];
+                        const toggleValue = (val: PreferredSplit) => {
                             if (selected.includes(val)) {
-                                field.onChange((selected as unknown as string[]).filter((v) => v !== val));
+                                field.onChange(selected.filter((v) => v !== val));
                             } else {
                                 field.onChange([...selected, val]);
                             }

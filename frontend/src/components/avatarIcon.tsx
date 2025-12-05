@@ -1,6 +1,7 @@
 ﻿import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar.tsx";
-import avatarPlaceholder from "@/assets/avatar-placeholder.png";
-export default function AvatarIcon({ icon= avatarPlaceholder}) {
+import defaultAvatar from "@/assets/tom_avatar.png";
+
+export default function AvatarIcon({ icon = defaultAvatar }) {
 return(
     <Avatar className="h-12 w-12">
         <AvatarImage src={icon} />

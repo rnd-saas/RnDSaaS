@@ -2,8 +2,10 @@
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {Controller, useFormContext} from "react-hook-form";
+import type {ControllerRenderProps} from "react-hook-form";
 import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
 
+type ProblemAreasField = ControllerRenderProps<Inputs, "problemAreas">;
 
 export default function Step9ProtectedAreas() {
     const { control } = useFormContext<Inputs>();
@@ -14,7 +16,7 @@ export default function Step9ProtectedAreas() {
         { value: "none", label: "None" },
     ];
 
-    function toggleCheckbox(selected: string[], field, value: string) {
+    function toggleCheckbox(selected: string[], field: ProblemAreasField, value: string) {
         if (selected.includes(value)) {
             field.onChange(selected.filter(v => v !== value));
         } else {
@@ -22,7 +24,7 @@ export default function Step9ProtectedAreas() {
         }
     }
 
-    function toggleOther(selected: string[], field, checked: boolean) {
+    function toggleOther(selected: string[], field: ProblemAreasField, checked: boolean) {
         if (!checked) {
             field.onChange(selected.filter(v => !v.startsWith("other:")));
         } else {
@@ -30,7 +32,7 @@ export default function Step9ProtectedAreas() {
         }
     }
 
-    function updateOtherText(selected: string[], field, text: string) {
+    function updateOtherText(selected: string[], field: ProblemAreasField, text: string) {
         const withoutOther = selected.filter(v => !v.startsWith("other:"));
         if (text.trim() === "") {
             field.onChange(withoutOther);
@@ -63,7 +65,7 @@ export default function Step9ProtectedAreas() {
                                 ))}
                                 <Field orientation="horizontal">
                                     <Checkbox id="other" checked={hasOther}
-                                        onCheckedChange={checked => toggleOther(selected, field, checked)}
+                                        onCheckedChange={checked => toggleOther(selected, field, Boolean(checked))}
                                     />
                                     <FieldLabel htmlFor="other" className="font-normal">Other</FieldLabel>
                                 </Field>

@@ -6,22 +6,71 @@
     XAxis,
     YAxis
 } from "recharts";
+import {useState, useEffect} from "react";
+import {progressService} from "@/lib/api";
 
 export default function Workouts(){
-    const latestWorkouts = [
-        {date: "2025-11-02T09:00:00", length:45},
-        {date: "2025-11-02T11:00:00", length: 15},
-        {date: "2025-11-04T15:00:00", length: 60},
-        {date: "2025-11-05T16:00:00", length: 75},
-    ];
-    const data = latestWorkouts.map((d) => ({
-        time: new Date(d.date).getTime(),
-        duration: d.length,
-    }));
+    const [data, setData] = useState<Array<{time: number; duration: number}>>([]);
+    const [loading, setLoading] = useState(true);
 
-    const minDate = new Date(Math.min(...data.map(d => d.time)));
-    const maxDate = new Date(Math.max(...data.map(d => d.time)));
-    const dayTicks = [];
+    useEffect(() => {
+        loadWorkouts();
+    }, []);
+
+    const loadWorkouts = async () => {
+        try {
+            setLoading(true);
+            const response = await progressService.getWeekWorkouts();
+            
+            // Create a map of date -> duration for quick lookup
+            const workoutMap = new Map<number, number>();
+            response.workouts.forEach((d) => {
+                const date = new Date(d.date);
+                date.setHours(0, 0, 0, 0);
+                workoutMap.set(date.getTime(), d.length);
+            });
+            
+            // Calculate start of week (Monday)
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - daysToMonday);
+            startOfWeek.setHours(0, 0, 0, 0);
+            
+            // Fill all 7 days of the week with data (0 for days without workouts)
+            const weekData: Array<{time: number; duration: number}> = [];
+            for (let i = 0; i < 7; i++) {
+                const currentDate = new Date(startOfWeek);
+                currentDate.setDate(startOfWeek.getDate() + i);
+                currentDate.setHours(0, 0, 0, 0);
+                const time = currentDate.getTime();
+                weekData.push({
+                    time,
+                    duration: workoutMap.get(time) || 0
+                });
+            }
+            
+            setData(weekData);
+        } catch (error) {
+            console.error('Failed to load workouts:', error);
+            setData([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return <div className="h-[25vh] w-full flex items-center justify-center">Loading...</div>;
+    }
+
+    if (data.length === 0) {
+        return <div className="h-[25vh] w-full flex items-center justify-center text-gray-500">No workout data available</div>;
+    }
+
+    const minDate = data.length > 0 ? new Date(Math.min(...data.map(d => d.time))) : new Date();
+    const maxDate = data.length > 0 ? new Date(Math.max(...data.map(d => d.time))) : new Date();
+    const dayTicks: number[] = [];
     const current = new Date(minDate);
     current.setHours(0, 0, 0, 0);
     while (current <= maxDate) {
@@ -37,7 +86,7 @@ export default function Workouts(){
                         dataKey="time"
                         name="Day"
                         ticks={dayTicks}
-                        tickFormatter={ts => new Date(ts).toLocaleDateString(undefined, { weekday: "short" })}
+                        tickFormatter={(ts: number) => new Date(ts).toLocaleDateString(undefined, { weekday: "short" })}
                         type="number"
                         domain={["dataMin", "dataMax"]}
                     />
@@ -47,9 +96,9 @@ export default function Workouts(){
                         domain={[0, 'dataMax+10']}
                     />
                     <Tooltip
-                        labelFormatter={ts => new Date(ts).toLocaleDateString()}
+                        labelFormatter={(ts: number) => new Date(ts).toLocaleDateString()}
                     />
-                    <Bar dataKey="duration"/>
+                    <Bar dataKey="duration" barSize={15}/>
                 </BarChart>
             </ResponsiveContainer>
         </div>

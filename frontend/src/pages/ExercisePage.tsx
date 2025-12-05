@@ -6,7 +6,12 @@ import { Rating, RatingButton } from "@/components/ui/shadcn-io/rating";
 import type { ExerciseInformation } from "@/lib/types/Workout";
 import { Button } from "@/components/WorkoutComponents/button";
 
-//TODO: fetch exercise based on exercise slug in database! this is unique for all exercises anyways...
+const getEmbedUrl = (url: string) => {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2]) ? `https://www.youtube.com/embed/${match[2]}` : null;
+};
 
 const logMode: Record<ExerciseInformation["logMode"], string> = {
   reps_weight: "Reps and weight",
@@ -93,11 +98,11 @@ export default function ExercisePage() {
             <section>
               <h3 className="h3-styles mb-3 text-xl">Tutorial</h3>
               <div className="aspect-video w-full overflow-hidden rounded-xl bg-muted shadow-sm">
-                {exercise?.tutorialUrl ? (
+                {exercise?.tutorialUrl && getEmbedUrl(exercise.tutorialUrl) ? (
                   <iframe
                     width="100%"
                     height="100%"
-                    src={exercise.tutorialUrl.replace("watch?v=", "embed/")}
+                    src={getEmbedUrl(exercise.tutorialUrl)!}
                     title="YouTube video player"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
