@@ -79,7 +79,7 @@ export interface DashboardData {
     trainer: boolean | null;
     goal: {
         workoutsCompleted: DashboardStat;
-        exercisesDiscovered: DashboardStat;
+        exercisesCompleted: DashboardStat;
         longestStreak: DashboardStat;
     };
     level: {

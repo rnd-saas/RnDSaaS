@@ -16,7 +16,7 @@ const FALLBACK_DASHBOARD: DashboardData = {
   trainer: null,
   goal: {
     workoutsCompleted: { current: 0, target: 100 },
-    exercisesDiscovered: { current: 0, target: 40 },
+    exercisesCompleted: { current: 0, target: 40 },
     longestStreak: { current: 0, target: 60 },
   },
   level: { label: "Novice", currentXp: 500, nextLevelXp: 1200 },
@@ -258,7 +258,7 @@ export default function DashboardPage() {
         <section className="space-y-3">
           <h2 className="text-xl font-semibold">To your goal:</h2>
           <GoalRow label="Workouts completed" value={goal.workoutsCompleted.current} target={goal.workoutsCompleted.target} />
-          <GoalRow label="New exercises discovered" value={goal.exercisesDiscovered.current} target={goal.exercisesDiscovered.target} />
+          <GoalRow label="Exercises completed" value={goal.exercisesCompleted.current} target={goal.exercisesCompleted.target} />
           <GoalRow label="Longest streak" value={goal.longestStreak.current} target={goal.longestStreak.target} />
         </section>
 
