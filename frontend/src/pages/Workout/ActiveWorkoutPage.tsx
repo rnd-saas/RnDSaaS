@@ -113,21 +113,9 @@ export default function ActiveWorkoutPage() {
 
   useEffect(() => {
     if (!plannedWorkout) {
-      console.log("no planned workout found");
-      console.error("testing the effect");
-      console.error(`value of plannedwworkout: ${plannedWorkout}`);
-      console.error(`value o f id param: ${id}`);
-      console.error(`value of logged workout is: ${loggedWorkout}`);
-      console.error(loggedWorkout);
-      console.error(`value of is running: ${isRunning}`);
       return;
     }
 
-    console.log("testing the effect");
-    console.log(`value of plannedwworkout: ${plannedWorkout}`);
-    console.log(`value o f id param: ${id}`);
-    console.log(`value of logged workout is: ${loggedWorkout}`);
-    console.log(`value of is running: ${isRunning}`);
     if (!isRunning) {
       // Safety Check: If we already have a logged workout for this ID, don't overwrite it!
       if (loggedWorkout && loggedWorkout.workoutId === id) {
@@ -135,8 +123,6 @@ export default function ActiveWorkoutPage() {
         return;
       }
 
-      console.log(`Planned workout is: ${plannedWorkout}`);
-      console.log(`is runnign has value of: ${isRunning}`);
       // convert planned exercises to logged exercises and add to store
       if (plannedWorkout.exercises) {
         const loggedExercises = convertPlannedToLogged(
@@ -147,7 +133,7 @@ export default function ActiveWorkoutPage() {
         updateWorkout({ exercises: loggedExercises });
       }
     }
-  }, []);
+  }, [plannedWorkout, isRunning, loggedWorkout, id, startWorkout, updateWorkout]);
 
   // console.log("INSIDE COMPONENT RENDER");
   // console.log(`value of plannedwworkout: ${plannedWorkout}`);

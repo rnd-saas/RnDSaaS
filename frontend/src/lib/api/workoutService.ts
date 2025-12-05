@@ -4,7 +4,12 @@ import type { PlannedWorkout, PlannedExercise, TargetSet, ExerciseInformation } 
 export const workoutService = {
     async getPlannedWorkout(date: Date): Promise<PlannedWorkout | null> {
         try {
-            const dateStr = date.toISOString();
+            // Use local date string YYYY-MM-DD to ensure backend queries the correct day for the user
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const dateStr = `${year}-${month}-${day}`;
+            
             const response = await apiClient.get<any>('/api/workouts/planned', { date: dateStr });
             
             if (!response) return null;
