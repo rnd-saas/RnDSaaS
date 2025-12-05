@@ -7,7 +7,7 @@ import {
   MiniCalendarDays,
   MiniCalendarNavigation,
 } from "@/components/ui/shadcn-io/mini-calendar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { startOfWeek } from "date-fns";
 import { usePlannedWorkout } from "@/api/workouts";
 import type { PlannedExercise, PlannedWorkout } from "@/lib/types/Workout";
@@ -22,13 +22,16 @@ export default function WorkoutPage() {
   const plannedWorkout: PlannedWorkout | null = data ?? null;
   // Store today's ID for when user clicks on "Start Workout"
   const [todayWorkoutId, setTodayWorkoutId] = useState<string | null>(null);
-  if (
-    !todayWorkoutId &&
-    plannedWorkout &&
-    plannedWorkout.date.toDateString() === new Date().toDateString()
-  ) {
-    setTodayWorkoutId(plannedWorkout.workoutId);
-  }
+  
+  useEffect(() => {
+    if (
+      !todayWorkoutId &&
+      plannedWorkout &&
+      plannedWorkout.date.toDateString() === new Date().toDateString()
+    ) {
+      setTodayWorkoutId(plannedWorkout.workoutId);
+    }
+  }, [plannedWorkout, todayWorkoutId]);
 
   const handleWorkoutStart = () => {
     navigate(`/workout/${todayWorkoutId}`);

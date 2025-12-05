@@ -1,5 +1,5 @@
 import {Button} from "@/components/ui/button.tsx";
-import {AlertTriangle, ArrowLeft, Loader2, MoreVertical, Send, CheckCircle2} from "lucide-react";
+import {AlertTriangle, ArrowLeft, Loader2, MoreVertical, Send, CheckCircle2, ChevronDown, ChevronUp} from "lucide-react";
 import tomAvatar from "@/assets/tom_avatar.png";
 import sarahAvatar from "@/assets/sarah_avatar.png";
 import {Input} from "@/components/ui/input.tsx";
