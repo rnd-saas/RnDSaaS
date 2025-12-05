@@ -137,9 +137,9 @@ export default function MoodPage() {
                 aria-pressed={active}
                 className={[
                   "group relative flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left transition-all",
-                  "bg-background hover:bg-accent/30",
+                  "bg-background hover:bg-primary/30",
                   active
-                    ? "border-foreground ring-2 ring-foreground/20 bg-gradient-to-r from-accent/50 to-transparent"
+                    ? "border-muted-foreground border-3 bg-primary/15 from-accent/50 to-transparent"
                     : "border-border",
                 ].join(" ")}
               >
@@ -147,7 +147,7 @@ export default function MoodPage() {
                   <div
                     className={[
                       "grid h-10 w-10 place-items-center rounded-full text-xl",
-                      active ? "bg-foreground/10" : "bg-muted",
+                      active ? "bg-foreground/15" : "bg-foreground/5",
                     ].join(" ")}
                   >
                     {m.emoji}
@@ -164,7 +164,7 @@ export default function MoodPage() {
                             key={idx}
                             className={[
                               "inline-block h-1.5 w-5 rounded-full",
-                              idx < m.level ? "bg-foreground/80" : "bg-muted",
+                              idx < m.level ? "bg-foreground/80" : "bg-foreground/50",
                             ].join(" ")}
                           />
                         ))}
@@ -180,7 +180,7 @@ export default function MoodPage() {
                 <span
                   className={[
                     "h-2.5 w-2.5 rounded-full transition-colors",
-                    active ? "bg-foreground" : "bg-muted",
+                    active ? "bg-foreground" : "bg-foreground/10",
                   ].join(" ")}
                 />
               </button>
@@ -202,25 +202,25 @@ export default function MoodPage() {
   
       {/* Explanation */}
       <section className="space-y-4">
-        <Card className="bg-muted/40">
-          <CardHeader className="pb-2">
+        <Card className="bg-muted/5 hover:scale-none">
+          <CardHeader >
             <CardTitle className="text-lg flex items-center gap-2">
               <span className="text-xl">{selectedMood.emoji}</span>
               <span>Your mood: {selectedMood.short}</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
+          <CardContent className="text-sm text-foreground/50">
             {selectedMood.explanation}
           </CardContent>
         </Card>
   
         {/* If anxious, show calming advice */}
         {selectedMood.anxious && (
-          <Card className="bg-muted/40">
-            <CardHeader className="pb-2">
+          <Card className="bg-muted/5 hover:scale-none">
+            <CardHeader >
               <CardTitle className="text-lg">If you’re feeling anxious</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <CardContent className="space-y-3 text-sm text-foreground/50">
               <ul className="list-disc pl-5 space-y-1">
                 {ANXIETY_ADVICE.map((tip, i) => (
                   <li key={i}>{tip}</li>
