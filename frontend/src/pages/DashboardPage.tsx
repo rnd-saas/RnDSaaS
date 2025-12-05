@@ -118,6 +118,44 @@ export default function DashboardPage() {
   );
   const [achievementPage, setAchievementPage] = useState(0);
 
+  // Swipe state
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  // Minimum swipe distance (in px)
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null); // Reset touch end
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      // Next page
+      if (achievementPage < totalAchievementPages - 1) {
+        setAchievementPage((prev) => prev + 1);
+      }
+    }
+
+    if (isRightSwipe) {
+      // Previous page
+      if (achievementPage > 0) {
+        setAchievementPage((prev) => prev - 1);
+      }
+    }
+  };
+
   // Load user settings to check streak_display
   const loadSettings = async () => {
     try {
@@ -385,35 +423,48 @@ export default function DashboardPage() {
 
       {/* Achievements */}
       <section className="lg:col-span-2">
-        <div className="flex items-center justify-between px-1">
+        <div className="flex items-center justify-between px-1 mb-4">
           <h3 className="h3-styles font-semibold">Achievements</h3>
-          <div className="overflow-hidden">
-            <div
-              className="flex transition-transform duration-300 ease-out"
-              style={{ transform: `translateX(-${achievementPage * 100}%)` }}
-            >
-              {achievementPages.map((page, idx) => (
-                <div key={`ach-page-${idx}`} className="min-w-full">
-                  <AchievementList
-                    achievements={page}
-                    isLoading={isLoading && !dashboardData}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-          {totalAchievementPages > 1 && (
-            <div className="mt-2 flex items-center justify-center gap-2">
-              {achievementPages.map((_, idx) => (
-                <Dot
-                  key={`ach-dot-${idx}`}
-                  active={idx === achievementPage}
-                  onClick={() => setAchievementPage(idx)}
-                />
-              ))}
-            </div>
-          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 text-xs"
+            onClick={() => navigate("/achievements")}
+          >
+            View All
+          </Button>
         </div>
+        <div
+          className="overflow-hidden touch-pan-y"
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+        >
+          <div
+            className="flex transition-transform duration-300 ease-out"
+            style={{ transform: `translateX(-${achievementPage * 100}%)` }}
+          >
+            {achievementPages.map((page, idx) => (
+              <div key={`ach-page-${idx}`} className="min-w-full">
+                <AchievementList
+                  achievements={page}
+                  isLoading={isLoading && !dashboardData}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+        {totalAchievementPages > 1 && (
+          <div className="mt-2 flex items-center justify-center gap-2">
+            {achievementPages.map((_, idx) => (
+              <Dot
+                key={`ach-dot-${idx}`}
+                active={idx === achievementPage}
+                onClick={() => setAchievementPage(idx)}
+              />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Advice */}
