@@ -10,7 +10,7 @@ const getEmbedUrl = (url: string) => {
   if (!url) return null;
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
   const match = url.match(regExp);
-  return (match && match[2]) ? `https://www.youtube.com/embed/${match[2]}` : null;
+  return match && match[2] ? `https://www.youtube.com/embed/${match[2]}` : null;
 };
 
 const logMode: Record<ExerciseInformation["logMode"], string> = {
@@ -170,7 +170,13 @@ export default function ExercisePage() {
                 Ask your workout buddy!
               </p>
               <div className="hidden lg:block">
-                <Button variant="default" className="w-full text-md shadow-sm">
+                <Button
+                  variant="default"
+                  onClick={() => {
+                    navigate("/chatbot");
+                  }}
+                  className="w-full text-md shadow-sm"
+                >
                   Ask Workout Buddy
                 </Button>
               </div>
