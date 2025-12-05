@@ -1,6 +1,6 @@
 ﻿import {useForm, FormProvider} from "react-hook-form"
 import { useNavigate } from "react-router-dom";
-import {useState, type ComponentType} from "react";
+import {useState, type ComponentType, useEffect} from "react";
 import FormProgress from "./FormProgress.tsx";
 import StepNavigator from "./StepNavigator.tsx";
 
@@ -142,6 +142,9 @@ export default function OnboardingManager() {
           navigate("/landing");
     }
 
+    useEffect(() => {
+        window.tidioChatApi.hide();
+    }, []);
     return (
         <FormProvider {...methods}>
             <div className="flex items-center justify-center p-4">

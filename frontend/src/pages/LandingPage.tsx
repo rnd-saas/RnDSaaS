@@ -2,13 +2,18 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import tomImage from "@/assets/onboarding_welcome/onboarding-tom.png";
 import sarahImage from "@/assets/onboarding_welcome/onboarding-sarah.png";
+import {useEffect} from "react";
 
 export default function LandingPage() {
-  const navigate = useNavigate();
-  const { state } = useLocation() as { state?: { trainerId?: number; firstName?: string } };
+    const navigate = useNavigate();
+    const { state } = useLocation() as { state?: { trainerId?: number; firstName?: string } };
 
-  console.log("LandingPage state:", state);
-console.log("LandingPage localStorage.firstName:", localStorage.getItem("firstName"));
+    useEffect(() => {
+        window.tidioChatApi.hide();
+    }, []);
+
+    console.log("LandingPage state:", state);
+    console.log("LandingPage localStorage.firstName:", localStorage.getItem("firstName"));
 
   // Prefer router state; fall back to localStorage; default to Tom (0)
   const trainerId =

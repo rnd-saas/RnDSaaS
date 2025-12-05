@@ -8,11 +8,15 @@ import { Card } from "@/components/card.tsx";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog.tsx";
 import LoginDialog from "@/pages/Login/LoginDialog.tsx";
 import RegisterDialog from "@/pages/Login/RegisterDialog.tsx";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 
 export default function DefaultPage() {
   const [loginOpen, setLoginOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
+
+  useEffect(() => {
+    window.tidioChatApi.hide();
+  }, []);
 
   return (
     <div className="w-full min-w-[50vw] min-h-[90vh] relative flex flex-col">

@@ -11,6 +11,7 @@ import AchievementList from "@/pages/Profile/ProfileComponents/AchievementList.t
 import { Button } from "@/components/ui/button.tsx";
 import SettingsButton from "@/components/settingsButton.tsx";
 import { Separator } from "@/components/ui/separator";
+import {useEffect} from "react";
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -34,6 +35,9 @@ export default function ProfilePage() {
   const userName =
     state?.firstName ?? localStorage.getItem("firstName") ?? "User";
 
+  useEffect(() => {
+    window.tidioChatApi.show();
+  }, []);
   return (
     <div className="w-full max-w-lg md:max-w-4xl lg:max-w-6xl mx-auto p-6 pb-24 flex flex-col space-y-8 bg-background text-foreground font-sans">
       <header className="flex flex-col items-center space-y-4 relative py-4">

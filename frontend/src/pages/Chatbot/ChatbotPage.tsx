@@ -59,6 +59,25 @@ export default function ChatbotPage() {
         return () => clearTimeout(timeout);
     }, [chatMessages]);
 
+    //hides customer support unless reported
+    useEffect(() => {
+        window.tidioChatApi.hide();
+    }, []);
+    const handleReport = (payload = {}) => {
+        if (window.tidioChatApi) {
+            // API is ready, emit the event
+            window.tidioChatApi.display(true);
+            window.tidioChatApi.open();
+            tidioChatApi.messageFromOperator('What would you like to report?');
+            window.tidioChatApi.track("reported");
+            console.log("tried to report")
+        } else {
+            // Retry shortly after if API is not ready
+            console.log("timeout")
+            setTimeout(() => handleReport(payload), 100);
+        }
+    };
+
     return (
         <div className="w-full min-w-[50vw] min-h-[90vh] relative flex flex-col">
             <header className="px-6 sticky top-0 pt-11 pb-4 bg-white z-10">
@@ -81,7 +100,7 @@ export default function ChatbotPage() {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="w-56">
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={handleReport}>
                                 Report chat
                             </DropdownMenuItem>
                         </DropdownMenuContent>

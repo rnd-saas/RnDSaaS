@@ -6,6 +6,7 @@ import Workouts from "@/pages/Progress/ProgressComponents/Workouts.tsx";
 import WorkoutDisplay from "@/pages/Profile/ProfileComponents/WorkoutDisplay.tsx";
 import PersonalData from "@/pages/Progress/ProgressComponents/PersonalData.tsx";
 import { Separator } from "@/components/ui/separator";
+import {useEffect} from "react";
 
 export default function ProgressPage() {
   const progressComponents = [
@@ -21,6 +22,9 @@ export default function ProgressPage() {
     { value: "data", component: PersonalData, label: "Body Metrics" },
   ];
 
+    useEffect(() => {
+        window.tidioChatApi.show();
+    }, []);
   return (
     <div className="w-full max-w-lg md:max-w-4xl lg:max-w-6xl mx-auto p-6 pb-24 flex flex-col space-y-8">
       <header>

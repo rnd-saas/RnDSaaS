@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import {useEffect, useMemo, useState} from "react";
 import { RefreshCcw } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
@@ -113,6 +113,9 @@ export default function DashboardPage() {
     setTipIndex((prev) => (prev + 1) % ADVICE_TIPS.length);
   };
 
+  useEffect(() => {
+    window.tidioChatApi.show();
+  }, []);
   return (
     <div className="w-full max-w-lg md:max-w-4xl lg:max-w-6xl mx-auto p-6 pb-24 space-y-8 md:space-y-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6">
       {/* Header */}

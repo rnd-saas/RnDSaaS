@@ -1,12 +1,16 @@
 ﻿import {useNavigate} from "react-router-dom";
 import tomImage from "@/assets/onboarding_welcome/onboarding-tom.png";
 import {Button} from "@/components/ui/button.tsx";
+import {useEffect} from "react";
 
 export default function OnboardingInvitePage() {
     const navigate = useNavigate();
     const avatarSrc = tomImage;
     const name = "Tom";
 
+    useEffect(() => {
+        window.tidioChatApi.hide();
+    }, []);
     return (
         <div className="flex flex-col items-center justify-between">
             <header className="my-10 text-center">
