@@ -46,3 +46,6 @@ export const socialService = socialServiceFunctions;
 import * as progressServiceFunctions from './progressService';
 export const progressService = progressServiceFunctions;
 
+// Export workout service
+export { workoutService } from './workoutService';
+

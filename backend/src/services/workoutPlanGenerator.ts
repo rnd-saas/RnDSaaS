@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { z } from 'zod';
 import { supabase } from '../db/supabase';
 
-const EXERCISE_NAMES = [
+export const EXERCISE_NAMES = [
     'Bench Press (Barbell)',
     'Chest Press (Machine)',
     'Dumbbell Bench Press',
@@ -21,7 +21,7 @@ const EXERCISE_NAMES = [
     'Seated Cable Row (Wide Grip)'
 ] as const;
 
-const EXERCISE_LIBRARY: ExerciseDefinition[] = [
+export const EXERCISE_LIBRARY: ExerciseDefinition[] = [
     {
         name: 'Bench Press (Barbell)',
         slug: 'bench-press',
@@ -172,7 +172,7 @@ type WorkoutProgram = z.infer<typeof workoutProgramSchema>;
 
 type ExerciseName = (typeof EXERCISE_NAMES)[number];
 
-interface ExerciseDefinition {
+export interface ExerciseDefinition {
     name: ExerciseName;
     slug: string;
     description: string;
@@ -568,6 +568,9 @@ async function persistProgram(userId: string, plan: WorkoutProgram): Promise<Gen
     const exerciseCatalog = await ensureExerciseCatalog();
     let programId: string | null = null;
     const planIds: string[] = [];
+    
+    // Extract unique workout days
+    const workoutDays = Array.from(new Set(plan.workout_plans.map(p => p.day_number))).sort((a, b) => a - b);
 
     try {
         await supabase
@@ -584,7 +587,8 @@ async function persistProgram(userId: string, plan: WorkoutProgram): Promise<Gen
                     name: plan.program_name,
                     description: plan.program_description,
                     weeks_count: plan.weeks_count,
-                    is_active: true
+                    is_active: true,
+                    workout_days: workoutDays
                 }
             ])
             .select('id')

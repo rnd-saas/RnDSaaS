@@ -62,5 +62,13 @@ export const workoutService = {
 
     async getAiFeedback(workoutId: string): Promise<{ feedback: string }> {
         return await apiClient.get(`/api/workouts/${workoutId}/ai-feedback`);
+    },
+
+    async getActiveWorkoutProgram(): Promise<any> {
+        return await apiClient.get('/api/workouts/program/active');
+    },
+
+    async updateActiveWorkoutProgram(newProgramData: any): Promise<any> {
+        return await apiClient.post('/api/workouts/program/update', newProgramData);
     }
 };
