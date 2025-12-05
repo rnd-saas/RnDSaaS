@@ -48,7 +48,7 @@ const MOODS: {
   {
     key: "comfortable",
     label: "I’m comfortable",
-    emoji: "😄",
+    emoji: "😌",
     short: "Comfortable",
     explanation:
       "You feel confident and settled in your routine. It’s a great place to be — keep that positive momentum going.",
@@ -130,7 +130,7 @@ export default function MoodPage() {
             const active = m.key === selected;
   
             return (
-              <button
+              <Card
                 key={m.key}
                 type="button"
                 onClick={() => setSelected(m.key)}
@@ -176,14 +176,14 @@ export default function MoodPage() {
                   </div>
                 </div>
   
-                {/* Right-side selected indicator */}
-                <span
-                  className={[
-                    "h-2.5 w-2.5 rounded-full transition-colors",
-                    active ? "bg-foreground" : "bg-foreground/10",
-                  ].join(" ")}
-                />
-              </button>
+                {/*/!* Right-side selected indicator *!/*/}
+                {/*<span*/}
+                {/*  className={[*/}
+                {/*    "h-2.5 w-2.5 rounded-full transition-colors",*/}
+                {/*    active ? "bg-foreground" : "bg-foreground/10",*/}
+                {/*  ].join(" ")}*/}
+                {/*/>*/}
+              </Card>
             );
           })}
         </div>
@@ -202,7 +202,7 @@ export default function MoodPage() {
   
       {/* Explanation */}
       <section className="space-y-4">
-        <Card className="bg-muted/5 hover:scale-none">
+        <Card className="hover:scale-none">
           <CardHeader >
             <CardTitle className="text-lg flex items-center gap-2">
               <span className="text-xl">{selectedMood.emoji}</span>
@@ -216,7 +216,7 @@ export default function MoodPage() {
   
         {/* If anxious, show calming advice */}
         {selectedMood.anxious && (
-          <Card className="bg-muted/5 hover:scale-none">
+          <Card className="hover:scale-none">
             <CardHeader >
               <CardTitle className="text-lg">If you’re feeling anxious</CardTitle>
             </CardHeader>

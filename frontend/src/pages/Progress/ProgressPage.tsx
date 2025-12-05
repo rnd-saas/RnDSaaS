@@ -1,5 +1,4 @@
 import AchievementList from "@/pages/Profile/ProfileComponents/AchievementList.tsx";
-import {Label} from "@/components/ui/label.tsx";
 import ChatbotButton from "@/components/chatbotButton.tsx";
 import Goals from "@/pages/Progress/ProgressComponents/Goals.tsx";
 import Moods from "@/pages/Progress/ProgressComponents/Moods.tsx";

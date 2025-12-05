@@ -5,11 +5,11 @@ import {progressService} from "@/lib/api";
 
 export default function Moods(){
     const moodEmojis: Record<number, string> = {
-        [MoodOptions.anxious]: "😰",
-        [MoodOptions.insecure]: "😟",
-        [MoodOptions.nervous]: "😐",
-        [MoodOptions.fine]: "🙂",
-        [MoodOptions.comfortable]: "😄",
+        [MoodOptions.anxious]: "😣",
+        [MoodOptions.insecure]: "😬",
+        [MoodOptions.nervous]: "🙂",
+        [MoodOptions.fine]: "😌",
+        [MoodOptions.comfortable]: "🤩",
     };
     const [data, setData] = useState<Array<{x: number; y: number}>>([]);
     const [loading, setLoading] = useState(true);

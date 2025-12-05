@@ -370,7 +370,7 @@ export default function DashboardPage() {
 
         <Card
           className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 bg-linear-to-br from-background to-primary/5 py-4 gap-2 md:flex-1 md:justify-center"
-          onClick={() => navigate("/workout/exercise")}
+          onClick={() => navigate("/workout")}
         >
           <CardHeader className="pb-0 px-4 flex flex-col items-center">
             <CardTitle className="text-base font-medium text-center">
