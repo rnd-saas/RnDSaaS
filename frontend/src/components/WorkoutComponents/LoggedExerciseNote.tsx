@@ -1,6 +1,5 @@
 import { useRef } from "react";
 import { useWorkoutStore } from "@/lib/state/workoutStore";
-import { usePlannedWorkout } from "@/api/workouts";
 
 export function LoggedExerciseNote({
   bgColor,
@@ -8,19 +7,15 @@ export function LoggedExerciseNote({
 }: {
   bgColor?: string;
   exerciseId: string;
-}): JSX.Element {
+}) {
   const ref = useRef<HTMLTextAreaElement>(null);
   const updateExercise = useWorkoutStore((state) => state.updateExercise);
 
   const loggedExercise = useWorkoutStore((state) =>
     state.getExercise(exerciseId)
   );
-  const { data: plannedWorkout } = usePlannedWorkout(new Date());
-  const plannedExercise = plannedWorkout?.exercises.find(
-    (ex) => ex.exerciseInfo.exerciseId === exerciseId
-  );
 
-  const noteValue = loggedExercise?.notes ?? plannedExercise?.notes ?? "";
+  const noteValue = loggedExercise?.notes ?? "";
 
   const autoGrow = () => {
     const el = ref.current;

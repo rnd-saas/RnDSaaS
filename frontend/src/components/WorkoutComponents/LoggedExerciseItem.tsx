@@ -2,7 +2,6 @@ import { Card, CardContent } from "../card";
 import { ChevronDown, HelpCircle } from "lucide-react";
 import bench from "@/assets/icons/bench.svg";
 import LoggedExerciseItemTable from "@/components/WorkoutComponents/LoggedExerciseItemTable";
-import { useState } from "react";
 import type { PlannedExercise } from "@/lib/types/Workout";
 import { LoggedExerciseNote } from "@/components/WorkoutComponents/LoggedExerciseNote";
 import { Timer } from "lucide-react";
@@ -34,7 +33,7 @@ export default function LoggedExerciseItem({
   const setExpandedExercideId = useWorkoutStore(
     (state) => state.setExpandedExerciseId
   );
-  const { data, isLoading, error } = usePlannedWorkout(new Date());
+  const { data, isLoading } = usePlannedWorkout(new Date());
 
   // Access the store actions and the specific logged exercise
   const updateExercise = useWorkoutStore((state) => state.updateExercise);

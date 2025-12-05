@@ -127,6 +127,7 @@ export interface ChatbotRequest {
     metadata?: {
         language?: string;
         onboardingSummary?: string;
+        workoutPlanContext?: any;
     };
 }
 

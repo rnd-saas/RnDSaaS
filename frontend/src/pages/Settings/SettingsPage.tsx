@@ -33,7 +33,7 @@ export default function SettingsPage() {
                     </AccordionItem>
                 ))}
             </Accordion>
-            <ChatbotButton variant={"primary"}/>
+            <ChatbotButton variant={"default"}/>
         </div>
     )
 }

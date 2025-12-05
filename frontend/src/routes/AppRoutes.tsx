@@ -20,7 +20,6 @@ function PageViewTracker() {
 }
 import AppLayout from "@/routes/AppLayout";
 import RestTimer from "@/pages/Workout/RestTimer";
-import WorkoutTimer from "@/pages/Workout/WorkoutTimer";
 import ProfilePage from "@/pages/Profile/ProfilePage.tsx";
 import ProgressPage from "@/pages/Progress/ProgressPage.tsx";
 import SocialPage from "@/pages/Social/SocialPage.tsx";

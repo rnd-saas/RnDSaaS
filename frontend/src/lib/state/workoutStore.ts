@@ -11,9 +11,9 @@ interface ActiveWorkoutState {
   elapsedTimeSeconds: number;
   workoutId: string;
   expandedExerciseId: string | null;
-  setExpandedExerciseId: (newId: string) => void;
+  setExpandedExerciseId: (newId: string | null) => void;
   loggedWorkout: LoggedWorkout | null;
-  startWorkout: (id: string, loggedExercises) => void;
+  startWorkout: (id: string, loggedExercises: LoggedExercise[]) => void;
   resumeWorkout: () => void;
   pauseWorkout: () => void;
   resetWorkout: () => void;
@@ -42,7 +42,7 @@ export const useWorkoutStore = create<ActiveWorkoutState>()(
       workoutId: "",
       expandedExerciseId: null,
       loggedWorkout: null,
-      startWorkout: (id: string, loggedExercises) =>
+      startWorkout: (id: string, loggedExercises: LoggedExercise[]) =>
         set({
           isRunning: true,
           // elapsedTimeSeconds: 0,

@@ -11,7 +11,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Check } from "lucide-react";
 import { useWorkoutStore } from "@/lib/state/workoutStore";
-import { usePlannedWorkout } from "@/api/workouts";
 import { useNavigate } from "react-router-dom";
 
 // const workoutData = [
@@ -24,14 +23,10 @@ import { useNavigate } from "react-router-dom";
 export default function WorkoutList({ exerciseId }: { exerciseId: string }) {
   const tableHeaders: string[] = [];
   const tableRows: number[][] = [];
-  const plannedExercise = usePlannedWorkout(new Date()).data?.exercises.find(
-    (ex) => ex.exerciseInfo.exerciseId === exerciseId
-  );
+  
   const loggedExercise = useWorkoutStore((state) =>
     state.getExercise(exerciseId)
   );
-
-  const workoutId = useWorkoutStore((state) => state.loggedWorkout?.workoutId);
 
   const updateExerciseSet = useWorkoutStore((state) => state.updateExerciseSet); // needs be used like this, otherwise no reactive updates will be possible.
   const navigate = useNavigate();
