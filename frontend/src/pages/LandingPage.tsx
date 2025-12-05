@@ -48,7 +48,7 @@ export default function LandingPage() {
       <footer className="w-full max-w-xs space-y-4 mb-10">
         <Button
           className="w-full rounded-2xl h-12 text-sm"
-          /*</footer>onClick={() => navigate("/dashboard",  { state: { firstName, trainerId } })}*/
+          onClick={() => navigate("/workout")}
         >
           Ready to work out?
         </Button>

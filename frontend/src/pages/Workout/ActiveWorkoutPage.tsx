@@ -368,6 +368,7 @@ export default function ActiveWorkoutPage() {
             size={"icon"}
             variant={isRunning ? "secondary" : "default"}
             className=""
+            onClick={() => navigate("/chatbot")}
           >
             <MessageSquareMore size={24} />
           </Button>

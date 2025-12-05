@@ -176,7 +176,7 @@ export default function SocialManageFriendsPage() {
       )}
 
       {!isLoading && receivedRequests.length === 0 && sentRequests.length === 0 && friends.length === 0 && (
-        <Card className="bg-muted/40 !py-3">
+        <Card className="bg-muted/10 hover:scale-none !py-3">
           <CardContent className="pt-3 pb-3 text-center !px-4">
             <p className="text-sm text-muted-foreground">
               No friend requests yet. Start by searching for users and sending friend requests!
@@ -202,13 +202,13 @@ export default function SocialManageFriendsPage() {
                 const isProcessing = isAccepting || isRejecting;
 
                 return (
-                  <Card key={request.id} className="bg-white shadow-sm !py-2">
+                  <Card key={request.id} className="bg-white hover:scale-none shadow-sm !py-2">
                     <CardContent className="pt-2 pb-2 !px-4">
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           <Avatar className="h-10 w-10 shrink-0">
                             <AvatarImage src={undefined} alt={otherUser.display_name} />
-                            <AvatarFallback>
+                            <AvatarFallback className={"bg-primary/10"}>
                               {initialsFromName(otherUser.display_name)}
                             </AvatarFallback>
                           </Avatar>
@@ -269,7 +269,7 @@ export default function SocialManageFriendsPage() {
                 );
               })}
               {receivedRequests.length === 0 && (
-                <Card className="bg-muted/40 !py-3">
+                <Card className="bg-muted/40 hover:scale-none !py-3">
                   <CardContent className="pt-3 pb-3 text-center !px-4">
                     <p className="text-xs text-muted-foreground">
                       No received friend requests.
@@ -293,13 +293,13 @@ export default function SocialManageFriendsPage() {
                 const isCancelling = cancelMutation.isPending && cancelMutation.variables === request.id;
 
                 return (
-                  <Card key={request.id} className="bg-white shadow-sm !py-2">
+                  <Card key={request.id} className="bg-white hover:scale-none shadow-sm !py-2">
                     <CardContent className="pt-2 pb-2 !px-4">
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           <Avatar className="h-10 w-10 shrink-0">
                             <AvatarImage src={undefined} alt={otherUser.display_name} />
-                            <AvatarFallback>
+                            <AvatarFallback className={"bg-primary/10"}>
                               {initialsFromName(otherUser.display_name)}
                             </AvatarFallback>
                           </Avatar>
@@ -344,7 +344,7 @@ export default function SocialManageFriendsPage() {
                 );
               })}
               {sentRequests.length === 0 && (
-                <Card className="bg-muted/40 !py-3">
+                <Card className="bg-muted/40 hover:scale-none !py-3">
                   <CardContent className="pt-3 pb-3 text-center !px-4">
                     <p className="text-xs text-muted-foreground">
                       No pending sent requests.
@@ -367,13 +367,13 @@ export default function SocialManageFriendsPage() {
                 if (!otherUser) return null;
 
                 return (
-                  <Card key={request.id} className="bg-white shadow-sm !py-2">
+                  <Card key={request.id} className="bg-white hover-scale-none shadow-sm !py-2">
                     <CardContent className="pt-2 pb-2 !px-4">
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           <Avatar className="h-10 w-10 shrink-0">
                             <AvatarImage src={undefined} alt={otherUser.display_name} />
-                            <AvatarFallback>
+                            <AvatarFallback className={"bg-primary/10"}>
                               {initialsFromName(otherUser.display_name)}
                             </AvatarFallback>
                           </Avatar>
@@ -392,9 +392,9 @@ export default function SocialManageFriendsPage() {
                 );
               })
             ) : (
-              <Card className="bg-muted/40 !py-3">
+              <Card className="bg-muted/10 hover:scale-none !py-3">
                 <CardContent className="pt-3 pb-3 text-center !px-4">
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-left text-muted-foreground">
                     You don't have any friends yet. Start by sending friend requests to other users!
                   </p>
                 </CardContent>
