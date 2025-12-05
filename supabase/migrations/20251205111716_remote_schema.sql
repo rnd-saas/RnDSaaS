@@ -1,6 +1,3 @@
-
-
-
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -489,6 +486,12 @@ CREATE TABLE IF NOT EXISTS "public"."users" (
 
 ALTER TABLE "public"."users" OWNER TO "postgres";
 
+
+-- Ensure columns exist even if table already existed
+ALTER TABLE "public"."users" ADD COLUMN IF NOT EXISTS "logon_days" integer;
+ALTER TABLE "public"."users" ADD COLUMN IF NOT EXISTS "latest_login" date;
+ALTER TABLE "public"."users" ADD COLUMN IF NOT EXISTS "referral_code" text;
+ALTER TABLE "public"."users" ADD COLUMN IF NOT EXISTS "referred_by" uuid;
 
 COMMENT ON COLUMN "public"."users"."logon_days" IS 'number of distinct days this user has opened the app';
 
