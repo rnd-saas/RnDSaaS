@@ -21,14 +21,11 @@ export default function WorkoutPage() {
 
   const plannedWorkout: PlannedWorkout | null = data;
   // Store today's ID for when user clicks on "Start Workout"
-  const [todayWorkoutId, setTodayWorkoutId] = useState<string | null>(null);
-  if (
-    !todayWorkoutId &&
+  const todayWorkoutId =
     plannedWorkout &&
-    plannedWorkout.date.toDateString() === new Date().toDateString()
-  ) {
-    setTodayWorkoutId(plannedWorkout.workoutId);
-  }
+    new Date(plannedWorkout.date).toDateString() === new Date().toDateString()
+      ? plannedWorkout.workoutId
+      : null;
 
   const handleWorkoutStart = () => {
     navigate(`/workout/${todayWorkoutId}`);
@@ -44,9 +41,12 @@ export default function WorkoutPage() {
   } else if (plannedWorkout?.isCompleted) {
     workoutContentBlock = (
       <div className="flex flex-col items-center justify-center p-8 text-center gap-4 mt-10">
-        <h3 className="text-2xl font-bold text-green-700">Workout Completed!</h3>
+        <h3 className="text-2xl font-bold text-green-700">
+          Workout Completed!
+        </h3>
         <p className="text-muted-foreground max-w-xs">
-          Great job crushing your workout today. Rest up and get ready for the next one!
+          Great job crushing your workout today. Rest up and get ready for the
+          next one!
         </p>
       </div>
     );
@@ -109,7 +109,8 @@ export default function WorkoutPage() {
           <Button
             variant="default"
             className={`flex-1 text-base lg:hidden ${
-              (!todayWorkoutId || plannedWorkout?.isCompleted) && "pointer-events-none opacity-50"
+              (!todayWorkoutId || plannedWorkout?.isCompleted) &&
+              "pointer-events-none opacity-50"
             }`}
             onClick={handleWorkoutStart}
           >
