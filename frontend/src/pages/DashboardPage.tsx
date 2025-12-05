@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { RefreshCcw } from "lucide-react";
-import {useLocation, useNavigate} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { dashboardService, settingsService, moodService } from "@/lib/api";
@@ -77,7 +78,7 @@ const ADVICE_TIPS: string[] = [
   "Put your next workout clothes out in advance.",
   "Drink a glass of water with each meal.",
   "End your day with one positive reflection.",
-  "Remind yourself why you started this journey."
+  "Remind yourself why you started this journey.",
 ];
 
 const LOCAL_MOOD_EMOJI = {
@@ -103,12 +104,18 @@ const DB_MOOD_EMOJI = ["😣", "😬", "🙂", "😌", "🤩"];
 export default function DashboardPage() {
   const location = useLocation();
   const { state } = location as { state?: { firstName?: string } };
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [streakDisplay, setStreakDisplay] = useState<boolean>(true); // Default to true
-  const [tipIndex, setTipIndex] = useState(() => Math.floor(Math.random() * ADVICE_TIPS.length));
-  const [moodEmoji, setMoodEmoji] = useState<string>(() => getStoredMoodEmoji() ?? FALLBACK_DASHBOARD.mood);
+  const [tipIndex, setTipIndex] = useState(() =>
+    Math.floor(Math.random() * ADVICE_TIPS.length)
+  );
+  const [moodEmoji, setMoodEmoji] = useState<string>(
+    () => getStoredMoodEmoji() ?? FALLBACK_DASHBOARD.mood
+  );
   const [achievementPage, setAchievementPage] = useState(0);
 
   // Load user settings to check streak_display
@@ -116,9 +123,12 @@ export default function DashboardPage() {
     try {
       const settings = await settingsService.getSettings();
       setStreakDisplay(settings.streak_display);
-    } catch (error: any) {
+    } catch (error: unknown) {
       // If settings fail to load, default to showing streak
-      console.warn("Failed to load settings, defaulting to show streak:", error);
+      console.warn(
+        "Failed to load settings, defaulting to show streak:",
+        error
+      );
       setStreakDisplay(true);
     }
   };
@@ -144,10 +154,14 @@ export default function DashboardPage() {
             // ignore storage failures
           }
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         if (!active) return;
         console.error("Failed to load dashboard data", error);
-        setFetchError(error?.message ?? "Failed to load dashboard data");
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Failed to load dashboard data";
+        setFetchError(message);
       } finally {
         if (active) {
           setIsLoading(false);
@@ -170,7 +184,11 @@ export default function DashboardPage() {
         const response = await moodService.getTodayMood();
         if (!active) return;
 
-        if (typeof response.mood === "number" && response.mood >= 0 && response.mood < DB_MOOD_EMOJI.length) {
+        if (
+          typeof response.mood === "number" &&
+          response.mood >= 0 &&
+          response.mood < DB_MOOD_EMOJI.length
+        ) {
           setMoodEmoji(DB_MOOD_EMOJI[response.mood]);
         } else {
           const localKey = getStoredMoodKey();
@@ -201,7 +219,10 @@ export default function DashboardPage() {
 
   const resolvedData = dashboardData ?? FALLBACK_DASHBOARD;
   const firstName =
-    dashboardData?.firstName ?? state?.firstName ?? localStorage.getItem("firstName") ?? "User";
+    dashboardData?.firstName ??
+    state?.firstName ??
+    localStorage.getItem("firstName") ??
+    "User";
 
   const today = useMemo(() => {
     const d = new Date();
@@ -252,16 +273,18 @@ export default function DashboardPage() {
       <div className="md:col-span-2 lg:col-span-3">
         <Separator />
       </div>
-        {fetchError && (
-            <div className="mb-4 rounded-md border border-amber-500/60 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-                {fetchError}
-            </div>
-        )}
+      {fetchError && (
+        <div className="mb-4 rounded-md border border-amber-500/60 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          {fetchError}
+        </div>
+      )}
 
       {/* Goal Section */}
-        {isLoading && !dashboardData && (
-            <p className="mb-4 text-sm text-muted-foreground">Loading your latest stats…</p>
-        )}
+      {isLoading && !dashboardData && (
+        <p className="mb-4 text-sm text-muted-foreground">
+          Loading your latest stats…
+        </p>
+      )}
       <section>
         <Card className="hover:scale-none">
           <CardHeader className="pb-2">
@@ -277,9 +300,9 @@ export default function DashboardPage() {
               target={goal.workoutsCompleted.target}
             />
             <GoalRow
-              label="Exercises discovered"
-              value={goal.exercisesDiscovered.current}
-              target={goal.exercisesDiscovered.target}
+              label="Exercises completed"
+              value={goal.exercisesCompleted.current}
+              target={goal.exercisesCompleted.target}
             />
             <GoalRow
               label="Longest streak"
@@ -293,7 +316,7 @@ export default function DashboardPage() {
       {/* Mood + Next workout */}
       <section className="grid grid-cols-2 gap-4 md:flex md:flex-col md:h-full">
         <Card
-          className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 bg-gradient-to-br from-background to-primary/5 py-4 gap-2 md:flex-1 md:justify-center  "
+          className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 bg-linear-to-br from-background to-primary/5 py-4 gap-2 md:flex-1 md:justify-center  "
           onClick={() => navigate("/mood")}
         >
           <CardHeader className="pb-0 px-4 flex flex-col items-center">
@@ -308,7 +331,7 @@ export default function DashboardPage() {
         </Card>
 
         <Card
-          className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 bg-gradient-to-br from-background to-primary/5 py-4 gap-2 md:flex-1 md:justify-center"
+          className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 bg-linear-to-br from-background to-primary/5 py-4 gap-2 md:flex-1 md:justify-center"
           onClick={() => navigate("/workout/exercise")}
         >
           <CardHeader className="pb-0 px-4 flex flex-col items-center">
@@ -328,16 +351,16 @@ export default function DashboardPage() {
       {/* Streak + Level */}
       <section>
         <Card className="hover:scale-none">
-            {streakDisplay && (
-          <CardHeader className="pb-0">
-            <div className="flex flex-col gap-1">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Current Streak
-              </CardTitle>
-              <span className="text-3xl font-bold">{streakDays} Days</span>
-            </div>
-          </CardHeader>
-            )}
+          {streakDisplay && (
+            <CardHeader className="pb-0">
+              <div className="flex flex-col gap-1">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Current Streak
+                </CardTitle>
+                <span className="text-3xl font-bold">{streakDays} Days</span>
+              </div>
+            </CardHeader>
+          )}
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs">
@@ -364,32 +387,32 @@ export default function DashboardPage() {
       <section className="lg:col-span-2">
         <div className="flex items-center justify-between px-1">
           <h3 className="h3-styles font-semibold">Achievements</h3>
-            <div className="overflow-hidden">
-                <div
-                    className="flex transition-transform duration-300 ease-out"
-                    style={{ transform: `translateX(-${achievementPage * 100}%)` }}
-                >
-                    {achievementPages.map((page, idx) => (
-                        <div key={`ach-page-${idx}`} className="min-w-full">
-                            <AchievementList
-                                achievements={page}
-                                isLoading={isLoading && !dashboardData}
-                            />
-                        </div>
-                    ))}
+          <div className="overflow-hidden">
+            <div
+              className="flex transition-transform duration-300 ease-out"
+              style={{ transform: `translateX(-${achievementPage * 100}%)` }}
+            >
+              {achievementPages.map((page, idx) => (
+                <div key={`ach-page-${idx}`} className="min-w-full">
+                  <AchievementList
+                    achievements={page}
+                    isLoading={isLoading && !dashboardData}
+                  />
                 </div>
+              ))}
             </div>
-            {totalAchievementPages > 1 && (
-                <div className="mt-2 flex items-center justify-center gap-2">
-                    {achievementPages.map((_, idx) => (
-                        <Dot
-                            key={`ach-dot-${idx}`}
-                            active={idx === achievementPage}
-                            onClick={() => setAchievementPage(idx)}
-                        />
-                    ))}
-                </div>
-            )}
+          </div>
+          {totalAchievementPages > 1 && (
+            <div className="mt-2 flex items-center justify-center gap-2">
+              {achievementPages.map((_, idx) => (
+                <Dot
+                  key={`ach-dot-${idx}`}
+                  active={idx === achievementPage}
+                  onClick={() => setAchievementPage(idx)}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -405,7 +428,7 @@ export default function DashboardPage() {
               size="icon"
               className="h-8 w-8 rounded-full"
               onClick={() =>
-                  setTipIndex((prev) => (prev + 1) % ADVICE_TIPS.length)
+                setTipIndex((prev) => (prev + 1) % ADVICE_TIPS.length)
               }
             >
               <RefreshCcw className="h-4 w-4" />
@@ -425,20 +448,38 @@ export default function DashboardPage() {
 
 /* ---------- Small bits ---------- */
 
-export function GoalRow({ label, value, target }: { label: string; value: number; target: number }) {
+export function GoalRow({
+  label,
+  value,
+  target,
+}: {
+  label: string;
+  value: number;
+  target: number;
+}) {
   const pct = Math.max(0, Math.min(100, (value / target) * 100));
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between text-[15px]">
-        <span className="list-item ml-6 list-disc marker:text-foreground/80">{label}:</span>
-        <span className="tabular-nums">{value} / {target}</span>
+        <span className="list-item ml-6 list-disc marker:text-foreground/80">
+          {label}:
+        </span>
+        <span className="tabular-nums">
+          {value} / {target}
+        </span>
       </div>
       <Progress value={pct} className="h-2 rounded-full" />
     </div>
   );
 }
 
-function Dot({ active = false, onClick }: { active?: boolean; onClick?: () => void }) {
+function Dot({
+  active = false,
+  onClick,
+}: {
+  active?: boolean;
+  onClick?: () => void;
+}) {
   return (
     <button
       type="button"
@@ -457,7 +498,9 @@ function getStoredMoodKey(): LocalMoodKey | null {
   if (typeof window === "undefined") {
     return null;
   }
-  const value = window.localStorage.getItem(LOCAL_MOOD_STORAGE_KEY) as LocalMoodKey | null;
+  const value = window.localStorage.getItem(
+    LOCAL_MOOD_STORAGE_KEY
+  ) as LocalMoodKey | null;
   if (value && value in LOCAL_MOOD_EMOJI) {
     return value;
   }
@@ -466,7 +509,8 @@ function getStoredMoodKey(): LocalMoodKey | null {
 
 function mapLocalKeyToIndex(key: string | null): number | null {
   if (!key) return null;
-  if ((LOCAL_MOOD_TO_DB_INDEX as Record<string, number>)[key] === undefined) return null;
+  if ((LOCAL_MOOD_TO_DB_INDEX as Record<string, number>)[key] === undefined)
+    return null;
   return LOCAL_MOOD_TO_DB_INDEX[key as LocalMoodKey];
 }
 
