@@ -1,31 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import {useEffect, useMemo, useState} from "react";
 import { RefreshCcw } from "lucide-react";
-import {useLocation, useNavigate} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { dashboardService, settingsService, moodService } from "@/lib/api";
-import type { DashboardData, DashboardAchievement } from "@/lib/api/types";
-import AchievementList from "@/pages/Profile/ProfileComponents/AchievementList.tsx";
-import SettingsButton from "@/components/settingsButton.tsx";
-
-const ACHIEVEMENTS_PER_PAGE = 3;
-
-const FALLBACK_DASHBOARD: DashboardData = {
-  firstName: null,
-  trainer: null,
-  goal: {
-    workoutsCompleted: { current: 0, target: 100 },
-    exercisesCompleted: { current: 0, target: 40 },
-    longestStreak: { current: 0, target: 60 },
-  },
-  level: { label: "Novice", currentXp: 500, nextLevelXp: 1200 },
-  achievements: [],
-  mood: "😣",
-  nextWorkout: "🏋️‍♂️",
-  streakDays: 20,
-  advice: "Fill half your plate with colorful vegetables!",
-};
+import { Button } from "@/components/ui/button";
+import Achievement from "@/components/achievement";
+import SettingsButton from "@/components/settingsButton";
+import { dashboardService, moodService } from "@/lib/api";
+import type { DashboardData } from "@/lib/api/types";
 
 const ADVICE_TIPS: string[] = [
   "Fill half your plate with colorful vegetables.",
@@ -63,7 +46,7 @@ const ADVICE_TIPS: string[] = [
   "Keep your phone away from the table when you eat.",
   "Do a 1-minute plank at some point today.",
   "Prepare a healthy snack before you get very hungry.",
-  "Try to include protein, carbs, and fats in a meal.",
+  "Try to include all three: protein, carbs, and fats in a meal.",
   "Celebrate a small win from this week’s workouts.",
   "Do 10 bodyweight squats during your next break.",
   "Try to eat at least one home-cooked meal today.",
@@ -77,63 +60,74 @@ const ADVICE_TIPS: string[] = [
   "Put your next workout clothes out in advance.",
   "Drink a glass of water with each meal.",
   "End your day with one positive reflection.",
-  "Remind yourself why you started this journey."
+  "Remind yourself why you started this journey.",
 ];
 
-const LOCAL_MOOD_EMOJI = {
-  anxious: "😣",
-  nervous: "😬",
-  okay: "🙂",
-  comfortable: "😌",
-  never: "🤩",
-} as const;
+// Mood emoji mapping - matches backend mood index (0-4)
+const MOOD_EMOJI: string[] = ["😣", "😬", "🙂", "😄", "🤩"];
 
-type LocalMoodKey = keyof typeof LOCAL_MOOD_EMOJI;
-
-const LOCAL_MOOD_TO_DB_INDEX: Record<LocalMoodKey, number> = {
+// Mood key to database index mapping (for localStorage compatibility)
+const MOOD_KEY_TO_DB_INDEX: Record<string, number> = {
   anxious: 0,
   nervous: 1,
   okay: 2,
+  fine: 2,
   comfortable: 3,
   never: 4,
+  never_been: 4,
 };
 
-const DB_MOOD_EMOJI = ["😣", "😬", "🙂", "😌", "🤩"];
-
 export default function DashboardPage() {
-  const location = useLocation();
-  const { state } = location as { state?: { firstName?: string } };
+  const { state } = useLocation() as { state?: { firstName?: string } };
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
-  const [streakDisplay, setStreakDisplay] = useState<boolean>(true); // Default to true
-  const [tipIndex, setTipIndex] = useState(() => Math.floor(Math.random() * ADVICE_TIPS.length));
-  const [moodEmoji, setMoodEmoji] = useState<string>(() => getStoredMoodEmoji() ?? FALLBACK_DASHBOARD.mood);
   const [achievementPage, setAchievementPage] = useState(0);
-
-  // Load user settings to check streak_display
-  const loadSettings = async () => {
-    try {
-      const settings = await settingsService.getSettings();
-      setStreakDisplay(settings.streak_display);
-    } catch (error: any) {
-      // If settings fail to load, default to showing streak
-      console.warn("Failed to load settings, defaulting to show streak:", error);
-      setStreakDisplay(true);
+  const [moodEmoji, setMoodEmoji] = useState<string>(() => {
+    // Try to get from localStorage first as fallback
+    const localKey = localStorage.getItem("currentMood_v1");
+    if (localKey && MOOD_KEY_TO_DB_INDEX[localKey] !== undefined) {
+      return MOOD_EMOJI[MOOD_KEY_TO_DB_INDEX[localKey]];
     }
+    return MOOD_EMOJI[2]; // Default to "okay"
+  });
+
+  const firstName =
+    dashboardData?.firstName ?? 
+    state?.firstName ?? 
+    localStorage.getItem("firstName") ?? 
+    "User";
+
+  const today = useMemo(() => {
+    const d = new Date();
+    return d.toLocaleDateString(undefined, {
+      weekday: "long",
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  }, []);
+
+  const navigate = useNavigate();
+
+  // ---------- advice tip state ----------
+  const [tipIndex, setTipIndex] = useState(() =>
+    Math.floor(Math.random() * ADVICE_TIPS.length)
+  );
+  const currentTip = ADVICE_TIPS[tipIndex];
+
+  const showNextTip = () => {
+    setTipIndex((prev) => (prev + 1) % ADVICE_TIPS.length);
   };
 
-  // Load settings on mount and when location changes (user returns from settings)
-  useEffect(() => {
-    loadSettings();
-  }, [location.pathname]);
-
+  // Fetch dashboard data from backend
   useEffect(() => {
     let active = true;
 
     const loadDashboard = async () => {
       try {
         setFetchError(null);
+        setIsLoading(true);
         const data = await dashboardService.fetchDashboard();
         if (!active) return;
         setDashboardData(data);
@@ -163,6 +157,13 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && (window as any).tidioChatApi) {
+      (window as any).tidioChatApi.show();
+    }
+  }, []);
+
+  // Fetch today's mood from backend
+  useEffect(() => {
     let active = true;
 
     const loadMood = async () => {
@@ -170,25 +171,32 @@ export default function DashboardPage() {
         const response = await moodService.getTodayMood();
         if (!active) return;
 
-        if (typeof response.mood === "number" && response.mood >= 0 && response.mood < DB_MOOD_EMOJI.length) {
-          setMoodEmoji(DB_MOOD_EMOJI[response.mood]);
+        if (typeof response.mood === "number" && response.mood >= 0 && response.mood < MOOD_EMOJI.length) {
+          setMoodEmoji(MOOD_EMOJI[response.mood]);
         } else {
-          const localKey = getStoredMoodKey();
-          const dbIndex = mapLocalKeyToIndex(localKey);
-          if (dbIndex !== null) {
-            setMoodEmoji(DB_MOOD_EMOJI[dbIndex]);
+          // Fallback to localStorage if no mood in database
+          const localKey = localStorage.getItem("currentMood_v1");
+          if (localKey && MOOD_KEY_TO_DB_INDEX[localKey] !== undefined) {
+            const dbIndex = MOOD_KEY_TO_DB_INDEX[localKey];
+            setMoodEmoji(MOOD_EMOJI[dbIndex]);
+            // Try to save to backend
             try {
               await moodService.saveTodayMood(dbIndex);
             } catch (error) {
               console.warn("Failed to persist mood selection", error);
             }
           } else {
-            setMoodEmoji(FALLBACK_DASHBOARD.mood);
+            setMoodEmoji(MOOD_EMOJI[2]); // Default to "okay"
           }
         }
       } catch (error) {
         if (!active) return;
         console.warn("Failed to load today's mood", error);
+        // Fallback to localStorage
+        const localKey = localStorage.getItem("currentMood_v1");
+        if (localKey && MOOD_KEY_TO_DB_INDEX[localKey] !== undefined) {
+          setMoodEmoji(MOOD_EMOJI[MOOD_KEY_TO_DB_INDEX[localKey]]);
+        }
       }
     };
 
@@ -199,243 +207,289 @@ export default function DashboardPage() {
     };
   }, []);
 
-  const resolvedData = dashboardData ?? FALLBACK_DASHBOARD;
-  const firstName =
-    dashboardData?.firstName ?? state?.firstName ?? localStorage.getItem("firstName") ?? "User";
-
-  const today = useMemo(() => {
-    const d = new Date();
-    return d.toLocaleDateString(undefined, {
-      weekday: "long",
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
-  }, []);
-
-  const goal = resolvedData.goal;
-  const level = resolvedData.level;
-  const achievements = resolvedData.achievements;
-  const streakDays = resolvedData.streakDays;
-  const nextWorkoutEmoji = resolvedData.nextWorkout;
-  const currentTip = ADVICE_TIPS[tipIndex];
-  const achievementPages = useMemo(
-    () => chunkAchievements(achievements, ACHIEVEMENTS_PER_PAGE),
-    [achievements]
-  );
+  // Use data from API or fallback to defaults
+  const goal = dashboardData?.goal ?? {
+    workoutsCompleted: { current: 0, target: 5 },
+    exercisesCompleted: { current: 0, target: 10 },
+    longestStreak: { current: 0, target: 7 },
+  };
+  const level = dashboardData?.level ?? { label: "Novice", currentXp: 0, nextLevelXp: 1200 };
+  const streakDays = dashboardData?.streakDays ?? 0;
+  const nextWorkout = dashboardData?.nextWorkout ?? "🏋️‍♂️";
+  
+  // Chunk achievements into pages of 3
+  const ACHIEVEMENTS_PER_PAGE = 3;
+  const achievements = dashboardData?.achievements ?? [];
+  const achievementPages = useMemo(() => {
+    if (!achievements || achievements.length === 0) return [[]];
+    const chunks: typeof achievements[] = [];
+    for (let i = 0; i < achievements.length; i += ACHIEVEMENTS_PER_PAGE) {
+      chunks.push(achievements.slice(i, i + ACHIEVEMENTS_PER_PAGE));
+    }
+    return chunks;
+  }, [achievements]);
   const totalAchievementPages = achievementPages.length;
-
-  const navigate = useNavigate();
-
+  
+  // Reset to first page when achievements change
   useEffect(() => {
     setAchievementPage(0);
-  }, [achievements]);
-
+  }, [achievements.length]);
   return (
-    <div className="w-full max-w-md min-h-[75vh] flex flex-col mx-auto px-4 py-4 space-y-4">
+    <div className="w-full max-w-lg md:max-w-4xl lg:max-w-6xl mx-auto p-6 pb-24 space-y-8 md:space-y-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6">
       {/* Header */}
-      <header className="flex items-start justify-between">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Hi, {firstName}!</h1>
-          <p className="text-sm text-muted-foreground">{today}</p>
+      <header className="space-y-1 md:col-span-2 lg:col-span-3">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold tracking-tight">
+            Hi, {firstName}!
+          </h1>
+          <SettingsButton />
         </div>
-        <SettingsButton/>
+        <p className="text-muted-foreground">
+          {today} &bull; Let's keep up the momentum.
+        </p>
       </header>
 
-      <Separator className="my-4" />
+      <div className="md:col-span-2 lg:col-span-3">
+        <Separator />
+      </div>
 
-        {fetchError && (
-          <div className="mb-4 rounded-md border border-amber-500/60 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-            {fetchError}
-          </div>
-        )}
+      {fetchError && (
+        <div className="md:col-span-2 lg:col-span-3 rounded-md border border-amber-500/60 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          {fetchError}
+        </div>
+      )}
 
-        {isLoading && !dashboardData && (
-          <p className="mb-4 text-sm text-muted-foreground">Loading your latest stats…</p>
-        )}
+      {isLoading && !dashboardData && (
+        <div className="md:col-span-2 lg:col-span-3 text-sm text-muted-foreground">
+          Loading your latest stats…
+        </div>
+      )}
 
-        {/* To your goal */}
-        <section className="space-y-3">
-          <h2 className="text-xl font-semibold">To your goal:</h2>
-          <GoalRow label="Workouts completed" value={goal.workoutsCompleted.current} target={goal.workoutsCompleted.target} />
-          <GoalRow label="Exercises completed" value={goal.exercisesCompleted.current} target={goal.exercisesCompleted.target} />
-          <GoalRow label="Longest streak" value={goal.longestStreak.current} target={goal.longestStreak.target} />
-        </section>
+      {/* Goal Section */}
+      <section>
+        <Card className="hover:scale-none">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg">Weekly Goals</CardTitle>
+              <span className="text-sm text-muted-foreground">Progress</span>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <GoalRow
+              label="Workouts completed"
+              value={goal.workoutsCompleted.current}
+              target={goal.workoutsCompleted.target}
+            />
+            <GoalRow
+              label="Exercises completed"
+              value={goal.exercisesCompleted.current}
+              target={goal.exercisesCompleted.target}
+            />
+            <GoalRow
+              label="Longest streak"
+              value={goal.longestStreak.current}
+              target={goal.longestStreak.target}
+            />
+          </CardContent>
+        </Card>
+      </section>
 
-        {/* Mood + Next workout */}
-        <section className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      {/* Mood + Next workout */}
+      <section className="grid grid-cols-2 gap-4 md:flex md:flex-col md:h-full">
         <Card
-          className="bg-muted/40 cursor-pointer hover:bg-accent/30 transition-colors"
+          className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 bg-gradient-to-br from-background to-primary/5 py-4 gap-2 md:flex-1 md:justify-center  "
           onClick={() => navigate("/mood")}
         >
-            <CardHeader>
-              <CardTitle className="text-2xl">Mood</CardTitle>
-            </CardHeader>
-            <CardContent className="flex items-center justify-center py-4">
-              <div className="text-6xl">{moodEmoji}</div>
-            </CardContent>
-          </Card>
+          <CardHeader className="pb-0 px-4 flex flex-col items-center">
+            <CardTitle className="text-base font-medium">Mood</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center justify-center pb-2 px-4">
+            <div className="text-4xl mb-2">{moodEmoji}</div>
+            <p className="text-[10px] text-muted-foreground text-center">
+              How are you feeling?
+            </p>
+          </CardContent>
+        </Card>
 
-          <Card
-            className="bg-muted/40 cursor-pointer hover:bg-accent/30 transition-colors"
-            onClick={() => navigate("/workout/exercise")}
-          >
-            <CardHeader>
-              <CardTitle className="text-2xl">Next Workout</CardTitle>
-            </CardHeader>
-            <CardContent className="flex items-center justify-center py-4">
-              <div className="text-4xl sm:text-5xl text-center whitespace-pre-line">{nextWorkoutEmoji}</div>
-            </CardContent>
-          </Card>
-        </section>
-
-        <button
-          type="button"
-          onClick={() => navigate("/chatbot")}
-          className="mt-3 text-[15px] text-amber-600 underline-offset-4 hover:underline text-left"
+        <Card
+          className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 bg-gradient-to-br from-background to-primary/5 py-4 gap-2 md:flex-1 md:justify-center"
+          onClick={() => navigate("/workout")}
         >
-          Need help calming down?
-        </button>
+          <CardHeader className="pb-0 px-4 flex flex-col items-center">
+            <CardTitle className="text-base font-medium text-center">
+              Next Workout
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center justify-center pb-2 px-4">
+            <div className="text-4xl mb-2">{nextWorkout}</div>
+            <p className="text-[10px] text-muted-foreground text-center">
+              Ready to sweat?
+            </p>
+          </CardContent>
+        </Card>
+      </section>
 
-        {/* Streak - Only show if streak_display is enabled */}
-        {streakDisplay && (
-          <section className="mt-6 space-y-3">
-            <h2 className="text-3xl font-semibold">Streak: {streakDays} days</h2>
-          </section>
-        )}
+      {/* Streak + Level */}
+      <section>
+        <Card className="hover:scale-none">
+          <CardHeader className="pb-0">
+            <div className="flex flex-col gap-1">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Current Streak
+              </CardTitle>
+              <span className="text-3xl font-bold">{streakDays} Days</span>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">
+                  Level:{" "}
+                  <span className="font-medium text-foreground">
+                    {level.label}
+                  </span>
+                </span>
+                <span className="text-muted-foreground">
+                  {level.currentXp} / {level.nextLevelXp} XP
+                </span>
+              </div>
+              <Progress
+                value={(level.currentXp / level.nextLevelXp) * 100}
+                className="h-2"
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </section>
 
-        {/* Level - Always show */}
-        <section className="mt-6 space-y-3">
-          <div className="flex items-center gap-2">
-            <span className="text-base text-muted-foreground">Current level:</span>
-            <span className="text-base font-medium">{level.label}</span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Progress
-              value={(level.currentXp / level.nextLevelXp) * 100}
-              className="h-4 flex-1 rounded-full"
-            />
-            <span className="w-24 text-right text-sm text-muted-foreground">
-              {level.currentXp}/{level.nextLevelXp}
-            </span>
-          </div>
-        </section>
-
-        {/* Achievements */}
-        <section className="mt-5">
-          <h3 className="mb-3 text-lg font-semibold">Achievements:</h3>
-          <div className="overflow-hidden">
-            <div
-              className="flex transition-transform duration-300 ease-out"
-              style={{ transform: `translateX(-${achievementPage * 100}%)` }}
-            >
-              {achievementPages.map((page, idx) => (
-                <div key={`ach-page-${idx}`} className="min-w-full">
-                  <AchievementList
-                    achievements={page}
-                    isLoading={isLoading && !dashboardData}
-                  />
+      {/* Achievements */}
+      <section className="lg:col-span-2">
+        <div className="flex items-center justify-between px-1">
+          <h3 className="h3-styles font-semibold">Achievements</h3>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 text-xs"
+            onClick={() => navigate("/achievements")}
+          >
+            View All
+          </Button>
+        </div>
+        <div className="overflow-hidden">
+          <div
+            className="flex transition-transform duration-300 ease-out"
+            style={{ transform: `translateX(-${achievementPage * 100}%)` }}
+          >
+            {achievementPages.map((page, idx) => (
+              <div key={`ach-page-${idx}`} className="min-w-full flex-shrink-0">
+                <div className="flex items-stretch gap-3 justify-center pb-1">
+                  {isLoading && !dashboardData ? (
+                    Array.from({ length: 3 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="h-24 w-24 rounded-xl bg-muted animate-pulse"
+                      />
+                    ))
+                  ) : (
+                    page.map((a) => (
+                      <Achievement 
+                        key={a.id} 
+                        title={a.title}
+                        sub={a.sub}
+                        image={a.emoji}
+                        obtained={true}
+                      />
+                    ))
+                  )}
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-          {totalAchievementPages > 1 && (
-            <div className="mt-2 flex items-center justify-center gap-2">
-              {achievementPages.map((_, idx) => (
-                <Dot
-                  key={`ach-dot-${idx}`}
-                  active={idx === achievementPage}
-                  onClick={() => setAchievementPage(idx)}
-                />
-              ))}
-            </div>
-          )}
-        </section>
+        </div>
+        {totalAchievementPages > 1 && (
+          <div className="mt-4 flex items-center justify-center gap-2">
+            {achievementPages.map((_, idx) => (
+              <Dot
+                key={`ach-dot-${idx}`}
+                active={idx === achievementPage}
+                onClick={() => setAchievementPage(idx)}
+              />
+            ))}
+          </div>
+        )}
+      </section>
 
-        {/* Advice */}
-        <section className="mt-6">
-          <Card className="bg-muted/40 w-full max-w-full">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg">Advice</CardTitle>
-              <button
-                aria-label="Next tip"
-                className="rounded-full p-1 text-muted-foreground hover:bg-accent active:rotate-90 transition-transform"
-                onClick={() =>
-                  setTipIndex((prev) => (prev + 1) % ADVICE_TIPS.length)
-                }
-              >
-                <RefreshCcw className="h-4 w-4" />
-              </button>
-            </CardHeader>
-            <CardContent className="text-base break-words whitespace-normal">
+      {/* Advice */}
+      <section className="md:col-span-2 lg:col-span-1">
+        <Card className="bg-primary/5 border-primary/10 hover:scale-none">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-base font-medium text-primary">
+              Daily Tip
+            </CardTitle>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-full"
+              onClick={showNextTip}
+            >
+              <RefreshCcw className="h-4 w-4" />
+              <span className="sr-only">Next tip</span>
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm leading-relaxed text-muted-foreground">
               {currentTip}
-            </CardContent>
-          </Card>
-        </section>
+            </p>
+          </CardContent>
+        </Card>
+      </section>
     </div>
   );
 }
 
 /* ---------- Small bits ---------- */
 
-export function GoalRow({ label, value, target }: { label: string; value: number; target: number }) {
+export function GoalRow({
+  label,
+  value,
+  target,
+}: {
+  label: string;
+  value: number;
+  target: number;
+}) {
   const pct = Math.max(0, Math.min(100, (value / target) * 100));
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between text-[15px]">
-        <span className="list-item ml-6 list-disc marker:text-foreground/80">{label}:</span>
-        <span className="tabular-nums">{value} / {target}</span>
+        <span className="list-item ml-6 list-disc marker:text-foreground/80">
+          {label}:
+        </span>
+        <span className="tabular-nums">{value}</span>
       </div>
-      <Progress value={pct} className="h-2 rounded-full mt-1.5" />
+      <Progress value={pct} className="h-2 rounded-full" />
     </div>
   );
 }
 
 function Dot({ active = false, onClick }: { active?: boolean; onClick?: () => void }) {
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className={`size-2 rounded-full transition-colors ${
+          active ? "bg-foreground" : "bg-muted-foreground/40"
+        }`}
+        aria-pressed={active}
+      />
+    );
+  }
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`size-2 rounded-full transition-colors ${
+    <div
+      className={`size-2 rounded-full ${
         active ? "bg-foreground" : "bg-muted-foreground/40"
       }`}
-      aria-pressed={active}
     />
   );
-}
-
-const LOCAL_MOOD_STORAGE_KEY = "currentMood_v1";
-
-function getStoredMoodKey(): LocalMoodKey | null {
-  if (typeof window === "undefined") {
-    return null;
-  }
-  const value = window.localStorage.getItem(LOCAL_MOOD_STORAGE_KEY) as LocalMoodKey | null;
-  if (value && value in LOCAL_MOOD_EMOJI) {
-    return value;
-  }
-  return null;
-}
-
-function mapLocalKeyToIndex(key: string | null): number | null {
-  if (!key) return null;
-  if ((LOCAL_MOOD_TO_DB_INDEX as Record<string, number>)[key] === undefined) return null;
-  return LOCAL_MOOD_TO_DB_INDEX[key as LocalMoodKey];
-}
-
-function getStoredMoodEmoji(): string | null {
-  const key = getStoredMoodKey();
-  return key ? LOCAL_MOOD_EMOJI[key] : null;
-}
-
-function chunkAchievements(items: DashboardAchievement[], size: number) {
-  if (!items || items.length === 0) {
-    return [[]];
-  }
-  const chunks: DashboardAchievement[][] = [];
-  for (let i = 0; i < items.length; i += size) {
-    chunks.push(items.slice(i, i + size));
-  }
-  return chunks;
 }
