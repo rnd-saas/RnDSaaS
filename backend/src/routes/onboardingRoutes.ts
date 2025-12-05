@@ -109,6 +109,68 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
             });
         }
 
+        // If weight is provided, also save it to user_progress_history for tracking
+        if (payload.weightKg !== null && payload.weightKg !== undefined) {
+            const recordedAt = new Date().toISOString();
+            
+            // Calculate BMI if height is available
+            let bmi = null;
+            if (payload.heightCm) {
+                const heightInMeters = Number(payload.heightCm) / 100;
+                bmi = payload.weightKg / (heightInMeters * heightInMeters);
+            }
+
+            // Update BMI in user_info if calculated
+            if (bmi !== null) {
+                await supabase
+                    .from('user_info')
+                    .update({ bmi: bmi })
+                    .eq('user_id', userId);
+            }
+
+            // Store weight in history table
+            try {
+                const { error: weightHistoryError } = await supabase
+                    .from('user_progress_history')
+                    .insert({
+                        user_id: userId,
+                        data_type: 'weight',
+                        value: payload.weightKg,
+                        recorded_at: recordedAt
+                    });
+
+                if (weightHistoryError) {
+                    // Ignore errors (e.g., duplicate entries)
+                    console.warn('Failed to save weight history during onboarding:', weightHistoryError);
+                }
+            } catch (err: any) {
+                // Ignore errors
+                console.warn('Failed to save weight history during onboarding:', err);
+            }
+
+            // Store BMI in history table if calculated
+            if (bmi !== null) {
+                try {
+                    const { error: bmiHistoryError } = await supabase
+                        .from('user_progress_history')
+                        .insert({
+                            user_id: userId,
+                            data_type: 'bmi',
+                            value: bmi,
+                            recorded_at: recordedAt
+                        });
+
+                    if (bmiHistoryError) {
+                        // Ignore errors
+                        console.warn('Failed to save BMI history during onboarding:', bmiHistoryError);
+                    }
+                } catch (err: any) {
+                    // Ignore errors
+                    console.warn('Failed to save BMI history during onboarding:', err);
+                }
+            }
+        }
+
         if (trainerId !== null) {
             try {
                 await upsertTrainerPreference(userId, trainerId);

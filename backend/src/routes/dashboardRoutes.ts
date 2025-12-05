@@ -33,11 +33,7 @@ type DashboardResponse = {
     advice: string;
 };
 
-const DEFAULT_ACHIEVEMENTS = [
-        { id: 'workouts-100', title: '100 Workouts', sub: 'Completed', emoji: '💪' },
-        { id: 'streak-7', title: '7 Days', sub: 'Streak', emoji: '📆' },
-        { id: 'consecutive-12', title: 'Consecutive', sub: 'Workout 12', emoji: '🔥' }
-];
+const DEFAULT_ACHIEVEMENTS: Array<{ id: string; title: string; sub: string; emoji: string }> = [];
 
 const WORKOUT_TARGET = 100;
 const EXERCISE_TARGET = 40;

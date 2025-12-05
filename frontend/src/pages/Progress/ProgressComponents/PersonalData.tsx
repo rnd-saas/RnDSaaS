@@ -1,6 +1,6 @@
 ﻿import {Input} from "@/components/ui/input.tsx";
 import {Label} from "@/components/ui/label.tsx";
-import {CartesianGrid, ResponsiveContainer, Scatter, ScatterChart, XAxis, YAxis} from "recharts";
+import {CartesianGrid, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis} from "recharts";
 import {useState, useEffect} from "react";
 import {progressService} from "@/lib/api";
 
@@ -81,7 +81,11 @@ export default function PersonalData(){
             // Normalize date to midnight local time to ensure alignment with X-axis ticks
             const date = new Date(d.date);
             date.setHours(0, 0, 0, 0);
-            return { x: date.getTime(), y: d.value };
+            return { 
+                x: date.getTime(), 
+                y: d.value,
+                date: d.date // Keep original date for tooltip
+            };
         });
 
     const dataTracked = [
@@ -163,6 +167,32 @@ export default function PersonalData(){
                                     tickFormatter={(value: number) => 
                                         item.value === 'bmi' ? value.toFixed(2) : value.toString()
                                     }
+                                />
+                                <Tooltip
+                                    content={({ active, payload }) => {
+                                        if (active && payload && payload.length > 0) {
+                                            const data = payload[0].payload;
+                                            const date = new Date(data.date);
+                                            const formattedDate = date.toLocaleDateString(undefined, { 
+                                                weekday: 'short',
+                                                month: 'short', 
+                                                day: 'numeric' 
+                                            });
+                                            const formattedValue = item.value === 'bmi' 
+                                                ? data.y.toFixed(2) 
+                                                : data.y.toString();
+                                            return (
+                                                <div className="bg-background border border-border rounded-lg p-2 shadow-lg">
+                                                    <p className="text-sm font-semibold">{formattedDate}</p>
+                                                    <p className="text-sm">
+                                                        <span className="capitalize">{item.value}:</span> {formattedValue}
+                                                        {item.value === 'weight' && ' kg'}
+                                                    </p>
+                                                </div>
+                                            );
+                                        }
+                                        return null;
+                                    }}
                                 />
                                 <Scatter name={item.value} data={item.data}/>
                             </ScatterChart>
