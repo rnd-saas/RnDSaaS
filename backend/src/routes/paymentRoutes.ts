@@ -45,7 +45,7 @@ router.get('/subscription', requireAuth, async (req: any, res) => {
 
 router.post('/create-checkout-session', requireAuth, async (req: any, res) => {
   try {
-    const { priceId, referralCode } = req.body;
+    const { priceId, referralCode, origin } = req.body;
     const user = req.user;
 
     if (!user || !user.email) {
@@ -74,7 +74,7 @@ router.post('/create-checkout-session', requireAuth, async (req: any, res) => {
         }
     }
 
-    const session = await createCheckoutSession(user.id, user.email, priceId, referrerId);
+    const session = await createCheckoutSession(user.id, user.email, priceId, referrerId, origin);
 
     res.json({ url: session.url });
   } catch (error: any) {
