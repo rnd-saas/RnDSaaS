@@ -3,7 +3,7 @@ name: Deploy BE Staging
 on:
     push:
         branches:
-            - be_combine
+            - be_backend
 
 jobs:
   deploy:
