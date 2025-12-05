@@ -10,6 +10,8 @@ interface ActiveWorkoutState {
   isRunning: boolean;
   elapsedTimeSeconds: number;
   workoutId: string;
+  expandedExerciseId: string | null;
+  setExpandedExerciseId: (newId: string) => void;
   loggedWorkout: LoggedWorkout | null;
   startWorkout: (id: string, loggedExercises) => void;
   resumeWorkout: () => void;
@@ -38,6 +40,7 @@ export const useWorkoutStore = create<ActiveWorkoutState>()(
       isRunning: false,
       elapsedTimeSeconds: 0,
       workoutId: "",
+      expandedExerciseId: null,
       loggedWorkout: null,
       startWorkout: (id: string, loggedExercises) =>
         set({
@@ -178,6 +181,9 @@ export const useWorkoutStore = create<ActiveWorkoutState>()(
         }, 0);
 
         return totalSets;
+      },
+      setExpandedExerciseId: (newId) => {
+        set({ expandedExerciseId: newId ?? null });
       },
     }),
     { name: "workout-storage" }

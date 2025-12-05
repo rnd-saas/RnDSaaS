@@ -72,11 +72,6 @@ const MOODS = {
 
 type MoodKey = keyof typeof MOODS;
 
-/**
- * Pure UI mock: no data fetching yet.
- * Replace the hardcoded values with real data when backend wiring is ready.
- */
-
 export default function DashboardPage() {
   const { state } = useLocation() as { state?: { firstName?: string } };
   const firstName =
@@ -137,7 +132,7 @@ export default function DashboardPage() {
 
       {/* Goal Section */}
       <section>
-        <Card>
+        <Card className="hover:scale-none">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg">Weekly Goals</CardTitle>
@@ -167,7 +162,7 @@ export default function DashboardPage() {
       {/* Mood + Next workout */}
       <section className="grid grid-cols-2 gap-4 md:flex md:flex-col md:h-full">
         <Card
-          className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 bg-gradient-to-br from-background to-primary/5 py-4 gap-2 md:flex-1 md:justify-center"
+          className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 bg-gradient-to-br from-background to-primary/5 py-4 gap-2 md:flex-1 md:justify-center  "
           onClick={() => navigate("/mood")}
         >
           <CardHeader className="pb-0 px-4 flex flex-col items-center">
@@ -209,7 +204,7 @@ export default function DashboardPage() {
 
       {/* Streak + Level */}
       <section>
-        <Card>
+        <Card className="hover:scale-none">
           <CardHeader className="pb-0">
             <div className="flex flex-col gap-1">
               <CardTitle className="text-sm font-medium text-muted-foreground">

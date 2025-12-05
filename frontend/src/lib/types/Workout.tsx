@@ -5,7 +5,7 @@ export interface PlannedWorkout {
   workoutId: string;
   date: Date; //date of the planned workout
   exercises: PlannedExercise[];
-  muscleGroups: string[]; //muscle groups targeted in the workout
+  muscleGroups?: string[]; //muscle groups targeted in the workout TODO: remove, not necessary.
 }
 
 // later expansion to create exercises manually. now only via DB!
