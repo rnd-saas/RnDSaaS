@@ -28,7 +28,12 @@ export default function LoggedExerciseItem({
   // plannedExercise: PlannedExercise;
 }) {
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
+  const isOpen = useWorkoutStore(
+    (state) => state.expandedExerciseId === plannedExerciseId
+  );
+  const setExpandedExercideId = useWorkoutStore(
+    (state) => state.setExpandedExerciseId
+  );
   const { data, isLoading, error } = usePlannedWorkout(new Date());
 
   // Access the store actions and the specific logged exercise
@@ -63,7 +68,9 @@ export default function LoggedExerciseItem({
         <CardContent className="flex flex-col gap-0 items-center pl-2 pr-2 md:pl-4 md:pr-4">
           <div
             className="w-full flex justify-start items-center pt-4 pb-4 pl-2 pr-2 gap-2 md:gap-1"
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={() =>
+              setExpandedExercideId(isOpen ? null : plannedExerciseId)
+            }
           >
             <div className="flex flex-1 items-center gap-2">
               <div
