@@ -154,6 +154,20 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
                 fallback: true
             });
         }
+
+        const mentalHealthResponse = checkMentalHealthKeywords(lastUserMessage.content);
+        if (mentalHealthResponse) {
+            return res.json({
+                message: {
+                    role: 'assistant',
+                    content: mentalHealthResponse,
+                    trainerId: requestedTrainerId
+                },
+                usage: null,
+                fallback: true,
+                isMentalHealthIntervention: true
+            });
+        }
     }
 
     const persona = resolvePersona(requestedTrainerId);
@@ -484,6 +498,26 @@ function checkCrisisKeywords(content: string): string | null {
             return "我只是一个AI健身助手，无法处理严重的心理危机。如果你感到绝望或想要伤害自己，请立即寻求专业医生的帮助，或拨打心理援助热线。\n\n中国心理危机干预热线：400-161-9995";
         } else {
             return "I am an AI fitness assistant and cannot provide the crisis support you need. If you are feeling overwhelmed or thinking of harming yourself, please contact a professional or a crisis hotline immediately.\n\nInternational Suicide Hotlines: https://blog.opencounseling.com/suicide-hotlines/";
+        }
+    }
+    return null;
+}
+
+function checkMentalHealthKeywords(content: string): string | null {
+    const lower = content.toLowerCase();
+    const mentalHealthKeywords = [
+        'depression', 'anxiety', 'depressed', 'anxious', 'panic attack', 
+        'mental health', 'therapy', 'counseling', 'psychologist', 'psychiatrist',
+        'bipolar', 'schizophrenia', 'ptsd', 'trauma',
+        '抑郁', '焦虑', '心理健康', '心理咨询', '心理医生', '精神科', 
+        '双相', '创伤', '恐慌'
+    ];
+    
+    if (mentalHealthKeywords.some(kw => lower.includes(kw))) {
+        if (/[\u4e00-\u9fa5]/.test(content)) {
+            return "我不是心理健康领域的专家。如果您正受到心理困扰，建议您咨询专业的心理医生或治疗师。\n\n以下是一些可能有帮助的一般建议：\n1. 规律运动有助于改善情绪。\n2. 尝试冥想或深呼吸练习。\n3. 保持充足的睡眠。\n4. 与信任的朋友或家人倾诉。";
+        } else {
+            return "I am not a mental health professional. If you are struggling with your mental health, I strongly recommend consulting with a qualified therapist or doctor.\n\nHere are some general suggestions that may help:\n1. Regular exercise can help improve mood.\n2. Try mindfulness or deep breathing exercises.\n3. Ensure you get enough sleep.\n4. Talk to a trusted friend or family member.";
         }
     }
     return null;
