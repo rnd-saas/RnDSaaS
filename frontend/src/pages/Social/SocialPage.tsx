@@ -243,9 +243,9 @@ export default function SocialPage() {
 
         {posts.map((post) => {
           const authorName = post.author?.display_name ?? "Anonymous athlete";
-          const authorHandle = post.author?.username
-            ? `@${post.author.username}`
-            : "";
+          // const authorHandle = post.author?.username
+          //   ? `@${post.author.username}`
+          //   : "";
 
           return (
             <Card key={post.id} className="bg-white hover:scale-none shadow-sm">
@@ -260,9 +260,9 @@ export default function SocialPage() {
                     <CardTitle className="text-base leading-tight">
                       {authorName}
                     </CardTitle>
-                    {authorHandle && (
-                      <p className="text-xs text-muted-foreground">{authorHandle}</p>
-                    )}
+                    {/*{authorHandle && (*/}
+                    {/*  <p className="text-xs text-muted-foreground">{authorHandle}</p>*/}
+                    {/*)}*/}
                   </div>
                 </div>
                 <span className="text-xs text-muted-foreground">

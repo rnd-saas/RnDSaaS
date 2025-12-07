@@ -53,13 +53,13 @@ export default function WorkoutDisplay({ weeks, isLoading }: WorkoutDisplayProps
         return (
             <div
                 className={cn(
-                    "size-8 rounded-xl border transition-all flex items-center justify-center",
-                    day.state === "worked" && "bg-[var(--color-primary-pressed)]",
-                    day.state === "rest" && "bg-[var(--color-primary-hover)]",
-                    day.state === "future" && "bg-[var(--color-background)]",
+                    "size-8 rounded-2xl transition-all flex items-center border-0 justify-center",
+                    day.state === "worked" && "bg-primary-pressed",
+                    day.state === "rest" && "bg-primary-hover",
+                    day.state === "future" && "bg-background",
                 )}
             >
-                {day.isCurrent && <div className="size-4 rounded-full border border-[var(--color-grey-background)]" />}
+                {day.isCurrent && <div className="size-4 rounded-full border border-background" />}
             </div>
         );
     }

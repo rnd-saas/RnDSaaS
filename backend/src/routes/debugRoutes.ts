@@ -111,7 +111,7 @@ router.get('/test-connection', async (_req, res) => {
 });
 
 /**
- * GET /api/debug/env-check
+ * GET /api/debug/.env-check
  * Check environment variables (without exposing sensitive data)
  * This endpoint doesn't require Supabase to work
  */
@@ -141,7 +141,7 @@ router.get('/env-check', async (_req, res) => {
             timestamp: new Date().toISOString()
         });
     } catch (error: any) {
-        console.error('env-check error:', error);
+        console.error('.env-check error:', error);
         res.status(500).json({
             error: error.message,
             stack: process.env.NODE_ENV === 'development' ? error.stack : undefined

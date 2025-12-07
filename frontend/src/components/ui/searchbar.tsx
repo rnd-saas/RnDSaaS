@@ -11,7 +11,7 @@ type SocialSearchBarProps = {
 export default function SocialSearchBar({
   value,
   onChange,
-  placeholder = "Type a command or search...",
+  placeholder = "Look for friends...",
   onSubmit,
 }: SocialSearchBarProps) {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

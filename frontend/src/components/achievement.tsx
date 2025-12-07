@@ -13,7 +13,7 @@ export default function Achievement({
 }) {
   return (
     <Card
-      className="flex-1 w-[20vw] md:w-[15vw] lg:w-[10vw] justify-between p-0 shadow-none border-0 bg-primary-disabled/20 hover:scale-none"
+      className="flex-1 max-w-[20vw] md:max-w-[15vw] lg:max-w-[10vw] justify-between p-0 shadow-none border-0 bg-primary-disabled/20 hover:scale-none"
       style={{ opacity: obtained ? 1 : 0.3 }}
     >
       <CardContent className="flex flex-col items-center justify-center gap-2 py-4">

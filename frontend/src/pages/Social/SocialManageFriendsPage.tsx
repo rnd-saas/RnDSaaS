@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { socialService, authService } from "@/lib/api";
 import type { FriendRequestWithUsers } from "@/lib/api/socialService";
-import { Loader2, CheckCircle2, Clock, UserX, Check, X } from "lucide-react";
+import { Loader2, CheckCircle2, Clock, Check, X } from "lucide-react";
 import { toast } from "sonner";
 
 const initialsFromName = (value?: string | null) =>
@@ -127,18 +127,18 @@ export default function SocialManageFriendsPage() {
     return request.requester;
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "accepted":
-        return <CheckCircle2 className="h-4 w-4 text-green-600" />;
-      case "pending":
-        return <Clock className="h-4 w-4 text-amber-600" />;
-      case "blocked":
-        return <UserX className="h-4 w-4 text-red-600" />;
-      default:
-        return null;
-    }
-  };
+  // const getStatusIcon = (status: string) => {
+  //   switch (status) {
+  //     case "accepted":
+  //       return <CheckCircle2 className="h-4 w-4 text-green-600" />;
+  //     case "pending":
+  //       return <Clock className="h-4 w-4 text-amber-600" />;
+  //     case "blocked":
+  //       return <UserX className="h-4 w-4 text-red-600" />;
+  //     default:
+  //       return null;
+  //   }
+  // };
 
   const getStatusLabel = (status: string, isRequester: boolean) => {
     switch (status) {
@@ -216,11 +216,11 @@ export default function SocialManageFriendsPage() {
                             <span className="text-sm font-medium truncate">
                               {otherUser.display_name}
                             </span>
-                            <span className="text-xs text-muted-foreground truncate">
-                              @{otherUser.username}
-                            </span>
+                            {/*<span className="text-xs text-muted-foreground truncate">*/}
+                            {/*  @{otherUser.username}*/}
+                            {/*</span>*/}
                             <div className="flex items-center gap-1 mt-1">
-                              {getStatusIcon(request.status)}
+                              {/*{getStatusIcon(request.status)}*/}
                               <span className="text-xs text-muted-foreground">
                                 {getStatusLabel(request.status, false)}
                               </span>
@@ -229,12 +229,11 @@ export default function SocialManageFriendsPage() {
                         </div>
                         <div className="flex flex-col gap-2 shrink-0">
                           <Button
-                            type="button"
                             size="sm"
                             variant="outline"
                             onClick={() => rejectMutation.mutate(request.id)}
                             disabled={isProcessing}
-                            className="rounded-xl gap-1.5"
+                            className="rounded-xl h-6 w-17"
                           >
                             {isRejecting ? (
                               <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -248,7 +247,7 @@ export default function SocialManageFriendsPage() {
                             size="sm"
                             onClick={() => acceptMutation.mutate(request.id)}
                             disabled={isProcessing}
-                            className="rounded-xl gap-1.5"
+                            className="rounded-xl h-6 w-17"
                           >
                             {isAccepting ? (
                               <>
@@ -307,11 +306,11 @@ export default function SocialManageFriendsPage() {
                             <span className="text-sm font-medium truncate">
                               {otherUser.display_name}
                             </span>
-                            <span className="text-xs text-muted-foreground truncate">
-                              @{otherUser.username}
-                            </span>
+                            {/*<span className="text-xs text-muted-foreground truncate">*/}
+                            {/*  @{otherUser.username}*/}
+                            {/*</span>*/}
                             <div className="flex items-center gap-1 mt-1">
-                              {getStatusIcon(request.status)}
+                              {/*{getStatusIcon(request.status)}*/}
                               <span className="text-xs text-muted-foreground">
                                 {getStatusLabel(request.status, true)}
                               </span>
@@ -324,7 +323,7 @@ export default function SocialManageFriendsPage() {
                           variant="outline"
                           onClick={() => cancelMutation.mutate(request.id)}
                           disabled={isCancelling}
-                          className="shrink-0 rounded-xl gap-1.5"
+                          className="rounded-xl h-6 w-17"
                         >
                           {isCancelling ? (
                             <>
@@ -367,7 +366,7 @@ export default function SocialManageFriendsPage() {
                 if (!otherUser) return null;
 
                 return (
-                  <Card key={request.id} className="bg-white hover-scale-none shadow-sm !py-2">
+                  <Card key={request.id} className="bg-white hover:scale-none shadow-sm !py-2">
                     <CardContent className="pt-2 pb-2 !px-4">
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -381,9 +380,9 @@ export default function SocialManageFriendsPage() {
                             <span className="text-sm font-medium truncate">
                               {otherUser.display_name}
                             </span>
-                            <span className="text-xs text-muted-foreground truncate">
-                              @{otherUser.username}
-                            </span>
+                            {/*<span className="text-xs text-muted-foreground truncate">*/}
+                            {/*  @{otherUser.username}*/}
+                            {/*</span>*/}
                           </div>
                         </div>
                       </div>

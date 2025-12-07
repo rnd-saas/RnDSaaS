@@ -100,11 +100,10 @@ export default function ProfilePage() {
           <SettingsButton />
         </div>
       </header>
-        <h2 className="text-3xl font-semibold tracking-tight">{displayName}</h2>
         {profile?.user.streakDays !== undefined && (
-            <p className="text-sm text-muted-foreground">
+            <h1>
                 Current streak: {profile.user.streakDays} days
-            </p>
+            </h1>
         )}
 
         {error && (

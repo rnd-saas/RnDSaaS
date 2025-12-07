@@ -192,7 +192,7 @@ export default function SocialCreatePostPage() {
       </Card>
 
       {/* Tips card */}
-      <Card className="bg-muted/10 border-dashed hover:scale-none !py-3">
+      <Card className="bg-background border-dashed hover:scale-none !py-3">
         <CardContent className="pt-3 text-left !px-4">
           <div className="space-y-2 text-sm text-muted-foreground text-left">
             <p className="font-medium text-foreground mb-2 text-left">💡 Post ideas:</p>

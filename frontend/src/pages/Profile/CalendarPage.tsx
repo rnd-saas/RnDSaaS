@@ -112,7 +112,7 @@ export default function CalendarPage(){
                                 selectedDateWorkouts.map((event) => (
                                     <div
                                         key={event.id || event.title}
-                                        className="bg-muted after:bg-primary/70 relative rounded-md p-2 pl-6 text-sm after:absolute after:inset-y-2 after:left-2 after:w-1 after:rounded-full"
+                                        className="bg-muted/5 after:bg-primary/70 relative rounded-md p-2 pl-6 text-sm after:absolute after:inset-y-2 after:left-2 after:w-1 after:rounded-full"
                                     >
                                         <div className="font-medium">{event.title}</div>
                                         {event.to && (
