@@ -13,6 +13,8 @@ export const workoutService = {
             if (!response.id && response.isCompleted !== undefined) {
                 return {
                     workoutId: '',
+                    name: '',
+                    description: '',
                     date: date,
                     exercises: [],
                     muscleGroups: [],
@@ -53,6 +55,8 @@ export const workoutService = {
 
             return {
                 workoutId: response.id,
+                name: response.name,
+                description: response.description,
                 date: new Date(response.scheduled_date || date),
                 exercises,
                 muscleGroups: [], // TODO: Aggregate from exercises
