@@ -109,6 +109,19 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
             });
         }
 
+        // Update user's display name if preferred name is provided
+        if (payload.preferredName) {
+            const { error: userUpdateError } = await supabase
+                .from('users')
+                .update({ display_name: payload.preferredName })
+                .eq('id', userId);
+
+            if (userUpdateError) {
+                console.error('Failed to update user display name:', userUpdateError);
+                // We continue even if this fails, as the main onboarding data is saved
+            }
+        }
+
         // If weight is provided, also save it to user_progress_history for tracking
         if (payload.weightKg !== null && payload.weightKg !== undefined) {
             const recordedAt = new Date().toISOString();
