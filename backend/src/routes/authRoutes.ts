@@ -10,6 +10,20 @@ import withTimeout from '../utils/withTimeout';
 
 const router = Router();
 
+async function generateUniqueReferralCode() {
+    for (let i = 0; i < 5; i++) {
+        const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+        const { data } = await supabase
+            .from('users')
+            .select('id')
+            .eq('referral_code', code)
+            .single();
+        
+        if (!data) return code;
+    }
+    return Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
 /**
  * POST /api/auth/login
  * User login
@@ -106,6 +120,28 @@ router.post('/login', async (req, res) => {
             userError = { message: 'users query failed or timed out' };
         }
 
+        // Double check: Ensure user has a referral code
+        if (userData && !userData.referral_code) {
+            try {
+                const referralCode = await generateUniqueReferralCode();
+                const { data: updatedUser, error: updateError } = await supabase
+                    .from('users')
+                    .update({ referral_code: referralCode })
+                    .eq('id', userData.id)
+                    .select()
+                    .single();
+                
+                if (!updateError && updatedUser) {
+                    console.log(`[auth:login] Generated missing referral code for user ${userData.id}`);
+                    userData = updatedUser;
+                } else {
+                    console.error('[auth:login] Failed to generate missing referral code', updateError);
+                }
+            } catch (err) {
+                console.error('[auth:login] Error generating missing referral code', err);
+            }
+        }
+
         if (userError || !userData) {
             // Create a record in users table if it doesn't exist
             let newUser: any = null;
@@ -114,7 +150,7 @@ router.post('/login', async (req, res) => {
                 const result = await withTimeout(
                     new Promise<any>(async (resolve, reject) => {
                         try {
-                            const referralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+                            const referralCode = await generateUniqueReferralCode();
                             const r = await supabase.from('users').insert([{
                                 id: authData.user.id,
                                 username: authData.user.email?.split('@')[0] || 'user',
@@ -220,7 +256,7 @@ router.post('/register', async (req, res) => {
         const session = authData.session;
 
         // Update user record in users table (created by trigger)
-        const referralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+        const referralCode = await generateUniqueReferralCode();
         const { data: userData, error: userError } = await supabase
             .from('users')
             .update({
@@ -331,7 +367,7 @@ router.get('/me', async (req, res) => {
         }
 
         // Get user details from users table
-        const { data: userData, error: userError } = await supabase
+        let { data: userData, error: userError } = await supabase
             .from('users')
             .select('*')
             .eq('id', authUser.id)
@@ -341,6 +377,25 @@ router.get('/me', async (req, res) => {
             return res.status(404).json({ 
                 error: { message: 'User not found' } 
             });
+        }
+
+        // Ensure referral code exists
+        if (!userData.referral_code) {
+            try {
+                const referralCode = await generateUniqueReferralCode();
+                const { data: updatedUser } = await supabase
+                    .from('users')
+                    .update({ referral_code: referralCode })
+                    .eq('id', userData.id)
+                    .select()
+                    .single();
+                
+                if (updatedUser) {
+                    userData = updatedUser;
+                }
+            } catch (err) {
+                console.error('[auth:me] Error generating missing referral code', err);
+            }
         }
 
         res.json(userData);

@@ -68,9 +68,12 @@ router.post('/create-checkout-session', requireAuth, async (req: any, res) => {
         
         if (referrer && !error) {
             // Prevent self-referral
-            if (referrer.id !== user.id) {
-                referrerId = referrer.id;
+            if (referrer.id === user.id) {
+                return res.status(400).json({ error: 'You cannot use your own referral code' });
             }
+            referrerId = referrer.id;
+        } else {
+             return res.status(400).json({ error: 'Invalid referral code' });
         }
     }
 
