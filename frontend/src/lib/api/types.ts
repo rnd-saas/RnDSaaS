@@ -143,6 +143,7 @@ export interface ChatbotResponse {
         total_tokens?: number | null;
     } | null;
     fallback: boolean;
+    isMentalHealthIntervention?: boolean;
 }
 
 export interface ChatbotTrainerProfile {

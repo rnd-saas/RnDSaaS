@@ -9,6 +9,7 @@ import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {chatbotService} from "@/lib/api";
 import type {ChatbotMessage, ChatbotTrainerProfile} from "@/lib/api/types";
+import { toast } from "sonner";
 
 type ConversationMessage = {
     id: string;
@@ -45,6 +46,7 @@ export default function ChatbotPage() {
     const [inputValue, setInputValue] = useState<string>("");
     const [isSending, setIsSending] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [isMentalHealthLock, setIsMentalHealthLock] = useState(false);
 
     const trainerName = profile?.name ?? "Tom";
     const trainerAvatar = AVATAR_MAP[profile?.avatarKey ?? "tom"] ?? tomAvatar;
@@ -154,6 +156,10 @@ export default function ChatbotPage() {
                         : message
                 )
             );
+
+            if (response.isMentalHealthIntervention) {
+                setIsMentalHealthLock(true);
+            }
         } catch (error: any) {
             console.error("Failed to send chatbot message", error);
             const message = error?.message || "Unable to reach the coach right now.";
@@ -216,6 +222,14 @@ export default function ChatbotPage() {
             // Retry shortly after if API is not ready
             console.log("timeout")
             setTimeout(() => handleReport(payload), 100);
+        }
+    };
+
+    const handleInputClick = () => {
+        if (isMentalHealthLock) {
+            toast.error("Detected poor mental state. Please refer to a doctor or family friend.", {
+                duration: 5000,
+            });
         }
     };
 
@@ -294,7 +308,7 @@ export default function ChatbotPage() {
 
                         return (
                             <div key={message.id} className="flex justify-end">
-                                <div className="inline-flex items-start gap-1 px-4 py-2.5 rounded-3xl max-w-[calc(100%-48px)] text-[var(--intuitive-names-app-background)] bg-[var(--intuitive-names-app-primary)]">
+                                <div className="inline-flex items-start gap-1 px-4 py-2.5 rounded-3xl max-w-[calc(100%-48px)] text-[var(--intuitive-names-app-background)] bg-[var(--intuitive-names-app-primary]">
                                     <p>{message.content}</p>
                                 </div>
                             </div>
@@ -305,12 +319,12 @@ export default function ChatbotPage() {
             </main>
             <footer className="px-6 mb-0 rounded-tl-[48px] bg-white sticky bottom-0 w-[90vw] lg:w-[60vw] inset-x-0 mx-auto">
                 <div className="flex items-center gap-4">
-                    <div className="flex-1 flex items-center justify-between px-5 py-2.5 rounded-[48px] border-[1.5px] border-solid">
-                        <Input placeholder={isProfileLoading ? "Loading coach..." : "Type a message ... "} onChange={handleInputChange} value={inputValue} onKeyDown={handleKeyDown} disabled={isSending || isProfileLoading}
-                            className="border-0 p-0 h-auto shadow-none font-normal text-base leading-6 focus-visible:ring-0 focus-visible:ring-offset-0"
+                    <div className="flex-1 flex items-center justify-between px-5 py-2.5 rounded-[48px] border-[1.5px] border-solid" onClick={handleInputClick}>
+                        <Input placeholder={isProfileLoading ? "Loading coach..." : isMentalHealthLock ? "Chat disabled" : "Type a message ... "} onChange={handleInputChange} value={inputValue} onKeyDown={handleKeyDown} disabled={isSending || isProfileLoading || isMentalHealthLock}
+                            className="border-0 p-0 h-auto shadow-none font-normal text-base leading-6 focus-visible:ring-0 focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50"
                         />
                     </div>
-                    <Button size="icon" className="h-11 w-11 rounded-full" onClick={handleSendMessage} disabled={isSending || !inputValue.trim() || isProfileLoading}>
+                    <Button size="icon" className="h-11 w-11 rounded-full" onClick={handleSendMessage} disabled={isSending || !inputValue.trim() || isProfileLoading || isMentalHealthLock}>
                         {isSending ? <Loader2 className="h-[18px] w-[18px] animate-spin" /> : <Send className="h-[18px] w-[18px]" />}
                     </Button>
                 </div>

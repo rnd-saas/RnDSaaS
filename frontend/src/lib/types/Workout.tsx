@@ -3,6 +3,8 @@
  */
 export interface PlannedWorkout {
   workoutId: string;
+  name: string;
+  description?: string;
   date: Date; //date of the planned workout
   exercises: PlannedExercise[];
   muscleGroups: string[]; //muscle groups targeted in the workout
