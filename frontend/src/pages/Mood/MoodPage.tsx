@@ -132,7 +132,7 @@ export default function MoodPage() {
             return (
               <Card
                 key={m.key}
-                type="button"
+                role="button"
                 onClick={() => setSelected(m.key)}
                 aria-pressed={active}
                 className={[
