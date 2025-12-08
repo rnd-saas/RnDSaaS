@@ -401,7 +401,7 @@ export default function DashboardPage() {
                     </p>
                     
                     {/* Mood Shift Visualization */}
-                    <div className="flex items-center justify-center gap-2 bg-primary/5 py-1.5 px-4 rounded-full mx-auto w-fit">
+                    <div className="flex items-center justify-center gap-2 bg-primary/5 py-1.5 px-4 rounded-full mx-auto w-fit mt-1">
                        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mr-1">Mood Shift</span>
                        <span className="text-lg leading-none">😣</span>
                        <ArrowRight className="h-3 w-3 text-muted-foreground/50" />
