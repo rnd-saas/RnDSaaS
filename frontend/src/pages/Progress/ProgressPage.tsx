@@ -6,10 +6,13 @@ import Workouts from "@/pages/Progress/ProgressComponents/Workouts";
 import WorkoutDisplay from "@/pages/Profile/ProfileComponents/WorkoutDisplay";
 import PersonalData from "@/pages/Progress/ProgressComponents/PersonalData";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 import {useEffect, useState} from "react";
+import { useNavigate } from "react-router-dom";
 import { profileService, type ProfileResponse } from "@/lib/api";
 
 export default function ProgressPage() {
+    const navigate = useNavigate();
     const [profile, setProfile] = useState<ProfileResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -42,7 +45,7 @@ export default function ProgressPage() {
     const progressComponents = [
         { value:"achievements", render: () => {
             try {
-                return <AchievementList achievements={profile?.achievements ?? []} />;
+                return <AchievementList achievements={profile?.achievements ?? []} isLoading={loading} />;
             } catch (error) {
                 console.error('Error rendering achievements:', error);
                 return <div className="text-sm text-red-500">Error loading achievements</div>;
@@ -132,6 +135,16 @@ export default function ProgressPage() {
                 {section.label}
               </h2>
               <Separator className="flex-1" />
+              {section.value === "achievements" && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 text-xs shrink-0"
+                  onClick={() => navigate("/achievements")}
+                >
+                  View All
+                </Button>
+              )}
             </div>
 
             <div className="px-1">

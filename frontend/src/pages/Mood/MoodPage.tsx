@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { moodService } from "@/lib/api";
+import WeeklyReview from "./WeeklyReview";
 
 type MoodKey = "anxious" | "nervous" | "okay" | "comfortable" | "never";
 
@@ -74,13 +75,15 @@ const ANXIETY_ADVICE = [
 ];
 
 const STORAGE_KEY = "currentMood_v1";
-const MOOD_KEY_TO_DB_INDEX: Record<MoodKey, number> = {
+export const MOOD_KEY_TO_DB_INDEX: Record<MoodKey, number> = {
   anxious: 0,
   nervous: 1,
   okay: 2,
   comfortable: 3,
   never: 4,
 };
+
+export { MOODS };
 
 export default function MoodPage() {
   const navigate = useNavigate();
@@ -199,7 +202,14 @@ export default function MoodPage() {
       </div>
   
       <Separator className="my-4" />
-  
+
+      {/* Weekly Review */}
+      <section className="space-y-4">
+        <WeeklyReview />
+      </section>
+
+      <Separator className="my-4" />
+
       {/* Explanation */}
       <section className="space-y-4">
         <Card className="hover:scale-none">
