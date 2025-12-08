@@ -24,13 +24,15 @@ export default function StepNavigator({
                 Previous
             </Button>
             {shouldSubmit && (
-                <Button type={"submit"} size="sm" disabled={isSubmitting || nextDisabled}>
+                <Button variant={"secondary"} type={"submit"} size="sm" disabled={isSubmitting || nextDisabled}>
                     {isSubmitting ? "Saving..." : "Submit"}
                 </Button>
             )}
-            {!shouldSubmit && <Button type={"button"} size="sm" onClick={nextStep} disabled={nextDisabled}>
-                Next
-            </Button>}
+            {!shouldSubmit &&
+                <Button type={"button"} size="sm" onClick={nextStep} disabled={nextDisabled}>
+                    Next
+                </Button>
+            }
         </div>
     )
 }

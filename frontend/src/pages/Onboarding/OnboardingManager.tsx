@@ -339,7 +339,7 @@ export default function OnboardingManager() {
             <div className="flex items-center justify-center p-4">
                 <form
                     onSubmit={methods.handleSubmit(onSubmit)}
-                    className="w-full max-w-md min-h-[75vh] min-w-[75vw] flex flex-col items-center gap-6"
+                    className="w-full max-w-md h-[95vh] min-w-[75vw] flex flex-col items-center gap-6"
                 >
                     <div className="w-full p-2">
                         <FormProgress
@@ -362,7 +362,7 @@ export default function OnboardingManager() {
                             <p className="text-primary">{submitError}</p>
                         )}
                     </div>
-                    <div className="fixed w-[75vw] bottom-[10vh] p-4">
+                    <div className="fixed w-[75vw] bottom-[5vh] p-4">
                         <StepNavigator
                             prevStep={back}
                             nextStep={next}
