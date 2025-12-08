@@ -2,12 +2,16 @@
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {Controller, useFormContext} from "react-hook-form";
 import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
+import Step7WhichDays from "@/pages/Onboarding/steps/Step7WhichDays.tsx";
 
 
 export default function Step6DaysPerWeek() {
-    const { control } = useFormContext<Inputs>();
+    const { control, watch } = useFormContext<Inputs>();
+    const selectedDays = watch("strDaysPerWeek");
+    const hasSelectedDays = !!selectedDays;
     return (
-        <FieldSet  className="w-[60vw] lg:w-[30vw] lg:ml-[30vw]">
+        <div>
+        <FieldSet  className="w-[60vw] lg:w-[30vw] lg:ml-[30vw] mb-10">
             <FieldLegend>Days per week</FieldLegend>
             <FieldDescription>
                 How many days per week would you like to train?
@@ -33,5 +37,9 @@ export default function Step6DaysPerWeek() {
                 />
             </div>
         </FieldSet>
+            {hasSelectedDays && (
+                <Step7WhichDays/>
+            )}
+        </div>
     )
 }
