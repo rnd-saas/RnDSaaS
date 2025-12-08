@@ -21,7 +21,7 @@ const FALLBACK_DASHBOARD: DashboardData = {
     exercisesCompleted: { current: 0, target: 40 },
     longestStreak: { current: 0, target: 60 },
   },
-  level: { label: "Novice", currentXp: 500, nextLevelXp: 1200 },
+  level: { label: "Novice", currentXp: 0, nextLevelXp: 0 },
   achievements: [],
   mood: "😣",
   nextWorkout: "🏋️‍♂️",
@@ -350,7 +350,7 @@ export default function DashboardPage() {
           className="h-full cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 bg-linear-to-br from-background to-primary/5 py-8 group"
           onClick={() => navigate("/workout")}
         >
-          <div className="w-[85%] md:w-[100%] mx-auto flex flex-col gap-4 px-4">
+          <div className="w-[85%] md:w-[100%] mx-auto flex flex-col gap-4 md:px-4">
             <CardHeader className="px-0 pb-2">
               <div className="flex flex-col gap-1">
                 <div className="flex items-center justify-between">
@@ -422,7 +422,7 @@ export default function DashboardPage() {
                         {date.toLocaleDateString('en-US', { weekday: 'narrow' })}
                       </span>
                       <div className={`
-                        h-6 w-6 md:h-9 md:w-9 rounded-full flex items-center justify-center text-xs md:text-sm font-bold transition-all
+                        h-6 w-6 md:h-8 md:w-8 rounded-full flex items-center justify-center text-xs md:text-xs font-bold transition-all
                         ${workout?.workoutId 
                           ? 'bg-primary text-primary-foreground shadow-sm ring-2 ring-primary/20' 
                           : 'bg-muted/50 text-muted-foreground/50'
@@ -487,16 +487,29 @@ export default function DashboardPage() {
       {/* Mood */}
       <section>
         <Card
-          className="h-full cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 bg-linear-to-br from-background to-primary/5 py-4 gap-2 flex flex-col justify-center"
+          className="h-full cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 bg-linear-to-br from-background to-primary/5 group"
           onClick={() => navigate("/mood")}
         >
-          <CardHeader className="pb-0 px-4 flex flex-col items-center">
-            <CardTitle className="text-base font-medium">Mood</CardTitle>
+          <CardHeader className="pb-2">
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Wellness
+                </span>
+                <div className="flex items-center text-xs md:text-sm text-muted-foreground group-hover:text-primary transition-colors">
+                  <span>Log Mood</span>
+                  <ChevronRight className="h-4 w-4 ml-0.5" />
+                </div>
+              </div>
+              <CardTitle className="text-lg">Daily Check-in</CardTitle>
+            </div>
           </CardHeader>
-          <CardContent className="flex flex-col items-center justify-center pb-2 px-4">
-            <div className="text-4xl mb-2">{moodEmoji}</div>
-            <p className="text-xs text-muted-foreground text-center">
-              How are you feeling about today's workout?
+          <CardContent className="flex flex-col items-center justify-center pt-4 pb-2">
+            <div className="text-5xl mb-3 group-hover:scale-110 transition-transform duration-300">{moodEmoji}</div>
+            <p className="text-xs text-muted-foreground text-center font-medium px-2">
+              {moodEmoji === "😣" || moodEmoji === "😬" 
+                ? "Feeling anxious? A quick workout might help reset." 
+                : "Tracking your mood helps build emotional awareness."}
             </p>
           </CardContent>
         </Card>
