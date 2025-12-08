@@ -1,22 +1,22 @@
 ﻿import {useForm, FormProvider} from "react-hook-form"
 import { useNavigate } from "react-router-dom";
 import {useState, useEffect, type ComponentType} from "react";
-import FormProgress from "./FormProgress.tsx";
-import StepNavigator from "./StepNavigator.tsx";
+import FormProgress from "./FormProgress";
+import StepNavigator from "./StepNavigator";
 
-import Step0Welcome from "./steps/Step0Welcome.tsx";
-import Step5Experience from "./steps/Step5Experience.tsx";
-import Step6DaysPerWeek from "@/pages/Onboarding/steps/Step6DaysPerWeek.tsx";
-import Step8SessionLength from "@/pages/Onboarding/steps/Step8SessionLength.tsx";
-import Step9ProtectedAreas from "@/pages/Onboarding/steps/Step9ProtectedAreas.tsx";
-import Step10WorkoutType from "@/pages/Onboarding/steps/Step10WorkoutType.tsx";
-import Step11Emotions from "@/pages/Onboarding/steps/Step11Emotions.tsx";
-import Step3Gender from "@/pages/Onboarding/steps/Step3Gender.tsx";
-import Step2Data from "@/pages/Onboarding/steps/Step2Data.tsx";
-import Step4PrimaryGoal from "./steps/Step4PrimaryGoal.tsx";
-import type {PrimaryGoal} from "@/utils/InputTypes.tsx";
-import type {Gender, GymComfortLevel, PreferredSplit} from "@/utils/InputTypes.tsx";
-import Step1Nickname from "@/pages/Onboarding/steps/Step1Nickname.tsx";
+import Step0Welcome from "./steps/Step0Welcome";
+import Step5Experience from "./steps/Step5Experience";
+import Step6DaysPerWeek from "@/pages/Onboarding/steps/Step6DaysPerWeek";
+import Step8SessionLength from "@/pages/Onboarding/steps/Step8SessionLength";
+import Step9ProtectedAreas from "@/pages/Onboarding/steps/Step9ProtectedAreas";
+import Step10WorkoutType from "@/pages/Onboarding/steps/Step10WorkoutType";
+import Step11Emotions from "@/pages/Onboarding/steps/Step11Emotions";
+import Step3Gender from "@/pages/Onboarding/steps/Step3Gender";
+import Step2Data from "@/pages/Onboarding/steps/Step2Data";
+import Step4PrimaryGoal from "./steps/Step4PrimaryGoal";
+import type {PrimaryGoal} from "@/utils/InputTypes";
+import type {Gender, GymComfortLevel, PreferredSplit} from "@/utils/InputTypes";
+import Step1Nickname from "@/pages/Onboarding/steps/Step1Nickname";
 import { onboardingService } from "@/lib/api";
 import type { OnboardingPayload } from "@/lib/api";
 import { trackOnboardingStep, trackOnboardingComplete, trackFormSubmit, trackError } from "@/lib/analytics";

@@ -1,9 +1,9 @@
-﻿import {Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet} from "@/components/ui/field.tsx";
-import {Checkbox} from "@/components/ui/checkbox.tsx";
-import {PreferredSplitValues} from "@/utils/InputTypes.tsx";
-import type {PreferredSplit} from "@/utils/InputTypes.tsx";
+﻿import {Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet} from "@/components/ui/field";
+import {Checkbox} from "@/components/ui/checkbox";
+import {PreferredSplitValues} from "@/utils/InputTypes";
+import type {PreferredSplit} from "@/utils/InputTypes";
 import {Controller, useFormContext} from "react-hook-form";
-import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
+import type {Inputs} from "@/pages/Onboarding/OnboardingManager";
 
 
 export default function Step10WorkoutType() {

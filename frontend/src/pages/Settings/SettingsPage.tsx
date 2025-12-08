@@ -1,11 +1,11 @@
 ﻿import {Accordion, AccordionContent, AccordionItem, AccordionTrigger,} from "@/components/ui/accordion"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import UserSettings from "@/pages/Settings/SettingGroups/UserSettings.tsx";
-import SubscriptionSettings from "@/pages/Settings/SettingGroups/SubscriptionSettings.tsx";
-import tomAvatar from '@/assets/tom_avatar.png';
+import UserSettings from "@/pages/Settings/SettingGroups/UserSettings";
+import SubscriptionSettings from "@/pages/Settings/SettingGroups/SubscriptionSettings";
+import tomAvatar from '../../assets/avatars/tom_avatar.png';
 import {useLocation} from "react-router-dom";
-import ChatbotButton from "@/components/chatbotButton.tsx";
-import AccountSettings from "@/pages/Settings/SettingGroups/AccountSettings.tsx";
+import ChatbotButton from "@/components/chatbotButton";
+import AccountSettings from "@/pages/Settings/SettingGroups/AccountSettings";
 
 export default function SettingsPage() {
     const settingsComponents = [

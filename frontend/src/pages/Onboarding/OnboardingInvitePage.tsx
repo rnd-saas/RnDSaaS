@@ -1,6 +1,6 @@
 ﻿import {useNavigate} from "react-router-dom";
 import tomImage from "@/assets/onboarding_welcome/onboarding-tom.png";
-import {Button} from "@/components/ui/button.tsx";
+import {Button} from "@/components/ui/button";
 import {useEffect} from "react";
 
 export default function OnboardingInvitePage() {

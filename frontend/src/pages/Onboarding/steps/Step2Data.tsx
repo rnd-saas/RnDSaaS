@@ -1,7 +1,7 @@
 ﻿import {Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet} from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select"
-import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
+import type {Inputs} from "@/pages/Onboarding/OnboardingManager";
 import {Controller, useFormContext} from "react-hook-form";
 
 export default function Step2Data() {

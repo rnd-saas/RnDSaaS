@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import BackButton from "@/components/backButton.tsx";
-import {Calendar, CalendarDayButton} from "@/components/ui/calendar.tsx";
-import {Card, CardContent, CardFooter} from "@/components/card.tsx";
+import BackButton from "@/components/backButton";
+import {Calendar, CalendarDayButton} from "@/components/ui/calendar";
+import {Card, CardContent, CardFooter} from "@/components/card";
 import { profileService, type WorkoutHistoryEntry, ApiError } from "@/lib/api";
 import { format } from 'date-fns';
 

@@ -7,8 +7,8 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { dashboardService, settingsService, moodService } from "@/lib/api";
 import type { DashboardData, DashboardAchievement } from "@/lib/api/types";
-import AchievementList from "@/pages/Profile/ProfileComponents/AchievementList.tsx";
-import SettingsButton from "@/components/settingsButton.tsx";
+import AchievementList from "@/pages/Profile/ProfileComponents/AchievementList";
+import SettingsButton from "@/components/settingsButton";
 import {usePlannedWorkout, useNextPlannedWorkout} from "@/api/workouts"
 
 const ACHIEVEMENTS_PER_PAGE = 3;

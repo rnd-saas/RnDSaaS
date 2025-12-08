@@ -1,4 +1,4 @@
-import Achievement from "@/components/achievement.tsx";
+import Achievement from "@/components/achievement";
 
 type AchievementListItem = {
     id: string;
@@ -13,9 +13,9 @@ type AchievementListProps = {
 };
 
 const FALLBACK_ACHIEVEMENTS: AchievementListItem[] = [
-    { id: "fallback-1", title: "100 Workouts", sub: "Completed", emoji: "💪" },
-    { id: "fallback-2", title: "7 Days", sub: "Streak", emoji: "📆" },
-    { id: "fallback-3", title: "Consecutive", sub: "Workout 12", emoji: "🔥" },
+    // { id: "fallback-1", title: "100 Workouts", sub: "Completed", emoji: "💪" },
+    // { id: "fallback-2", title: "7 Days", sub: "Streak", emoji: "📆" },
+    // { id: "fallback-3", title: "Consecutive", sub: "Workout 12", emoji: "🔥" },
 ];
 
 export default function AchievementList({ achievements, isLoading }: AchievementListProps) {

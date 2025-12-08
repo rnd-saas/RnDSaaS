@@ -1,5 +1,5 @@
-﻿import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar.tsx";
-import defaultAvatar from "@/assets/tom_avatar.png";
+﻿import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import defaultAvatar from "../assets/avatars/tom_avatar.png";
 
 export default function AvatarIcon({ icon = defaultAvatar }) {
 return(

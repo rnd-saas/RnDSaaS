@@ -1,9 +1,9 @@
 import { Controller, useFormContext } from "react-hook-form";
-import type { Inputs } from "@/pages/Onboarding/OnboardingManager.tsx";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group.tsx";
-import { FieldDescription, FieldLegend, FieldSet } from "@/components/ui/field.tsx";
-import type { GymComfortLevel } from "@/utils/InputTypes.tsx";
-import { GymComfortLevelValues } from "@/utils/InputTypes.tsx";
+import type { Inputs } from "@/pages/Onboarding/OnboardingManager";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { FieldDescription, FieldLegend, FieldSet } from "@/components/ui/field";
+import type { GymComfortLevel } from "@/utils/InputTypes";
+import { GymComfortLevelValues } from "@/utils/InputTypes";
 
 export default function Step11Emotions() {
     const { control, trigger } = useFormContext<Inputs>();

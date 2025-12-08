@@ -1,10 +1,10 @@
-import AchievementList from "@/pages/Profile/ProfileComponents/AchievementList.tsx";
-import ChatbotButton from "@/components/chatbotButton.tsx";
-import Goals from "@/pages/Progress/ProgressComponents/Goals.tsx";
-import Moods from "@/pages/Progress/ProgressComponents/Moods.tsx";
-import Workouts from "@/pages/Progress/ProgressComponents/Workouts.tsx";
-import WorkoutDisplay from "@/pages/Profile/ProfileComponents/WorkoutDisplay.tsx";
-import PersonalData from "@/pages/Progress/ProgressComponents/PersonalData.tsx";
+import AchievementList from "@/pages/Profile/ProfileComponents/AchievementList";
+import ChatbotButton from "@/components/chatbotButton";
+import Goals from "@/pages/Progress/ProgressComponents/Goals";
+import Moods from "@/pages/Progress/ProgressComponents/Moods";
+import Workouts from "@/pages/Progress/ProgressComponents/Workouts";
+import WorkoutDisplay from "@/pages/Profile/ProfileComponents/WorkoutDisplay";
+import PersonalData from "@/pages/Progress/ProgressComponents/PersonalData";
 import { Separator } from "@/components/ui/separator";
 import {useEffect, useState} from "react";
 import { profileService, type ProfileResponse } from "@/lib/api";

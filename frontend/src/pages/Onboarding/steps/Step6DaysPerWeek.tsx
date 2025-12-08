@@ -1,8 +1,8 @@
-﻿import {FieldDescription, FieldLegend, FieldSet} from "@/components/ui/field.tsx";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
+﻿import {FieldDescription, FieldLegend, FieldSet} from "@/components/ui/field";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Controller, useFormContext} from "react-hook-form";
-import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
-import Step7WhichDays from "@/pages/Onboarding/steps/Step7WhichDays.tsx";
+import type {Inputs} from "@/pages/Onboarding/OnboardingManager";
+import Step7WhichDays from "@/pages/Onboarding/steps/Step7WhichDays";
 
 
 export default function Step6DaysPerWeek() {

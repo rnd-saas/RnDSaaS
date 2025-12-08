@@ -1,4 +1,4 @@
-import {MoodOptions} from "@/utils/MoodOptions.tsx";
+import {MoodOptions} from "@/utils/MoodOptions";
 import {CartesianGrid, ResponsiveContainer, Scatter, ScatterChart, XAxis, YAxis} from "recharts";
 import {useState, useEffect} from "react";
 import {progressService} from "@/lib/api";

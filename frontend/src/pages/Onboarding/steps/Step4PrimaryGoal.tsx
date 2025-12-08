@@ -1,9 +1,9 @@
-﻿import {Field, FieldDescription, FieldLabel, FieldLegend, FieldSet} from "@/components/ui/field.tsx";
-import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group.tsx";
-import {PrimaryGoalValues} from "@/utils/InputTypes.tsx";
-import type {PrimaryGoal} from "@/utils/InputTypes.tsx";
+﻿import {Field, FieldDescription, FieldLabel, FieldLegend, FieldSet} from "@/components/ui/field";
+import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
+import {PrimaryGoalValues} from "@/utils/InputTypes";
+import type {PrimaryGoal} from "@/utils/InputTypes";
 import {Controller, useFormContext} from "react-hook-form";
-import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
+import type {Inputs} from "@/pages/Onboarding/OnboardingManager";
 
 
 export default function Step4PrimaryGoal() {

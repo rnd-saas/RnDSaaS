@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import Achievement from "@/components/achievement.tsx";
-import BackButton from "@/components/backButton.tsx";
-import { Card } from "@/components/card.tsx";
+import Achievement from "@/components/achievement";
+import BackButton from "@/components/backButton";
+import { Card } from "@/components/card";
 import { profileService, type ProfileAchievement, ApiError } from "@/lib/api";
 import { useLocation } from "react-router-dom";
 
@@ -26,7 +26,7 @@ export default function AchievementPage() {
                 if (err instanceof ApiError) {
                     setError(err.message);
                 } else {
-                    setError("无法加载成就列表");
+                    setError("Unable to load achievement list");
                 }
             } finally {
                 if (active) {
@@ -69,7 +69,7 @@ export default function AchievementPage() {
                         </div>
                     ) : achievements.length === 0 ? (
                         <p className="text-center text-muted-foreground">
-                            还没有获得任何成就
+                            No achievements yet
                         </p>
                     ) : (
                         <div

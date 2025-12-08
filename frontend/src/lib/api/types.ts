@@ -62,6 +62,17 @@ export interface OnboardingPayload {
     trainer?: boolean | null;
 }
 
+export interface ProfileData {
+    firstName: string | null;
+    avatarOption: number | null;
+    level: {
+        label: string;
+        currentXp: number;
+        nextLevelXp: number;
+    };
+    onboarding: OnboardingPayload;
+}
+
 export interface DashboardStat {
     current: number;
     target: number;

@@ -1,7 +1,7 @@
-﻿import {Field, FieldDescription, FieldLabel, FieldLegend, FieldSet} from "@/components/ui/field.tsx";
-import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group.tsx";
+﻿import {Field, FieldDescription, FieldLabel, FieldLegend, FieldSet} from "@/components/ui/field";
+import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {Controller, useFormContext} from "react-hook-form";
-import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
+import type {Inputs} from "@/pages/Onboarding/OnboardingManager";
 
 
 export default function Step5Experience() {

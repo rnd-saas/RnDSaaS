@@ -1,12 +1,32 @@
 ﻿import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import DefaultPage from "@/pages/DefaultPage.tsx";
-import OnboardingManager from "@/pages/Onboarding/OnboardingManager.tsx";
+import DefaultPage from "@/pages/DefaultPage";
+import OnboardingManager from "@/pages/Onboarding/OnboardingManager";
 import DashboardPage from "@/pages/DashboardPage";
-import SettingsPage from "@/pages/Settings/SettingsPage.tsx";
+import SettingsPage from "@/pages/Settings/SettingsPage";
 import LandingPage from "@/pages/LandingPage";
 import ChatbotPage from "@/pages/Chatbot/ChatbotPage";
 import { trackPageView } from "@/lib/analytics";
+import AppLayout from "@/routes/AppLayout";
+import RestTimer from "@/pages/Workout/RestTimer";
+import ProfilePage from "@/pages/Profile/ProfilePage";
+import ProgressPage from "@/pages/Progress/ProgressPage";
+import SocialPage from "@/pages/Social/SocialPage";
+import SocialCreatePostPage from "@/pages/Social/SocialCreatePostPage";
+import SocialManageFriendsPage from "@/pages/Social/SocialManageFriendsPage";
+import MoodPage from "@/pages/Mood/MoodPage";
+import CalendarPage from "@/pages/Profile/CalendarPage";
+import AchievementPage from "@/pages/Profile/AchievementPage";
+import SubscriptionPage from "@/pages/SubscriptionPage";
+import PaymentSuccessPage from "@/pages/Payment/SuccessPage";
+import PaymentCancelPage from "@/pages/Payment/CancelPage";
+import OnboardingInvitePage from "@/pages/Onboarding/OnboardingInvitePage";
+
+import PlannedWorkoutPage from "@/pages/Workout/PlannedWorkoutPage";
+import ActiveWorkoutPage from "@/pages/Workout/ActiveWorkoutPage";
+import ExercisePage from "@/pages/ExercisePage";
+import WorkoutEvaluationPage from "@/pages/Workout/WorkoutEvaluationPage";
+import WorkoutPlanChatbotPage from "@/pages/Workout/WorkoutPlanChatbotPage";
 
 // Component to track page views on route changes
 function PageViewTracker() {
@@ -18,27 +38,6 @@ function PageViewTracker() {
 
   return null;
 }
-import AppLayout from "@/routes/AppLayout";
-import RestTimer from "@/pages/Workout/RestTimer";
-import ProfilePage from "@/pages/Profile/ProfilePage.tsx";
-import ProgressPage from "@/pages/Progress/ProgressPage.tsx";
-import SocialPage from "@/pages/Social/SocialPage.tsx";
-import SocialCreatePostPage from "@/pages/Social/SocialCreatePostPage.tsx";
-import SocialManageFriendsPage from "@/pages/Social/SocialManageFriendsPage.tsx";
-import MoodPage from "@/pages/Mood/MoodPage";
-import CalendarPage from "@/pages/Profile/CalendarPage.tsx";
-import AchievementPage from "@/pages/Profile/AchievementPage.tsx";
-import SubscriptionPage from "@/pages/SubscriptionPage.tsx";
-import PaymentSuccessPage from "@/pages/Payment/SuccessPage.tsx";
-import PaymentCancelPage from "@/pages/Payment/CancelPage.tsx";
-import OnboardingInvitePage from "@/pages/Onboarding/OnboardingInvitePage.tsx";
-
-import PlannedWorkoutPage from "@/pages/Workout/PlannedWorkoutPage.tsx";
-import ActiveWorkoutPage from "@/pages/Workout/ActiveWorkoutPage.tsx";
-import ExercisePage from "@/pages/ExercisePage.tsx";
-import WorkoutEvaluationPage from "@/pages/Workout/WorkoutEvaluationPage.tsx";
-import WorkoutPlanChatbotPage from "@/pages/Workout/WorkoutPlanChatbotPage.tsx";
-
 export default function AppRoutes() {
   return (
     <BrowserRouter>

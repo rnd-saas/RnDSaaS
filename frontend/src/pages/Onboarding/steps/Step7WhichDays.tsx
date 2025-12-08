@@ -1,7 +1,7 @@
 ﻿import { Checkbox } from "@/components/ui/checkbox"
 import {Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet,} from "@/components/ui/field"
 import {Controller, useFormContext} from "react-hook-form";
-import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
+import type {Inputs} from "@/pages/Onboarding/OnboardingManager";
 
 export default function Step7WhichDays() {
     const { control, getValues } = useFormContext<Inputs>();

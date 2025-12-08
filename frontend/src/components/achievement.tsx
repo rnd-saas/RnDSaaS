@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/components/card.tsx";
+import { Card, CardContent } from "@/components/card";
 
 export default function Achievement({
   title,

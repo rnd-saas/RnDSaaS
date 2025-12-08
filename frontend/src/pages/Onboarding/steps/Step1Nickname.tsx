@@ -1,7 +1,7 @@
 ﻿import {useFormContext} from "react-hook-form";
-import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
-import {Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet} from "@/components/ui/field.tsx";
-import {Input} from "@/components/ui/input.tsx";
+import type {Inputs} from "@/pages/Onboarding/OnboardingManager";
+import {Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet} from "@/components/ui/field";
+import {Input} from "@/components/ui/input";
 
 export default function Step1Nickname() {
     const { register} = useFormContext<Inputs>();

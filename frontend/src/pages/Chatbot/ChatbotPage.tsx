@@ -1,11 +1,11 @@
-﻿import {Button} from "@/components/ui/button.tsx";
+﻿import {Button} from "@/components/ui/button";
 import {AlertTriangle, ArrowLeft, Loader2, MoreVertical, Send} from "lucide-react";
-import tomAvatar from "@/assets/tom_avatar.png";
-import sarahAvatar from "@/assets/sarah_avatar.png";
-import {Input} from "@/components/ui/input.tsx";
+import tomAvatar from "../../assets/avatars/tom_avatar.png";
+import sarahAvatar from "../../assets/avatars/sarah_avatar.png";
+import {Input} from "@/components/ui/input";
 import {useNavigate} from "react-router-dom";
-import AvatarIcon from "@/components/avatarIcon.tsx";
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu.tsx";
+import AvatarIcon from "@/components/avatarIcon";
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {chatbotService} from "@/lib/api";
 import type {ChatbotMessage, ChatbotTrainerProfile} from "@/lib/api/types";
