@@ -350,7 +350,7 @@ export default function DashboardPage() {
           className="h-full cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 bg-linear-to-br from-background to-primary/5 py-8 group"
           onClick={() => navigate("/workout")}
         >
-          <div className="w-[85%] md:w-[100%] mx-auto flex flex-col gap-4 md:px-4">
+          <div className="w-[85%] md:w-[100%] mx-auto flex flex-col gap-4 md:px-6">
             <CardHeader className="px-0 pb-2">
               <div className="flex flex-col gap-1">
                 <div className="flex items-center justify-between">
@@ -573,7 +573,7 @@ export default function DashboardPage() {
       </section>
 
       {/* Advice */}
-      <section className="md:col-span-2 lg:col-span-1">
+      <section className="md:col-span-2 lg:col-span-3">
         <Card className="bg-primary/5 border-primary/10 hover:scale-none">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-base font-medium text-primary">
