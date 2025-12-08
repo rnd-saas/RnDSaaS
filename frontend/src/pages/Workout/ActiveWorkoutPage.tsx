@@ -13,7 +13,7 @@ import { usePlannedWorkout, useSubmitWorkout } from "@/api/workouts";
 import type { PlannedExercise, PlannedWorkout } from "@/lib/types/Workout";
 import { useWorkoutStore } from "@/lib/state/workoutStore";
 import { useParams, useNavigate } from "react-router-dom";
-import { formatRestTime } from "@/lib/utils/time.ts";
+import { formatRestTime } from "@/lib/utils/time";
 import { convertPlannedToLogged } from "@/lib/utils/workout";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/popover";
 import {
@@ -62,7 +62,7 @@ export default function ActiveWorkoutPage() {
       onSuccess: (data) => {
         // Check for achievements
         if (data.newAchievements && data.newAchievements.length > 0) {
-          data.newAchievements.forEach((achievement: any) => {
+          data.newAchievements.forEach((achievement ) => {
             toast.success(`Achievement Unlocked: ${achievement.name}!`, {
               description: achievement.description,
               duration: 5000,

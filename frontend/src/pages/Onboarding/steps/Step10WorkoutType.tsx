@@ -4,17 +4,11 @@ import {PreferredSplitValues} from "@/utils/InputTypes";
 import type {PreferredSplit} from "@/utils/InputTypes";
 import {Controller, useFormContext} from "react-hook-form";
 import type {Inputs} from "@/pages/Onboarding/OnboardingManager";
+import {splitOptions} from "@/utils/SplitOptionLabels";
 
 
 export default function Step10WorkoutType() {
     const { control } = useFormContext<Inputs>();
-    const splitOptions: { value: PreferredSplit; label: string }[]  = [
-        { value: PreferredSplitValues.DontKnow, label: "Suggest something for me" },
-        { value: PreferredSplitValues.FullBody, label: "Full body" },
-        { value: PreferredSplitValues.UpperLower, label: "Upper-lower body" },
-        { value: PreferredSplitValues.PushPullLegs, label: "Push-pull-Legs" },
-        { value: PreferredSplitValues.Other, label: "Other" },
-    ];
     return (
         <FieldGroup  className="w-[60vw] lg:w-[30vw] lg:ml-[30vw]">
             <FieldSet>
