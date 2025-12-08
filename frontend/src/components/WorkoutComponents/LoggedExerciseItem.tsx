@@ -15,7 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { calculateRestTimeOptions, formatRestTime } from "@/lib/utils/time.ts";
+import { calculateRestTimeOptions, formatRestTime } from "@/lib/utils/time";
 import { useWorkoutStore } from "@/lib/state/workoutStore";
 import { usePlannedWorkout } from "@/api/workouts";
 import { useNavigate } from "react-router-dom";

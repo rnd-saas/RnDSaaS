@@ -24,13 +24,9 @@ export default function Step6DaysPerWeek() {
                                 <SelectValue placeholder="Select the number of days"/>
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="1">1</SelectItem>
-                                <SelectItem value="2">2</SelectItem>
-                                <SelectItem value="3">3</SelectItem>
-                                <SelectItem value="4">4</SelectItem>
-                                <SelectItem value="5">5</SelectItem>
-                                <SelectItem value="6">6</SelectItem>
-                                <SelectItem value="7">7</SelectItem>
+                                {[1,2,3,4,5,6,7].map((g) => (
+                                    <SelectItem key={g} value={String(g)} id={String(g)}>{g}</SelectItem>
+                                ))}
                             </SelectContent>
                         </Select>
                     )}

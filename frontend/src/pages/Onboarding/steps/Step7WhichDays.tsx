@@ -2,18 +2,10 @@
 import {Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet,} from "@/components/ui/field"
 import {Controller, useFormContext} from "react-hook-form";
 import type {Inputs} from "@/pages/Onboarding/OnboardingManager";
+import {dayOptions} from "@/utils/DayOptionLabels";
 
 export default function Step7WhichDays() {
     const { control, getValues } = useFormContext<Inputs>();
-    const dayOptions = [
-        { id: "monday", label: "Monday", value: "1" },
-        { id: "tuesday", label: "Tuesday", value: "2" },
-        { id: "wednesday", label: "Wednesday", value: "3" },
-        { id: "thursday", label: "Thursday", value: "4" },
-        { id: "friday", label: "Friday", value: "5" },
-        { id: "saturday", label: "Saturday", value: "6" },
-        { id: "sunday", label: "Sunday", value: "0" },
-    ];
     const minDays = Number(getValues("strDaysPerWeek"))|| 1;
     return (
         <FieldGroup  className="w-[60vw] lg:w-[30vw] lg:ml-[30vw]">

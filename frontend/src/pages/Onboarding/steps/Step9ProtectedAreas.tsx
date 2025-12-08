@@ -4,18 +4,12 @@ import {Input} from "@/components/ui/input";
 import {Controller, useFormContext} from "react-hook-form";
 import type {ControllerRenderProps} from "react-hook-form";
 import type {Inputs} from "@/pages/Onboarding/OnboardingManager";
+import {areaOptions} from "@/utils/AreaOptionLabels";
 
 type ProblemAreasField = ControllerRenderProps<Inputs, "problemAreas">;
 
 export default function Step9ProtectedAreas() {
     const { control } = useFormContext<Inputs>();
-    const areaOptions = [
-        { value: "shoulders", label: "Shoulders" },
-        { value: "lower-back", label: "Lower back" },
-        { value: "knees", label: "Knees" },
-        { value: "none", label: "None" },
-    ];
-
     function toggleCheckbox(selected: string[], field: ProblemAreasField, value: string) {
         if (selected.includes(value)) {
             field.onChange(selected.filter(v => v !== value));

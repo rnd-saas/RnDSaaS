@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { RefreshCcw } from "lucide-react";
+import { RefreshCcw, ChevronRight, ArrowRight } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,7 @@ const FALLBACK_DASHBOARD: DashboardData = {
     exercisesCompleted: { current: 0, target: 40 },
     longestStreak: { current: 0, target: 60 },
   },
-  level: { label: "Novice", currentXp: 500, nextLevelXp: 1200 },
+  level: { label: "Novice", currentXp: 0, nextLevelXp: 0 },
   achievements: [],
   mood: "😣",
   nextWorkout: "🏋️‍♂️",
@@ -302,7 +302,13 @@ export default function DashboardPage() {
     window.tidioChatApi.show();
   }, []);
   return (
+    
     <div className="w-full max-w-lg md:max-w-4xl lg:max-w-6xl mx-auto p-6 pb-24 space-y-8 md:space-y-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6">
+      {fetchError && (
+        <div className="w-full mb-4 rounded-md border border-amber-500/60 bg-amber-50 px-3 py-2 text-sm text-amber-900 col-span-3">
+          {fetchError}
+        </div>
+      )}
       {/* Header */}
       <header className="space-y-1 md:col-span-2 lg:col-span-3">
         <div className="flex items-center justify-between ">
@@ -311,7 +317,7 @@ export default function DashboardPage() {
           </h1>
           <SettingsButton />
         </div>
-        <div className="flex items-start justify-between">
+        <div className="flex items-center justify-between">
           <p className="text-muted-foreground">{today}</p>
           <div className="flex flex-col items-end gap-1 min-w-[150px]">
             <div className="flex items-center justify-between w-full text-xs">
@@ -332,48 +338,57 @@ export default function DashboardPage() {
           </div>
         </div>
       <div className="md:col-span-2 lg:col-span-3">
-        <Separator />
+        <Separator className="mt-2" />
       </div>
       </header>
 
-      {fetchError && (
-        <div className="mb-4 rounded-md border border-amber-500/60 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-          {fetchError}
-        </div>
-      )}
+      
 
       {/* Next Workout */}
       <section className="md:col-span-2 lg:col-span-2">
         <Card
-          className="h-full cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 bg-linear-to-br from-background to-primary/5 py-8"
+          className="h-full cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 bg-linear-to-br from-background to-primary/5 py-8 group"
           onClick={() => navigate("/workout")}
         >
-          <div className="md:w-[50%] mx-auto flex flex-col gap-6">
-            <CardHeader className="block">
-              <CardTitle className={`h2-styles font-bold ${isTodayWorkoutCompleted ? "text-center" : "text-left"}`}>
-                {!isTodayWorkoutCompleted 
-                  ? `Today's Workout: ${plannedWorkout?.name || "Training Session"}` 
-                  : `Congrats! Next workout is ${
-                      nextWorkout?.date 
-                        ? new Date(nextWorkout.date).toLocaleDateString('en-US', { weekday: 'long' })
-                        : "soon"
-                    }`
-                }
-              </CardTitle>
+          <div className="w-[85%] md:w-[100%] mx-auto flex flex-col gap-4 md:px-4">
+            <CardHeader className="px-0 pb-2">
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    {!isTodayWorkoutCompleted ? "Today's Workout" : "Status"}
+                  </span>
+                  {!isTodayWorkoutCompleted && (
+                    <div className="flex items-center text-xs md:text-sm text-muted-foreground group-hover:text-primary transition-colors shrink-0">
+                      <span>Start Workout</span>
+                      <ChevronRight className="h-4 w-4 ml-0.5" />
+                    </div>
+                  )}
+                </div>
+                <CardTitle className={`h2-styles font-bold px-0! leading-tight ${isTodayWorkoutCompleted ? "text-center" : "text-left"}`}>
+                  {!isTodayWorkoutCompleted 
+                    ? (plannedWorkout?.name || "Training Session")
+                    : `Congrats! Next workout is ${
+                        nextWorkout?.date 
+                          ? new Date(nextWorkout.date).toLocaleDateString('en-US', { weekday: 'long' })
+                          : "soon"
+                      }`
+                  }
+                </CardTitle>
+              </div>
             </CardHeader>
             <CardContent className="p-0 flex flex-col items-center gap-2">
               {!isTodayWorkoutCompleted ? (
                 <>
-                  <div className="text-6xl">{nextWorkoutEmoji}</div>
+                  <div className="text-6xl group-hover:scale-110 transition-transform duration-300">{nextWorkoutEmoji}</div>
                   <div className="w-full px-6 text-left">
-                    <p className="body-styles text-muted-foreground font-semibold">
-                      Description:
+                    <p className="body-styles text-muted-foreground font-semibold tracking-wider mt-4">
+                      Description
                     </p>
                     <p className="body-styles line-clamp-3">
                       {plannedWorkout?.description || "Get ready to push your limits and build strength."}
                     </p>
                   </div>
-                  <p className="text-sm text-muted-foreground text-center mt-2">
+                  <p className="text-sm text-muted-foreground text-center mt-0">
                     Ready to sweat? Tap to start.
                   </p>
                 </>
@@ -384,8 +399,17 @@ export default function DashboardPage() {
                     <p className="body-styles font-medium">
                       You crushed {plannedWorkout?.workoutName || "it"}!
                     </p>
+                    
+                    {/* Mood Shift Visualization */}
+                    <div className="flex items-center justify-center gap-2 bg-primary/5 py-1.5 px-4 rounded-full mx-auto w-fit mt-1">
+                       <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mr-1">Mood Shift</span>
+                       <span className="text-lg leading-none">😣</span>
+                       <ArrowRight className="h-3 w-3 text-muted-foreground/50" />
+                       <span className="text-lg leading-none">😌</span>
+                    </div>
+
                     {nextWorkout ? (
-                      <div className="text-sm text-muted-foreground bg-background/50 p-3 rounded-lg border border-border/50">
+                      <div className="text-sm text-muted-foreground bg-background/50 p-3 rounded-lg border border-border/50 mt-2">
                         <p className="font-semibold text-foreground">Next Up: {nextWorkout.name}</p>
                       </div>
                     ) : (
@@ -398,16 +422,16 @@ export default function DashboardPage() {
               )}
 
               {/* Upcoming Schedule Calendar - Always Visible */}
-              <div className="w-full px-4 mt-6">
-                <p className="text-xs font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Upcoming Schedule</p>
-                <div className="flex justify-between items-center w-full">
+              <div className="w-full px-0 md:px-4 mt-6">
+                <p className="body-styles font-semibold text-muted-foreground mb-3 ">Upcoming Schedule</p>
+                <div className="flex justify-between md:justify-start items-center w-full gap-2">
                   {upcomingWorkouts?.map(({ date, workout }) => (
                     <div key={date.toISOString()} className="flex flex-col items-center gap-1.5">
                       <span className="text-[10px] font-medium text-muted-foreground">
                         {date.toLocaleDateString('en-US', { weekday: 'narrow' })}
                       </span>
                       <div className={`
-                        h-7 w-7 rounded-full flex items-center justify-center text-[10px] font-bold transition-all
+                        h-6 w-6 md:h-8 md:w-8 rounded-full flex items-center justify-center text-xs md:text-xs font-bold transition-all
                         ${workout?.workoutId 
                           ? 'bg-primary text-primary-foreground shadow-sm ring-2 ring-primary/20' 
                           : 'bg-muted/50 text-muted-foreground/50'
@@ -431,26 +455,37 @@ export default function DashboardPage() {
         </p>
       )}
       <section>
-        <Card className="hover:scale-none h-full">
+        <Card 
+          className="h-full cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 bg-linear-to-br from-background to-primary/5 group"
+          onClick={() => navigate("/progress")}
+        >
           <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Progress
+                </span>
+                <div className="flex items-center text-xs md:text-sm text-muted-foreground group-hover:text-primary transition-colors">
+                  <span>View Details</span>
+                  <ChevronRight className="h-4 w-4 ml-0.5" />
+                </div>
+              </div>
               <CardTitle className="text-lg">Weekly Goals</CardTitle>
-              <span className="text-sm text-muted-foreground">Progress</span>
             </div>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-5 pt-2">
             <GoalRow
-              label="Workouts completed"
+              label="Workouts"
               value={goal.workoutsCompleted.current}
               target={goal.workoutsCompleted.target}
             />
             <GoalRow
-              label="Exercises completed"
+              label="Exercises"
               value={goal.exercisesCompleted.current}
               target={goal.exercisesCompleted.target}
             />
             <GoalRow
-              label="Longest streak"
+              label="Streak"
               value={goal.longestStreak.current}
               target={goal.longestStreak.target}
             />
@@ -461,52 +496,32 @@ export default function DashboardPage() {
       {/* Mood */}
       <section>
         <Card
-          className="h-full cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 bg-linear-to-br from-background to-primary/5 py-4 gap-2 flex flex-col justify-center"
+          className="h-full cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 bg-linear-to-br from-background to-primary/5 group"
           onClick={() => navigate("/mood")}
         >
-          <CardHeader className="pb-0 px-4 flex flex-col items-center">
-            <CardTitle className="text-base font-medium">Mood</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col items-center justify-center pb-2 px-4">
-            <div className="text-4xl mb-2">{moodEmoji}</div>
-            <p className="text-[10px] text-muted-foreground text-center">
-              How are you feeling?
-            </p>
-          </CardContent>
-        </Card>
-      </section>
-
-      {/* Streak + Level */}
-      <section>
-        <Card className="hover:scale-none h-full">
-          {streakDisplay && (
-            <CardHeader className="pb-0">
-              <div className="flex flex-col gap-1">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Current Streak
-                </CardTitle>
-                <span className="text-3xl font-bold">{streakDays} Days</span>
-              </div>
-            </CardHeader>
-          )}
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">
-                  Level:{" "}
-                  <span className="font-medium text-foreground">
-                    {level.label}
-                  </span>
+          <CardHeader className="pb-2">
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Wellness
                 </span>
-                <span className="text-muted-foreground">
-                  {level.currentXp} / {level.nextLevelXp} XP
-                </span>
+                <div className="flex items-center text-xs md:text-sm text-muted-foreground group-hover:text-primary transition-colors">
+                  <span>Log Mood</span>
+                  <ChevronRight className="h-4 w-4 ml-0.5" />
+                </div>
               </div>
-              <Progress
-                value={(level.currentXp / level.nextLevelXp) * 100}
-                className="h-2"
-              />
+              <CardTitle className="text-lg">Daily Check-in</CardTitle>
             </div>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center justify-center min-h-[140px] py-2">
+            <div className="text-6xl mb-4 group-hover:scale-110 transition-transform duration-300 drop-shadow-sm filter">
+              {moodEmoji}
+            </div>
+            <p className="text-xs text-muted-foreground text-center font-medium px-6 leading-relaxed">
+              {moodEmoji === "😣" || moodEmoji === "😬" 
+                ? "Feeling anxious? A quick workout might help reset." 
+                : "Tracking your mood helps build emotional awareness."}
+            </p>
           </CardContent>
         </Card>
       </section>
@@ -600,13 +615,16 @@ export function GoalRow({
 }) {
   const pct = Math.max(0, Math.min(100, (value / target) * 100));
   return (
-    <div className="space-y-1.5">
-      <div className="flex items-center justify-between text-[15px]">
-        <span className="list-item ml-6 list-disc marker:text-foreground/80">
-          {label}:
-        </span>
-        <span className="tabular-nums">
-          {value} / {target}
+    <div className="space-y-2">
+      <div className="flex items-center justify-between text-sm">
+        <div className="flex items-center gap-2">
+          {/* Custom dot instead of list-item for better alignment */}
+          <div className="h-1.5 w-1.5 rounded-full bg-primary/60 shrink-0" />
+          <span className="font-medium opacity-90">{label}</span>
+        </div>
+        <span className="tabular-nums text-muted-foreground text-xs">
+          <span className="font-medium text-foreground">{value}</span> /{" "}
+          <span className="font-medium text-foreground">{target}</span>
         </span>
       </div>
       <Progress value={pct} className="h-2 rounded-full" />
