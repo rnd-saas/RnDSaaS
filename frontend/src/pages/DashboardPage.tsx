@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { RefreshCcw, ChevronRight } from "lucide-react";
+import { RefreshCcw, ChevronRight, ArrowRight } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
 import { Button } from "@/components/ui/button";
@@ -399,8 +399,17 @@ export default function DashboardPage() {
                     <p className="body-styles font-medium">
                       You crushed {plannedWorkout?.workoutName || "it"}!
                     </p>
+                    
+                    {/* Mood Shift Visualization */}
+                    <div className="flex items-center justify-center gap-2 bg-primary/5 py-1.5 px-4 rounded-full mx-auto w-fit">
+                       <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mr-1">Mood Shift</span>
+                       <span className="text-lg leading-none">😣</span>
+                       <ArrowRight className="h-3 w-3 text-muted-foreground/50" />
+                       <span className="text-lg leading-none">😌</span>
+                    </div>
+
                     {nextWorkout ? (
-                      <div className="text-sm text-muted-foreground bg-background/50 p-3 rounded-lg border border-border/50">
+                      <div className="text-sm text-muted-foreground bg-background/50 p-3 rounded-lg border border-border/50 mt-2">
                         <p className="font-semibold text-foreground">Next Up: {nextWorkout.name}</p>
                       </div>
                     ) : (
@@ -504,48 +513,15 @@ export default function DashboardPage() {
               <CardTitle className="text-lg">Daily Check-in</CardTitle>
             </div>
           </CardHeader>
-          <CardContent className="flex flex-col items-center justify-center pt-4 pb-2">
-            <div className="text-5xl mb-3 group-hover:scale-110 transition-transform duration-300">{moodEmoji}</div>
-            <p className="text-xs text-muted-foreground text-center font-medium px-2">
+          <CardContent className="flex flex-col items-center justify-center min-h-[140px] py-2">
+            <div className="text-6xl mb-4 group-hover:scale-110 transition-transform duration-300 drop-shadow-sm filter">
+              {moodEmoji}
+            </div>
+            <p className="text-xs text-muted-foreground text-center font-medium px-6 leading-relaxed">
               {moodEmoji === "😣" || moodEmoji === "😬" 
                 ? "Feeling anxious? A quick workout might help reset." 
                 : "Tracking your mood helps build emotional awareness."}
             </p>
-          </CardContent>
-        </Card>
-      </section>
-
-      {/* Streak + Level */}
-      <section>
-        <Card className="hover:scale-none h-full">
-          {streakDisplay && (
-            <CardHeader className="pb-0">
-              <div className="flex flex-col gap-1">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Current Streak
-                </CardTitle>
-                <span className="text-3xl font-bold">{streakDays} Days</span>
-              </div>
-            </CardHeader>
-          )}
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">
-                  Level:{" "}
-                  <span className="font-medium text-foreground">
-                    {level.label}
-                  </span>
-                </span>
-                <span className="text-muted-foreground">
-                  {level.currentXp} / {level.nextLevelXp} XP
-                </span>
-              </div>
-              <Progress
-                value={(level.currentXp / level.nextLevelXp) * 100}
-                className="h-2"
-              />
-            </div>
           </CardContent>
         </Card>
       </section>
