@@ -73,7 +73,10 @@ export default function AchievementPage() {
                         </p>
                     ) : (
                         <div
-                            className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(20vw,1fr))] md:grid-cols-[repeat(auto-fit,minmax(15vw,1fr))] lg:grid-cols-[repeat(auto-fit,minmax(10vw,1fr))]">
+                            // Changed to a standard responsive grid
+                            // grid-cols-2 on mobile (50% width each) -> up to 6 on large screens
+                            className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
+                        >
                             {achievements.map((a) => (
                                 <Achievement
                                     key={a.id}
@@ -81,6 +84,7 @@ export default function AchievementPage() {
                                     sub={a.sub}
                                     image={a.emoji}
                                     obtained={true}
+                                    className="w-full h-full"
                                 />
                             ))}
                         </div>
