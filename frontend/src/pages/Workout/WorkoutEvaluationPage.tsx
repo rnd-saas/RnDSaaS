@@ -11,12 +11,6 @@ import { useLocation } from "react-router-dom";
 import type { WorkoutEvaluation } from "@/lib/types/Workout";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import imgDead from "@/assets/workout-evaluation/dead.png";
-import imgSad from "@/assets/workout-evaluation/sad.png";
-import imgSceptic from "@/assets/workout-evaluation/sceptic.png";
-import imgHappy from "@/assets/workout-evaluation/happy.png";
-import imgVeryHappy from "@/assets/workout-evaluation/very-happy.png";
-
 export default function WorkoutEvaluationPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -187,28 +181,24 @@ export default function WorkoutEvaluationPage() {
             Tell us... How do you feel?
           </h3>
           <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center justify-between gap-2 lg:max-w-[50vw]">
               {[
-                { id: "dead", src: imgDead },
-                { id: "sad", src: imgSad },
-                { id: "sceptic", src: imgSceptic },
-                { id: "happy", src: imgHappy },
-                { id: "veryHappy", src: imgVeryHappy },
+                { id: "dead", src: "😣" },
+                { id: "sad", src: "😬" },
+                { id: "sceptic", src: "🙂" },
+                { id: "happy", src: "😌" },
+                { id: "veryHappy", src: "🤩" },
               ].map((emoji) => (
                 <button
                   key={emoji.id}
                   onClick={() => setFeeling(emoji.id)}
-                  className={`relative w-[36px] h-[36px] rounded-full transition-transform hover:scale-110 ${
-                    feeling === emoji.id
-                      ? "ring-2 ring-primary ring-offset-2"
-                      : ""
+                  className={`relative w-[48px] h-[48px] text-3xl rounded-full transition-transform hover:scale-110 ${
+                      feeling === emoji.id
+                          ? "ring-2 ring-primary ring-offset-2"
+                          : ""
                   }`}
                 >
-                  <img
-                    src={emoji.src}
-                    alt={emoji.id}
-                    className="w-full h-full object-cover"
-                  />
+                  {emoji.src}
                 </button>
               ))}
             </div>

@@ -2,7 +2,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import UserSettings from "@/pages/Settings/SettingGroups/UserSettings.tsx";
 import SubscriptionSettings from "@/pages/Settings/SettingGroups/SubscriptionSettings.tsx";
-import tomAvatar from '@/assets/tom_avatar.png';
+import tomAvatar from '../../assets/avatars/tom_avatar.png';
 import {useLocation} from "react-router-dom";
 import ChatbotButton from "@/components/chatbotButton.tsx";
 import AccountSettings from "@/pages/Settings/SettingGroups/AccountSettings.tsx";
