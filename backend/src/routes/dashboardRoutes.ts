@@ -3,6 +3,7 @@ import type { Request } from 'express';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../db/supabase';
 import { requireAuth } from '../middleware/requireAuth';
+import { requireSubscription } from '../middleware/requireSubscription';
 
 const router = Router();
 
@@ -49,7 +50,7 @@ const LEVELS = [
     { label: 'Legend', minXp: 8000, maxXp: 11000 }
 ];
 
-router.get('/', requireAuth, async (req: AuthedRequest, res) => {
+router.get('/', requireAuth, requireSubscription, async (req: AuthedRequest, res) => {
     try {
         const userId = req.user?.id;
         if (!userId) {

@@ -27,6 +27,7 @@ import ActiveWorkoutPage from "@/pages/Workout/ActiveWorkoutPage";
 import ExercisePage from "@/pages/ExercisePage";
 import WorkoutEvaluationPage from "@/pages/Workout/WorkoutEvaluationPage";
 import WorkoutPlanChatbotPage from "@/pages/Workout/WorkoutPlanChatbotPage";
+import Paywall from "@/components/Paywall";
 
 // Component to track page views on route changes
 function PageViewTracker() {
@@ -47,8 +48,16 @@ export default function AppRoutes() {
         <Route path="/onboarding" element={<OnboardingManager />} />
         <Route path="/onboarding-invite" element={<OnboardingInvitePage />} />
         <Route path="/landing" element={<LandingPage />} />
-        <Route path="/chatbot" element={<ChatbotPage />} />
-        <Route path="/workout/plan-chatbot" element={<WorkoutPlanChatbotPage />} />
+        <Route path="/chatbot" element={
+            <Paywall>
+                <ChatbotPage />
+            </Paywall>
+        } />
+        <Route path="/workout/plan-chatbot" element={
+            <Paywall>
+                <WorkoutPlanChatbotPage />
+            </Paywall>
+        } />
         <Route
           path="/workout/:workoutId/:exerciseSlug/rest"
           element={<RestTimer />}
@@ -61,21 +70,57 @@ export default function AppRoutes() {
         <Route path="/payment/cancel" element={<PaymentCancelPage />} />
         {/* App layout with persistent bottom nav */}
         <Route element={<AppLayout />}>
-          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/dashboard" element={
+              <Paywall>
+                  <DashboardPage />
+              </Paywall>
+          } />
           <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/workout" element={<PlannedWorkoutPage />} />
-          <Route path="/social" element={<SocialPage />} />
-          <Route path="/social/post" element={<SocialCreatePostPage />} />
-          <Route path="/social/manage" element={<SocialManageFriendsPage />} />
+          <Route path="/workout" element={
+              <Paywall>
+                  <PlannedWorkoutPage />
+              </Paywall>
+          } />
+          <Route path="/social" element={
+              <Paywall>
+                  <SocialPage />
+              </Paywall>
+          } />
+          <Route path="/social/post" element={
+              <Paywall>
+                  <SocialCreatePostPage />
+              </Paywall>
+          } />
+          <Route path="/social/manage" element={
+              <Paywall>
+                  <SocialManageFriendsPage />
+              </Paywall>
+          } />
           <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/progress" element={<ProgressPage />} />
+          <Route path="/progress" element={
+              <Paywall>
+                  <ProgressPage />
+              </Paywall>
+          } />
         </Route>
-        <Route path="/workout/:id" element={<ActiveWorkoutPage />} />
+        <Route path="/workout/:id" element={
+            <Paywall>
+                <ActiveWorkoutPage />
+            </Paywall>
+        } />
         <Route
           path="/workout/:id/evaluation"
-          element={<WorkoutEvaluationPage />}
+          element={
+              <Paywall>
+                  <WorkoutEvaluationPage />
+              </Paywall>
+          }
         />
-        <Route path="/exercise/:exerciseSlug" element={<ExercisePage />} />
+        <Route path="/exercise/:exerciseSlug" element={
+            <Paywall>
+                <ExercisePage />
+            </Paywall>
+        } />
       </Routes>
     </BrowserRouter>
   );

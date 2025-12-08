@@ -24,6 +24,7 @@ export interface LoginResponse {
     token?: string;
     refreshToken?: string;
     expiresAt?: number | null;
+    subscriptionStatus?: string;
     message?: string;
 }
 

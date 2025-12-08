@@ -2,7 +2,7 @@ import { stripe } from '../utils/stripe';
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
-export const createCheckoutSession = async (userId: string, userEmail: string, priceId: string, referrerId?: string, origin?: string) => {
+export const createCheckoutSession = async (userId: string, userEmail: string, priceId: string, referrerId?: string, origin?: string, allowTrial: boolean = true) => {
   try {
     // Optional: Retrieve or create customer in Stripe to link with your DB user
     // const customer = await stripe.customers.create({ email: userEmail, metadata: { userId } });
@@ -18,9 +18,6 @@ export const createCheckoutSession = async (userId: string, userEmail: string, p
         },
       ],
       mode: 'subscription', // or 'payment' for one-time
-      subscription_data: {
-        trial_period_days: 14,
-      },
       success_url: `${baseUrl}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/payment/cancel`,
       customer_email: userEmail,
@@ -28,6 +25,12 @@ export const createCheckoutSession = async (userId: string, userEmail: string, p
         userId,
       },
     };
+
+    if (allowTrial) {
+      sessionConfig.subscription_data = {
+        trial_period_days: 14,
+      };
+    }
 
     if (referrerId) {
         sessionConfig.metadata.referredBy = referrerId;

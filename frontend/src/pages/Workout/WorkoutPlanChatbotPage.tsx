@@ -7,7 +7,8 @@ import {useNavigate} from "react-router-dom";
 import AvatarIcon from "@/components/avatarIcon";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 import {useCallback, useEffect, useMemo, useRef, useState} from "react";
-import {chatbotService, workoutService} from "@/lib/api";
+import {chatbotService, workoutService } from "@/lib/api";
+import apiClient from "@/lib/api/client";
 import type {ChatbotMessage, ChatbotTrainerProfile} from "@/lib/api/types";
 import { toast } from "sonner";
 
@@ -91,6 +92,12 @@ export default function WorkoutPlanChatbotPage() {
     const [isUpdatingPlan, setIsUpdatingPlan] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
     const [isMentalHealthLock, setIsMentalHealthLock] = useState(false);
+    const [isSubscribed, setIsSubscribed] = useState(false);
+
+    useEffect(() => {
+        const status = apiClient.getSubscriptionStatus();
+        setIsSubscribed(status === 'active' || status === 'trialing');
+    }, []);
 
     const hasProposedPlan = useMemo(() => messages.some(m => m.proposedPlan), [messages]);
 
@@ -481,8 +488,15 @@ export default function WorkoutPlanChatbotPage() {
             </main>
             <footer className="px-6 mb-0 rounded-tl-[48px] bg-white sticky bottom-0 w-[90vw] lg:w-[60vw] inset-x-0 mx-auto flex flex-col gap-2 pt-4">
                 {!hasProposedPlan && (
-                    <div className="flex justify-center">
-                        <Button variant="secondary" size="sm" onClick={handleGeneratePlan} disabled={isGenerating || messages.length < 2 || isMentalHealthLock} className="rounded-full px-6 shadow-sm hover:shadow-md transition-all bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-100">
+                    <div className="flex justify-end">
+                        <Button 
+                            variant="secondary" 
+                            size="sm" 
+                            onClick={handleGeneratePlan} 
+                            disabled={isGenerating || messages.length < 2 || isMentalHealthLock || !isSubscribed} 
+                            className="rounded-full px-6 shadow-sm hover:shadow-md transition-all bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-100 disabled:opacity-50"
+                            title={!isSubscribed ? "Upgrade to Pro to generate plans" : ""}
+                        >
                             {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
                             Generate Plan from Chat
                         </Button>

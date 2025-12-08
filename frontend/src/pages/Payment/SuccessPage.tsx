@@ -28,7 +28,7 @@ export default function PaymentSuccessPage() {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
-            Your account has been upgraded to Pro. You now have access to all premium features.
+            Your account has been upgraded to Premium. You now have access to all premium features.
           </p>
         </CardContent>
         <CardFooter className="flex justify-center">

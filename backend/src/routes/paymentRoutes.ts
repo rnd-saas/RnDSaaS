@@ -77,7 +77,16 @@ router.post('/create-checkout-session', requireAuth, async (req: any, res) => {
         }
     }
 
-    const session = await createCheckoutSession(user.id, user.email, priceId, referrerId, origin);
+    // Check if user has ever subscribed before to determine trial eligibility
+    const { data: existingSub } = await supabase
+        .from('user_subscription')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+    
+    const allowTrial = !existingSub;
+
+    const session = await createCheckoutSession(user.id, user.email, priceId, referrerId, origin, allowTrial);
 
     res.json({ url: session.url });
   } catch (error: any) {

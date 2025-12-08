@@ -21,6 +21,10 @@ export async function login(credentials: LoginRequest): Promise<LoginResponse> {
     }
     apiClient.setTokenExpiry(response.expiresAt);
     
+    if (response.subscriptionStatus) {
+        apiClient.setSubscriptionStatus(response.subscriptionStatus);
+    }
+    
     return response;
 }
 
@@ -56,7 +60,13 @@ export async function logout(): Promise<void> {
  * Get current user
  */
 export async function getCurrentUser(): Promise<any> {
-    return apiClient.get('/api/auth/me');
+    const user = await apiClient.get<any>('/api/auth/me');
+    
+    if (user.subscriptionStatus) {
+        apiClient.setSubscriptionStatus(user.subscriptionStatus);
+    }
+    
+    return user;
 }
 
 /**

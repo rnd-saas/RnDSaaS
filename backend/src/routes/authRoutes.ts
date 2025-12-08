@@ -99,20 +99,26 @@ router.post('/login', async (req, res) => {
         // Get user details from users table
         let userData: any = null;
         let userError: any = null;
+        let subscriptionData: any = null;
+
         try {
             const result = await withTimeout(
                 new Promise<any>(async (resolve, reject) => {
                     try {
-                        const r = await supabase.from('users').select('*').eq('id', authData.user.id).single();
-                        resolve(r);
+                        const [userRes, subRes] = await Promise.all([
+                            supabase.from('users').select('*').eq('id', authData.user.id).single(),
+                            supabase.from('user_subscription').select('sub_status').eq('user_id', authData.user.id).single()
+                        ]);
+                        resolve({ user: userRes, sub: subRes });
                     } catch (e) {
                         reject(e);
                     }
                 }),
                 6000
             );
-            userData = result.data;
-            userError = result.error;
+            userData = result.user.data;
+            userError = result.user.error;
+            subscriptionData = result.sub.data;
         } catch (err: any) {
             console.error('[auth:login] users table query error or timeout', err?.message || err);
             // fallback to creating a user record below if needed
@@ -183,6 +189,7 @@ router.post('/login', async (req, res) => {
                 token: session?.access_token,
                 refreshToken: session?.refresh_token,
                 expiresAt: session?.expires_at ?? null,
+                subscriptionStatus: subscriptionData?.sub_status || 'inactive',
                 message: 'Login successful'
             });
         }
@@ -192,6 +199,7 @@ router.post('/login', async (req, res) => {
             token: session?.access_token,
             refreshToken: session?.refresh_token,
             expiresAt: session?.expires_at ?? null,
+            subscriptionStatus: subscriptionData?.sub_status || 'inactive',
             message: 'Login successful'
         });
 
@@ -379,6 +387,13 @@ router.get('/me', async (req, res) => {
             });
         }
 
+        // Get subscription status
+        const { data: subscriptionData } = await supabase
+            .from('user_subscription')
+            .select('sub_status')
+            .eq('user_id', authUser.id)
+            .single();
+
         // Ensure referral code exists
         if (!userData.referral_code) {
             try {
@@ -398,7 +413,10 @@ router.get('/me', async (req, res) => {
             }
         }
 
-        res.json(userData);
+        res.json({
+            ...userData,
+            subscriptionStatus: subscriptionData?.sub_status || 'inactive'
+        });
 
     } catch (error: any) {
         console.error('Get current user error:', error);

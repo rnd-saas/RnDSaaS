@@ -4,6 +4,7 @@ import type { User } from '@supabase/supabase-js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { z } from 'zod';
 import { requireAuth } from '../middleware/requireAuth';
+import { requireSubscription } from '../middleware/requireSubscription';
 import { supabase } from '../db/supabase';
 import { EXERCISE_NAMES, EXERCISE_LIBRARY, generateWorkoutPlanForUser } from '../services/workoutPlanGenerator';
 
@@ -80,7 +81,7 @@ if (geminiModelNormalized) {
 }
 const geminiClient = geminiApiKey ? new GoogleGenerativeAI(geminiApiKey) : null;
 
-router.get('/profile', requireAuth, async (req: AuthedRequest, res) => {
+router.get('/profile', requireAuth, requireSubscription, async (req: AuthedRequest, res) => {
     try {
         const userId = req.user?.id;
         if (!userId) {
@@ -114,7 +115,7 @@ router.get('/profile', requireAuth, async (req: AuthedRequest, res) => {
     }
 });
 
-router.post('/', requireAuth, async (req: AuthedRequest, res) => {
+router.post('/', requireAuth, requireSubscription, async (req: AuthedRequest, res) => {
     const parseResult = requestSchema.safeParse(req.body);
 
     if (!parseResult.success) {
@@ -244,7 +245,7 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
     });
 });
 
-router.post('/generate-plan', requireAuth, async (req: AuthedRequest, res) => {
+router.post('/generate-plan', requireAuth, requireSubscription, async (req: AuthedRequest, res) => {
     try {
         const userId = req.user?.id;
         if (!userId) return res.status(401).json({ error: 'Unauthorized' });

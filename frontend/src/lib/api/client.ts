@@ -163,45 +163,42 @@ class ApiClient {
     }
 
     /**
-     * Save token
+     * Set token
      */
     setToken(token: string): void {
         localStorage.setItem('auth_token', token);
     }
 
     /**
-     * Save refresh token for session renewal
+     * Set refresh token
      */
-    setRefreshToken(refreshToken: string): void {
-        localStorage.setItem('auth_refresh_token', refreshToken);
+    setRefreshToken(token: string): void {
+        localStorage.setItem('auth_refresh_token', token);
     }
 
     /**
-     * Save token expiry timestamp (seconds since epoch)
+     * Set token expiry
      */
-    setTokenExpiry(expiresAt: number | null | undefined): void {
-        if (typeof expiresAt === 'number') {
-            localStorage.setItem('auth_expires_at', String(expiresAt));
+    setTokenExpiry(expiry: number | null | undefined): void {
+        if (expiry) {
+            localStorage.setItem('auth_token_expiry', String(expiry));
         } else {
-            localStorage.removeItem('auth_expires_at');
+            localStorage.removeItem('auth_token_expiry');
         }
     }
 
     /**
-     * Retrieve refresh token when needed
+     * Set subscription status
      */
-    getRefreshToken(): string | null {
-        return localStorage.getItem('auth_refresh_token');
+    setSubscriptionStatus(status: string): void {
+        localStorage.setItem('subscription_status', status);
     }
 
     /**
-     * Retrieve stored expiry timestamp
+     * Get subscription status
      */
-    getTokenExpiry(): number | null {
-        const raw = localStorage.getItem('auth_expires_at');
-        if (!raw) return null;
-        const parsed = Number(raw);
-        return Number.isNaN(parsed) ? null : parsed;
+    getSubscriptionStatus(): string | null {
+        return localStorage.getItem('subscription_status');
     }
 
     /**
@@ -210,7 +207,8 @@ class ApiClient {
     clearToken(): void {
         localStorage.removeItem('auth_token');
         localStorage.removeItem('auth_refresh_token');
-        localStorage.removeItem('auth_expires_at');
+        localStorage.removeItem('auth_token_expiry');
+        localStorage.removeItem('subscription_status');
     }
 }
 
