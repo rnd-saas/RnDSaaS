@@ -119,13 +119,13 @@ export default function ProfilePage() {
                 </div>
             ),
         },
-        {
-            key: "onboarding",
-            label: "Workout preferences",
-            content: (
-                <WorkoutPreferences currentValues={onboardingResults}/>
-            ),
-        },
+        // {
+        //     key: "onboarding",
+        //     label: "Workout preferences",
+        //     content: (
+        //         <WorkoutPreferences currentValues={onboardingResults}/>
+        //     ),
+        // },
     ];
 
     useEffect(() => {
