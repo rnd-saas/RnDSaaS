@@ -179,6 +179,7 @@ export interface ProfileAchievement {
     title: string;
     sub: string;
     emoji: string;
+    obtained?: boolean; // Optional: true if user has unlocked this achievement
 }
 
 export interface ProfileResponse {
@@ -191,6 +192,11 @@ export interface ProfileResponse {
     };
     achievements: ProfileAchievement[];
     workoutGrid: ProfileWorkoutDay[][];
+    level?: {
+        label: string;
+        currentXp: number;
+        nextLevelXp: number;
+    };
 }
 
 export interface AchievementListResponse {

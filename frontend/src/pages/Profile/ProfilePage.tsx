@@ -91,7 +91,8 @@ export default function ProfilePage() {
         }
     };
     const resolvedData = profileData ?? FALLBACK_PROFILE;
-    const level = resolvedData.level;
+    // Use level from API if available, otherwise use fallback
+    const level = profile?.level ?? resolvedData.level;
     const avatarOption = resolvedData.avatarOption;
     const onboardingResults = resolvedData.onboarding;
 
