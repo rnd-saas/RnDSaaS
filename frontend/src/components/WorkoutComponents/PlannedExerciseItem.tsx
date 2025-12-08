@@ -7,7 +7,7 @@ import type { PlannedExercise } from "@/lib/types/Workout";
 import { PlannedExerciseNote } from "@/components/WorkoutComponents/PlannedExerciseNote";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/WorkoutComponents/button";
-import { formatRestTime } from "@/lib/utils/time.ts";
+import { formatRestTime } from "@/lib/utils/time";
 
 export default function PlannedExerciseItem({
   exercise,
