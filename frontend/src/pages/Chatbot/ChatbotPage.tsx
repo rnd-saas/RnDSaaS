@@ -1,7 +1,7 @@
 ﻿import {Button} from "@/components/ui/button";
-import {AlertTriangle, ArrowLeft, Loader2, MoreVertical, Send} from "lucide-react";
-import tomAvatar from "../../assets/avatars/tom_avatar.png";
-import sarahAvatar from "../../assets/avatars/sarah_avatar.png";
+import {AlertTriangle, ArrowLeft, Loader2, MoreVertical, Send, Sparkles} from "lucide-react";
+import tomAvatar from "@/assets/avatars/tom_avatar.png";
+import sarahAvatar from "@/assets/avatars/sarah_avatar.png";
 import {Input} from "@/components/ui/input";
 import {useNavigate} from "react-router-dom";
 import AvatarIcon from "@/components/avatarIcon";

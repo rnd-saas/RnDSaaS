@@ -3,7 +3,7 @@ name: Deploy BE Staging
 on:
     push:
         branches:
-            - combination
+            - combination/
 
 jobs:
   deploy:

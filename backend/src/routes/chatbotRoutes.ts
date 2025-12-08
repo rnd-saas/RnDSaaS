@@ -5,7 +5,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { z } from 'zod';
 import { requireAuth } from '../middleware/requireAuth';
 import { supabase } from '../db/supabase';
-import { EXERCISE_NAMES, EXERCISE_LIBRARY } from '../services/workoutPlanGenerator';
+import { EXERCISE_NAMES, EXERCISE_LIBRARY, generateWorkoutPlanForUser } from '../services/workoutPlanGenerator';
 
 const router = Router();
 
@@ -243,6 +243,79 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
         fallback
     });
 });
+
+router.post('/generate-plan', requireAuth, async (req: AuthedRequest, res) => {
+    try {
+        const userId = req.user?.id;
+        if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+        const { messages } = req.body;
+        if (!messages || !Array.isArray(messages)) {
+            return res.status(400).json({ error: 'Invalid messages' });
+        }
+
+        // 1. Extract profile updates
+        const updates = await extractProfileFromChat(messages);
+        console.log('[chatbot] Extracted profile updates:', updates);
+
+        // 2. Update user_info if there are updates
+        if (Object.keys(updates).length > 0) {
+            const { error } = await supabase
+                .from('user_info')
+                .update(updates)
+                .eq('user_id', userId);
+            
+            if (error) {
+                console.error('[chatbot] Failed to update user profile', error);
+            }
+        }
+
+        // 3. Generate plan
+        const result = await generateWorkoutPlanForUser(userId);
+        
+        res.json({ success: true, plan: result });
+
+    } catch (error: any) {
+        console.error('[chatbot] Generate plan error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+async function extractProfileFromChat(messages: any[]): Promise<any> {
+    if (!geminiClient) return {};
+    
+    const conversation = messages
+        .map((m: any) => `${m.role}: ${m.content}`)
+        .join('\n');
+
+    const prompt = `
+    Analyze the conversation history and extract the user's latest workout preferences to update their profile.
+    Output ONLY a valid JSON object with the following fields (only if mentioned or implied):
+    - primary_goal: string[] (e.g. ["weight_loss", "muscle_gain", "endurance", "flexibility"])
+    - training_days_per_week: number (1-7)
+    - session_duration: number (minutes, 20-180)
+    - problem_areas: string[] (e.g. ["knees", "lower_back", "shoulders"])
+    - experience_level: number (1=beginner, 5=advanced)
+
+    If a field is not mentioned or cannot be inferred, do not include it.
+    
+    Conversation:
+    ${conversation}
+    `;
+
+    try {
+        const model = geminiClient.getGenerativeModel({ model: geminiModelName });
+        const result = await model.generateContent(prompt);
+        const text = result.response.text();
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+            return JSON.parse(jsonMatch[0]);
+        }
+    } catch (e) {
+        console.error('Failed to extract profile from chat', e);
+    }
+    return {};
+}
 
 function resolvePersona(trainerId: number): TrainerPersona {
     return TRAINER_PERSONAS[String(trainerId)] ?? TRAINER_PERSONAS['0'];

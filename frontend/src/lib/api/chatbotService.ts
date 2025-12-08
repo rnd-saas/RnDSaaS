@@ -8,3 +8,7 @@ export async function sendMessage(payload: ChatbotRequest): Promise<ChatbotRespo
 export async function fetchProfile(): Promise<ChatbotTrainerProfile> {
     return apiClient.get<ChatbotTrainerProfile>('/api/chatbot/profile');
 }
+
+export async function generatePlan(messages: any[]): Promise<any> {
+    return apiClient.post('/api/chatbot/generate-plan', { messages });
+}

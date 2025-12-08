@@ -1,11 +1,11 @@
-import {Button} from "@/components/ui/button.tsx";
-import {AlertTriangle, ArrowLeft, Loader2, MoreVertical, Send, CheckCircle2} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {AlertTriangle, ArrowLeft, Loader2, MoreVertical, Send, CheckCircle2, Sparkles} from "lucide-react";
 import tomAvatar from "../../assets/avatars/tom_avatar.png";
 import sarahAvatar from "../../assets/avatars/sarah_avatar.png";
-import {Input} from "@/components/ui/input.tsx";
+import {Input} from "@/components/ui/input";
 import {useNavigate} from "react-router-dom";
-import AvatarIcon from "@/components/avatarIcon.tsx";
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu.tsx";
+import AvatarIcon from "@/components/avatarIcon";
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {chatbotService, workoutService} from "@/lib/api";
 import type {ChatbotMessage, ChatbotTrainerProfile} from "@/lib/api/types";
@@ -89,6 +89,10 @@ export default function WorkoutPlanChatbotPage() {
     const [isSending, setIsSending] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [isUpdatingPlan, setIsUpdatingPlan] = useState(false);
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [isMentalHealthLock, setIsMentalHealthLock] = useState(false);
+
+    const hasProposedPlan = useMemo(() => messages.some(m => m.proposedPlan), [messages]);
 
     const trainerName = profile?.name ?? "Tom";
     const trainerAvatar = AVATAR_MAP[profile?.avatarKey ?? "tom"] ?? tomAvatar;
@@ -164,6 +168,14 @@ export default function WorkoutPlanChatbotPage() {
         setInputValue(e.target.value);
     };
 
+    const handleInputClick = () => {
+        if (isMentalHealthLock) {
+            toast.error("Detected poor mental state. Please refer to a doctor or family friend.", {
+                duration: 5000,
+            });
+        }
+    };
+
     const extractProposedPlan = (content: string): any | null => {
         try {
             const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/) || content.match(/\{[\s\S]*"proposed_plan"[\s\S]*\}/);
@@ -228,6 +240,10 @@ export default function WorkoutPlanChatbotPage() {
 
             console.log("Raw Chatbot Response:", response.message.content);
 
+            if (response.isMentalHealthIntervention) {
+                setIsMentalHealthLock(true);
+            }
+
             const proposedPlan = extractProposedPlan(response.message.content);
             const displayContent = proposedPlan ? cleanMessageContent(response.message.content) : response.message.content;
 
@@ -265,31 +281,38 @@ export default function WorkoutPlanChatbotPage() {
     };
 
     const handleConfirmPlan = async (planData: any) => {
+        if (isUpdatingPlan) return;
         setIsUpdatingPlan(true);
         try {
-            // Determine plans array
-            const plans = Array.isArray(planData) ? planData : (planData.proposed_plan || planData.plans);
-            
-            // Determine program metadata
-            const programName = planData.program_name || `AI Modified Plan - ${new Date().toLocaleDateString()}`;
-            const programDescription = planData.program_description || "Modified by AI Coach based on user feedback.";
-
-            const newProgramPayload = {
-                name: programName,
-                description: programDescription,
-                weeks_count: activePlan?.weeks_count || 4, // Default or preserve
-                plans: plans
-            };
-
-            await workoutService.updateActiveWorkoutProgram(newProgramPayload);
-            
+            await workoutService.updateActiveWorkoutProgram(planData);
             toast.success("Workout plan updated successfully!");
-            navigate("/workout"); // Redirect to workout home
-        } catch (error: any) {
+            // Optionally refresh the page or update local state
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } catch (error) {
             console.error("Failed to update plan", error);
             toast.error("Failed to update plan. Please try again.");
         } finally {
             setIsUpdatingPlan(false);
+        }
+    };
+
+    const handleGeneratePlan = async () => {
+        if (isGenerating) return;
+        setIsGenerating(true);
+        try {
+            await chatbotService.generatePlan(messages);
+            toast.success("Workout plan generated successfully based on your chat!");
+            // Optionally refresh to show new plan
+             setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } catch (error) {
+            console.error("Failed to generate plan", error);
+            toast.error("Failed to generate plan. Please try again.");
+        } finally {
+            setIsGenerating(false);
         }
     };
 
@@ -316,6 +339,28 @@ export default function WorkoutPlanChatbotPage() {
         return () => clearTimeout(timeout);
     }, [messages]);
 
+    //hides customer support unless reported
+    useEffect(() => {
+        if ((window as any).tidioChatApi) {
+            (window as any).tidioChatApi.hide();
+        }
+    }, []);
+    const handleReport = (payload = {}) => {
+        const api = (window as any).tidioChatApi;
+        if (api) {
+            // API is ready, emit the event
+            api.display(true);
+            api.open();
+            api.messageFromOperator('What would you like to report?');
+            api.track("reported");
+            console.log("tried to report")
+        } else {
+            // Retry shortly after if API is not ready
+            console.log("timeout")
+            setTimeout(() => handleReport(payload), 100);
+        }
+    };
+
     return (
         <div className="w-full min-w-[50vw] min-h-[90vh] relative flex flex-col">
             <header className="px-6 sticky top-0 pt-11 pb-4 bg-white z-10">
@@ -340,7 +385,7 @@ export default function WorkoutPlanChatbotPage() {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="w-56">
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={handleReport}>
                                 Report chat
                             </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -401,20 +446,22 @@ export default function WorkoutPlanChatbotPage() {
                                                 <ProposedPlanPreview planData={message.proposedPlan} />
                                             </div>
 
-                                            <Button 
-                                                onClick={() => handleConfirmPlan(message.proposedPlan)}
-                                                disabled={isUpdatingPlan}
-                                                className="w-full bg-green-600 hover:bg-green-700 text-white"
-                                            >
-                                                {isUpdatingPlan ? (
-                                                    <>
-                                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                        Applying Changes...
-                                                    </>
-                                                ) : (
-                                                    "Confirm & Apply Changes"
-                                                )}
-                                            </Button>
+                                            <div className="flex justify-end">
+                                                <Button 
+                                                    onClick={() => handleConfirmPlan(message.proposedPlan)}
+                                                    disabled={isUpdatingPlan}
+                                                    className="bg-green-600 hover:bg-green-700 text-white"
+                                                >
+                                                    {isUpdatingPlan ? (
+                                                        <>
+                                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                            Applying Changes...
+                                                        </>
+                                                    ) : (
+                                                        "Confirm & Apply Changes"
+                                                    )}
+                                                </Button>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -432,14 +479,22 @@ export default function WorkoutPlanChatbotPage() {
                     <div ref={messagesEndRef} />
                 </div>
             </main>
-            <footer className="px-6 mb-0 rounded-tl-[48px] bg-white sticky bottom-0 w-[90vw] lg:w-[60vw] inset-x-0 mx-auto">
+            <footer className="px-6 mb-0 rounded-tl-[48px] bg-white sticky bottom-0 w-[90vw] lg:w-[60vw] inset-x-0 mx-auto flex flex-col gap-2 pt-4">
+                {!hasProposedPlan && (
+                    <div className="flex justify-center">
+                        <Button variant="secondary" size="sm" onClick={handleGeneratePlan} disabled={isGenerating || messages.length < 2 || isMentalHealthLock} className="rounded-full px-6 shadow-sm hover:shadow-md transition-all bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-100">
+                            {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                            Generate Plan from Chat
+                        </Button>
+                    </div>
+                )}
                 <div className="flex items-center gap-4">
-                    <div className="flex-1 flex items-center justify-between px-5 py-2.5 rounded-[48px] border-[1.5px] border-solid">
-                        <Input placeholder={isProfileLoading ? "Loading coach..." : "Type a message ... "} onChange={handleInputChange} value={inputValue} onKeyDown={handleKeyDown} disabled={isSending || isProfileLoading}
+                    <div onClick={handleInputClick} className="flex-1 flex items-center justify-between px-5 py-2.5 rounded-[48px] border-[1.5px] border-solid">
+                        <Input placeholder={isProfileLoading ? "Loading coach..." : "Tell me what you'd like to adjust, then click the button above to make your program. "} onChange={handleInputChange} value={inputValue} onKeyDown={handleKeyDown} disabled={isSending || isProfileLoading || isMentalHealthLock}
                             className="border-0 p-0 h-auto font-normal text-base leading-6 focus-visible:ring-0 focus-visible:ring-offset-0"
                         />
                     </div>
-                    <Button size="icon" className="h-11 w-11 rounded-full" onClick={handleSendMessage} disabled={isSending || !inputValue.trim() || isProfileLoading}>
+                    <Button size="icon" className="h-11 w-11 rounded-full" onClick={handleSendMessage} disabled={isSending || !inputValue.trim() || isProfileLoading || isMentalHealthLock}>
                         {isSending ? <Loader2 className="h-[18px] w-[18px] animate-spin" /> : <Send className="h-[18px] w-[18px]" />}
                     </Button>
                 </div>

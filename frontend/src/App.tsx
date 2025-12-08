@@ -1,6 +1,6 @@
 import "./App.css";
-import GlobalTimeRunner from "./lib/state/globalTimeRunner.ts";
-import AppRoutes from "./routes/AppRoutes.tsx";
+import GlobalTimeRunner from "./lib/state/globalTimeRunner";
+import AppRoutes from "./routes/AppRoutes";
 import {
   QueryClient,
   QueryClientProvider,
