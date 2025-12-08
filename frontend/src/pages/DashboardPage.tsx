@@ -110,7 +110,6 @@ export default function DashboardPage() {
   
   // Fetch the next available workout (looks ahead 7 days)
   const { nextWorkout } = useNextPlannedWorkout(new Date());
-
   const location = useLocation();
   const { state } = location as { state?: { firstName?: string } };
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
@@ -353,11 +352,11 @@ export default function DashboardPage() {
             <CardHeader className="block">
               <CardTitle className={`h2-styles font-bold ${isTodayWorkoutCompleted ? "text-center" : "text-left"}`}>
                 {!isTodayWorkoutCompleted 
-                  ? `Today's Workout: ${plannedWorkout?.date ? new Date(plannedWorkout.date).toLocaleDateString('en-US', { weekday: 'long' }) : 'Today'}` 
+                  ? `Today's Workout: ${plannedWorkout?.workoutName || "Training Session"}` 
                   : `Congrats! Next workout is ${
                       nextWorkout?.date 
                         ? new Date(nextWorkout.date).toLocaleDateString('en-US', { weekday: 'long' })
-                        : "not scheduled yet"
+                        : "soon"
                     }`
                 }
               </CardTitle>
@@ -370,8 +369,8 @@ export default function DashboardPage() {
                     <p className="body-styles text-muted-foreground font-semibold">
                       Description:
                     </p>
-                    <p className="body-styles">
-                      Description of the workout that you finished
+                    <p className="body-styles line-clamp-3">
+                      {plannedWorkout?.description || "Get ready to push your limits and build strength."}
                     </p>
                   </div>
                   <p className="text-sm text-muted-foreground text-center mt-2">
@@ -379,8 +378,23 @@ export default function DashboardPage() {
                   </p>
                 </>
               ) : (
-                <div className="text-6xl">{nextWorkoutEmoji}</div>
-                
+                <>
+                  <div className="text-6xl">🎉</div>
+                  <div className="w-full px-6 text-center space-y-2">
+                    <p className="body-styles font-medium">
+                      You crushed {plannedWorkout?.workoutName || "it"}!
+                    </p>
+                    {nextWorkout ? (
+                      <div className="text-sm text-muted-foreground bg-background/50 p-3 rounded-lg border border-border/50">
+                        <p className="font-semibold text-foreground">Next Up: {nextWorkout.name}</p>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        Rest up and stay hydrated.
+                      </p>
+                    )}
+                  </div>
+                </>
               )}
             </CardContent>
             </div>
