@@ -80,7 +80,7 @@ export default function AchievementPage() {
                                     title={a.title}
                                     sub={a.sub}
                                     image={a.emoji}
-                                    obtained={true}
+                                    obtained={a.obtained ?? false}
                                 />
                             ))}
                         </div>

@@ -58,7 +58,7 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
                 .limit(20), // Query more records to ensure we get 3 unique achievements after deduplication
             supabase
                 .from('workouts')
-                .select('id, started_at')
+                .select('id, started_at', { count: 'exact' })
                 .eq('user_id', userId)
                 .order('started_at', { ascending: false })
                 .limit(100)  // Get last 100 workouts to ensure we cover all workouts in the displayed range
@@ -104,6 +104,18 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
             usersResult.data?.display_name ??
             null;
 
+        // Calculate level and XP (same logic as dashboard)
+        const workouts = workoutsResult.data ?? [];
+        const totalWorkouts = workoutsResult.count ?? workouts.length;
+        const workoutDates = new Set(
+            workouts
+                .map((row) => row.started_at)
+                .filter((iso): iso is string => Boolean(iso))
+                .map((iso) => iso.slice(0, 10))
+        );
+        const totalXp = calculateExperience(totalWorkouts, streak);
+        const level = resolveLevel(totalXp);
+
         // Ensure we return exactly 3 achievements for the profile page
         // Only use DEFAULT_ACHIEVEMENTS if we truly have no achievements (not just due to a query error)
         const displayAchievements = achievements.length > 0 
@@ -119,7 +131,8 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
                 streakDays: streak
             },
             achievements: displayAchievements,
-            workoutGrid
+            workoutGrid,
+            level
         });
     } catch (error: any) {
         console.error('Failed to load profile summary:', error);
@@ -412,7 +425,57 @@ function parseIsoDate(iso: string): Date {
     return new Date(`${iso}T00:00:00Z`);
 }
 
-// GET /api/profile/achievements - Get all obtained achievements for the current user
+// Level calculation constants (same as dashboardRoutes)
+const XP_PER_WORKOUT = 50;
+
+const LEVELS = [
+    { label: 'Novice', minXp: 0, maxXp: 500 },
+    { label: 'Apprentice', minXp: 500, maxXp: 1500 },
+    { label: 'Athlete', minXp: 1500, maxXp: 3000 },
+    { label: 'Challenger', minXp: 3000, maxXp: 5000 },
+    { label: 'Elite', minXp: 5000, maxXp: 8000 },
+    { label: 'Legend', minXp: 8000, maxXp: 11000 }
+];
+
+type LevelInfo = {
+    label: string;
+    currentXp: number;
+    nextLevelXp: number;
+};
+
+function calculateExperience(totalWorkouts: number, streakDays: number): number {
+    const baseXp = totalWorkouts * XP_PER_WORKOUT;
+    if (baseXp === 0 || streakDays <= 0) {
+        return baseXp;
+    }
+
+    const cappedStreak = Math.min(streakDays, 45); // prevent runaway multipliers
+    const streakMultiplier = 1 + cappedStreak * 0.02; // +2% XP per streak day, up to +90%
+
+    return Math.round(baseXp * streakMultiplier);
+}
+
+function resolveLevel(totalXp: number): LevelInfo {
+    let currentLevel = LEVELS[0];
+    for (const level of LEVELS) {
+        if (totalXp >= level.minXp) {
+            currentLevel = level;
+        } else {
+            break;
+        }
+    }
+
+    const span = (currentLevel.maxXp ?? currentLevel.minXp + 1000) - currentLevel.minXp;
+    const progressWithinLevel = Math.max(0, Math.min(totalXp - currentLevel.minXp, span));
+
+    return {
+        label: currentLevel.label,
+        currentXp: progressWithinLevel,
+        nextLevelXp: span
+    };
+}
+
+// GET /api/profile/achievements - Get all achievements (obtained and un-obtained) for the current user
 router.get('/achievements', requireAuth, async (req: AuthedRequest, res) => {
     try {
         const userId = req.user?.id;
@@ -423,8 +486,20 @@ router.get('/achievements', requireAuth, async (req: AuthedRequest, res) => {
             });
         }
 
-        // Fetch all user achievements using pagination to ensure we get all records
-        // Supabase has a default limit of 1000, so we need to paginate if there are more
+        // Fetch all achievements from the database
+        const { data: allAchievements, error: allAchievementsError } = await supabase
+            .from('achievements')
+            .select('id, name, description, icon')
+            .order('created_at', { ascending: true });
+
+        if (allAchievementsError) {
+            console.error('Failed to load all achievements:', allAchievementsError);
+            return res.status(500).json({
+                error: { message: 'Failed to load achievements' }
+            });
+        }
+
+        // Fetch all user achievements using pagination
         let userAchievementsResult: Array<{ id: string; achievement_id: string | null; unlocked_at: string | null }> = [];
         let from = 0;
         const pageSize = 1000;
@@ -455,7 +530,6 @@ router.get('/achievements', requireAuth, async (req: AuthedRequest, res) => {
 
             if (data && data.length > 0) {
                 userAchievementsResult = userAchievementsResult.concat(data);
-                // If we got fewer records than pageSize, we've reached the end
                 hasMore = data.length === pageSize;
                 from += pageSize;
             } else {
@@ -463,8 +537,21 @@ router.get('/achievements', requireAuth, async (req: AuthedRequest, res) => {
             }
         }
 
-        // Use buildAllAchievements to show all achievements without deduplication
-        const achievements = await buildAllAchievements(userAchievementsResult);
+        // Create a set of obtained achievement IDs
+        const obtainedAchievementIds = new Set(
+            userAchievementsResult
+                .map(ua => ua.achievement_id)
+                .filter((id): id is string => Boolean(id))
+        );
+
+        // Build response with all achievements, marking which ones are obtained
+        const achievements: Array<ProfileAchievement & { obtained: boolean }> = (allAchievements || []).map(achievement => ({
+            id: achievement.id,
+            title: achievement.name ?? 'Achievement',
+            sub: achievement.description ?? '',
+            emoji: achievement.icon ?? '🏆',
+            obtained: obtainedAchievementIds.has(achievement.id)
+        }));
 
         return res.json({
             achievements: achievements
