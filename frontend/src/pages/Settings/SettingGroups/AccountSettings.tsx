@@ -1,4 +1,4 @@
-﻿import {Button} from "@/components/ui/button.tsx";
+﻿import {Button} from "@/components/ui/button";
 import {logout as logoutService, deleteAccount as deleteAccountService} from "@/lib/api/authService";
 import {clearUserId} from "@/lib/analytics";
 import {useCallback, useState} from "react";

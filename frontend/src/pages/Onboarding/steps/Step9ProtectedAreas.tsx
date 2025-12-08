@@ -1,9 +1,9 @@
-﻿import {Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet} from "@/components/ui/field.tsx";
-import {Checkbox} from "@/components/ui/checkbox.tsx";
-import {Input} from "@/components/ui/input.tsx";
+﻿import {Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet} from "@/components/ui/field";
+import {Checkbox} from "@/components/ui/checkbox";
+import {Input} from "@/components/ui/input";
 import {Controller, useFormContext} from "react-hook-form";
 import type {ControllerRenderProps} from "react-hook-form";
-import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
+import type {Inputs} from "@/pages/Onboarding/OnboardingManager";
 
 type ProblemAreasField = ControllerRenderProps<Inputs, "problemAreas">;
 

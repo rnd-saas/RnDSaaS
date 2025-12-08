@@ -1,8 +1,8 @@
-﻿import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
-import {Label} from "@/components/ui/label.tsx";
-import {Separator} from "@/components/ui/separator.tsx";
-import {Switch} from "@/components/ui/switch.tsx";
-import {Button} from "@/components/ui/button.tsx";
+﻿import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {Label} from "@/components/ui/label";
+import {Separator} from "@/components/ui/separator";
+import {Switch} from "@/components/ui/switch";
+import {Button} from "@/components/ui/button";
 import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {settingsService, type UserSettings as ApiUserSettings, type UpdateSettingsRequest} from "@/lib/api";

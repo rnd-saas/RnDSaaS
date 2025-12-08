@@ -1,8 +1,8 @@
 ﻿import {Field, FieldDescription, FieldLabel, FieldLegend, FieldSet,} from "@/components/ui/field"
 import {RadioGroup, RadioGroupItem,} from "@/components/ui/radio-group"
-import {GenderValues} from "@/utils/InputTypes.tsx";
-import type {Gender} from "@/utils/InputTypes.tsx";
-import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
+import {GenderValues} from "@/utils/InputTypes";
+import type {Gender} from "@/utils/InputTypes";
+import type {Inputs} from "@/pages/Onboarding/OnboardingManager";
 import {Controller, useFormContext} from "react-hook-form";
 
 export default function Step3Gender() {

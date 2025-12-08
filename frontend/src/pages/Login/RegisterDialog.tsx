@@ -1,7 +1,7 @@
 ﻿import { useState } from "react";
 import { useForm } from "react-hook-form";
-import {Button} from "@/components/ui/button.tsx";
-import {DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog.tsx";
+import {Button} from "@/components/ui/button";
+import {DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 import {useNavigate} from "react-router-dom";
 import { authService, ApiError } from "@/lib/api";
 import { trackRegistration, trackFormSubmit, trackError } from "@/lib/analytics";

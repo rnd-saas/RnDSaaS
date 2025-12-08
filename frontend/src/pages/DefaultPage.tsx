@@ -3,11 +3,11 @@ import tomImage from "@/assets/onboarding_welcome/onboarding-tom.png";
 import {
   ButtonGroup,
   ButtonGroupSeparator,
-} from "@/components/ui/button-group.tsx";
-import { Card } from "@/components/card.tsx";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog.tsx";
-import LoginDialog from "@/pages/Login/LoginDialog.tsx";
-import RegisterDialog from "@/pages/Login/RegisterDialog.tsx";
+} from "@/components/ui/button-group";
+import { Card } from "@/components/card";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import LoginDialog from "@/pages/Login/LoginDialog";
+import RegisterDialog from "@/pages/Login/RegisterDialog";
 import {useEffect, useState} from "react";
 
 export default function DefaultPage() {

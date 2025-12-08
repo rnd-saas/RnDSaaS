@@ -1,5 +1,5 @@
-﻿import {Input} from "@/components/ui/input.tsx";
-import {Label} from "@/components/ui/label.tsx";
+﻿import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
 import {CartesianGrid, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis} from "recharts";
 import {useState, useEffect} from "react";
 import {progressService} from "@/lib/api";

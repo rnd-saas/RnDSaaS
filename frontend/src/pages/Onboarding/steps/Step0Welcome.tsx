@@ -1,10 +1,10 @@
-﻿import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious} from "@/components/ui/carousel.tsx";
-import {Field, FieldDescription, FieldLabel, FieldLegend, FieldSet} from "@/components/ui/field.tsx";
-import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group.tsx";
+﻿import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious} from "@/components/ui/carousel";
+import {Field, FieldDescription, FieldLabel, FieldLegend, FieldSet} from "@/components/ui/field";
+import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import tomImage from '@/assets/onboarding_welcome/onboarding-tom.png';
 import sarahImage from '@/assets/onboarding_welcome/onboarding-sarah.png';
 import {Controller, useFormContext} from "react-hook-form";
-import type {Inputs} from "@/pages/Onboarding/OnboardingManager.tsx";
+import type {Inputs} from "@/pages/Onboarding/OnboardingManager";
 
 export default function Step0Welcome() {
     const { control, trigger } = useFormContext<Inputs>();

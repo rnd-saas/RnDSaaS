@@ -1,4 +1,4 @@
-import Achievement from "@/components/achievement.tsx";
+import Achievement from "@/components/achievement";
 
 type AchievementListItem = {
     id: string;

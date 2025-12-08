@@ -1,15 +1,15 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar.tsx";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import avatarPlaceholder from "../../assets/avatars/tom_avatar.png";
-import ChatbotButton from "@/components/chatbotButton.tsx";
+import ChatbotButton from "@/components/chatbotButton";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button.tsx";
+import { Button } from "@/components/ui/button";
 import {profileService, type ProfileResponse, ApiError, ProfileData, OnboardingPayload} from "@/lib/api";
-import SettingsButton from "@/components/settingsButton.tsx";
+import SettingsButton from "@/components/settingsButton";
 import { Separator } from "@/components/ui/separator";
-import {Progress} from "@/components/ui/progress.tsx";
-import {GenderValues, GymComfortLevelValues, PreferredSplitValues, PrimaryGoalValues} from "@/utils/InputTypes.tsx";
-import {AvatarOptionValues} from "@/utils/AvatarOptionValues.tsx";
+import {Progress} from "@/components/ui/progress";
+import {GenderValues, GymComfortLevelValues, PreferredSplitValues, PrimaryGoalValues} from "@/utils/InputTypes";
+import {AvatarOptionValues} from "@/utils/AvatarOptionValues";
 import {
     Dialog, DialogClose,
     DialogContent,
@@ -17,8 +17,8 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger
-} from "@/components/ui/dialog.tsx";
-import WorkoutPreferences from "@/pages/Profile/ProfileComponents/WorkoutPreferences.tsx";
+} from "@/components/ui/dialog";
+import WorkoutPreferences from "@/pages/Profile/ProfileComponents/WorkoutPreferences";
 
 export default function ProfilePage() {
     const navigate = useNavigate();
