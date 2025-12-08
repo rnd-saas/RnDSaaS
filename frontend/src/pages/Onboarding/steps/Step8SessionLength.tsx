@@ -2,17 +2,11 @@
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {Controller, useFormContext} from "react-hook-form";
 import type {Inputs} from "@/pages/Onboarding/OnboardingManager";
+import {lengthOptions} from "@/utils/SessionLengthOptionLabels";
 
 
 export default function Step8SessionLength() {
     const { control } = useFormContext<Inputs>();
-    const lengthOptions = [
-        { id: "30", label: "30 minutes", value: "30" },
-        { id: "45", label: "45 minutes", value: "45" },
-        { id: "60", label: "60 minutes", value: "60" },
-        { id: "90", label: "90 minutes", value: "90" },
-        { id: "no-preference", label: "No preference", value: "no-preference" },
-    ];
     return (
         <FieldSet className="w-[60vw] lg:w-[30vw] lg:ml-[30vw]">
             <FieldLegend>Session length</FieldLegend>
