@@ -157,12 +157,14 @@ export type Inputs = {
 }
 export default function OnboardingManager() {
     const [formStep, setStep] = useState(0);
-    const methods = useForm<Inputs>();
+    const methods = useForm<Inputs>({
+        mode: "onChange",
+        reValidateMode: "onChange",
+    });
     const navigate = useNavigate();
     const [submitError, setSubmitError] = useState<string | null>(null);
     const { isSubmitting } = methods.formState;
     const { triggerCheck } = useAchievements();
-
     //defining all quiz steps
     type Step = {
         component: ComponentType;
@@ -243,6 +245,8 @@ export default function OnboardingManager() {
         if (formStep < stepNames.length) {
             trackOnboardingStep(formStep, stepNames[formStep]);
         }
+        const { fields } = stepComponents[formStep];
+        methods.trigger(fields);
     }, [formStep]);
 
     const next = async () => {
@@ -329,6 +333,7 @@ export default function OnboardingManager() {
     useEffect(() => {
         window.tidioChatApi.hide();
     }, []);
+    const currentStepHasErrors = getStepErrors(formStep).length > 0;
     return (
         <FormProvider {...methods}>
             <div className="flex items-center justify-center p-4">
@@ -349,12 +354,12 @@ export default function OnboardingManager() {
 
                     <div className="p-4">
                         {getStepErrors(formStep).map((error, i) => (
-                            <p key={i}>
+                            <p key={i} className="text-primary">
                                 {error?.message}
                             </p>
                         ))}
                         {submitError && (
-                            <p className="text-[var(--intuitive-names-error-message)]">{submitError}</p>
+                            <p className="text-primary">{submitError}</p>
                         )}
                     </div>
                     <div className="fixed w-[75vw] bottom-[10vh] p-4">
@@ -362,7 +367,8 @@ export default function OnboardingManager() {
                             prevStep={back}
                             nextStep={next}
                             prevDisabled={formStep == 0}
-                            nextDisabled={formStep == totalSteps}
+                            nextDisabled={currentStepHasErrors}
+                            shouldSubmit={formStep == totalSteps}
                             isSubmitting={isSubmitting}
                         />
                     </div>
