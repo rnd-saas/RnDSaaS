@@ -4,7 +4,7 @@ import ChatbotButton from "@/components/chatbotButton";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import {profileService, type ProfileResponse, ApiError, ProfileData, OnboardingPayload} from "@/lib/api";
+import {profileService, type ProfileResponse, ApiError, ProfileData} from "@/lib/api";
 import SettingsButton from "@/components/settingsButton";
 import { Separator } from "@/components/ui/separator";
 import {Progress} from "@/components/ui/progress";
@@ -13,7 +13,7 @@ import {AvatarOptionValues} from "@/utils/AvatarOptionValues";
 import {
     Dialog, DialogClose,
     DialogContent,
-    DialogDescription, DialogFooter,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger
@@ -119,13 +119,13 @@ export default function ProfilePage() {
                 </div>
             ),
         },
-        // {
-        //     key: "onboarding",
-        //     label: "Workout preferences",
-        //     content: (
-        //         <WorkoutPreferences currentValues={onboardingResults}/>
-        //     ),
-        // },
+        {
+            key: "onboarding",
+            label: "Workout preferences",
+            content: (
+                <WorkoutPreferences currentValues={onboardingResults}/>
+            ),
+        },
     ];
 
     useEffect(() => {
