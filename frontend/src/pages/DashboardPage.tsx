@@ -109,7 +109,7 @@ export default function DashboardPage() {
   const isTodayWorkoutCompleted = plannedWorkout?.isCompleted;
   
   // Fetch the next available workout (looks ahead 7 days)
-  const { nextWorkout } = useNextPlannedWorkout(new Date());
+  const { nextWorkout, upcomingWorkouts } = useNextPlannedWorkout(new Date());
   const location = useLocation();
   const { state } = location as { state?: { firstName?: string } };
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
@@ -393,6 +393,29 @@ export default function DashboardPage() {
                         Rest up and stay hydrated.
                       </p>
                     )}
+                  </div>
+                  
+                  {/* Upcoming Schedule Calendar */}
+                  <div className="w-full px-4 mt-6">
+                    <p className="text-xs font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Upcoming Schedule</p>
+                    <div className="flex justify-between items-center w-full">
+                      {upcomingWorkouts?.map(({ date, workout }) => (
+                        <div key={date.toISOString()} className="flex flex-col items-center gap-1.5">
+                          <span className="text-[10px] font-medium text-muted-foreground">
+                            {date.toLocaleDateString('en-US', { weekday: 'narrow' })}
+                          </span>
+                          <div className={`
+                            h-7 w-7 rounded-full flex items-center justify-center text-[10px] font-bold transition-all
+                            ${workout?.workoutId 
+                              ? 'bg-primary text-primary-foreground shadow-sm ring-2 ring-primary/20' 
+                              : 'bg-muted/50 text-muted-foreground/50'
+                            }
+                          `}>
+                            {date.getDate()}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </>
               )}

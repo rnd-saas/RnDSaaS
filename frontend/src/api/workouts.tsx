@@ -112,7 +112,14 @@ export function useNextPlannedWorkout(startDate: Date, daysToLookAhead: number =
 
   // Find the first successful query with data (non-null workoutId means a plan exists)
   const nextWorkout = queries.find((q) => q.data && q.data.workoutId)?.data ?? null;
+  
+  const upcomingWorkouts = queries.map((q, index) => ({
+    date: dates[index],
+    workout: q.data ?? null,
+    isLoading: q.isLoading
+  }));
+
   const isLoading = queries.some((q) => q.isLoading);
 
-  return { nextWorkout, isLoading };
+  return { nextWorkout, upcomingWorkouts, isLoading };
 }
