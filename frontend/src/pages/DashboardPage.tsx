@@ -9,6 +9,7 @@ import { dashboardService, settingsService, moodService } from "@/lib/api";
 import type { DashboardData, DashboardAchievement } from "@/lib/api/types";
 import AchievementList from "@/pages/Profile/ProfileComponents/AchievementList.tsx";
 import SettingsButton from "@/components/settingsButton.tsx";
+import {usePlannedWorkout, useNextPlannedWorkout} from "@/api/workouts"
 
 const ACHIEVEMENTS_PER_PAGE = 3;
 
@@ -27,6 +28,7 @@ const FALLBACK_DASHBOARD: DashboardData = {
   streakDays: 20,
   advice: "Fill half your plate with colorful vegetables!",
 };
+
 
 const ADVICE_TIPS: string[] = [
   "Fill half your plate with colorful vegetables.",
@@ -102,6 +104,13 @@ const LOCAL_MOOD_TO_DB_INDEX: Record<LocalMoodKey, number> = {
 const DB_MOOD_EMOJI = ["😣", "😬", "🙂", "😌", "🤩"];
 
 export default function DashboardPage() {
+  const {data, isLoadingg, isError} = usePlannedWorkout(new Date());
+  const plannedWorkout = data ?? null;
+  const isTodayWorkoutCompleted = plannedWorkout?.isCompleted;
+  
+  // Fetch the next available workout (looks ahead 7 days)
+  const { nextWorkout } = useNextPlannedWorkout(new Date());
+
   const location = useLocation();
   const { state } = location as { state?: { firstName?: string } };
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
@@ -297,25 +306,86 @@ export default function DashboardPage() {
     <div className="w-full max-w-lg md:max-w-4xl lg:max-w-6xl mx-auto p-6 pb-24 space-y-8 md:space-y-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6">
       {/* Header */}
       <header className="space-y-1 md:col-span-2 lg:col-span-3">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between ">
           <h1 className="text-3xl font-bold tracking-tight">
             Hi, {firstName}!
           </h1>
           <SettingsButton />
         </div>
-        <p className="text-muted-foreground">
-          {today} &bull; Let's keep up the momentum.
-        </p>
-      </header>
-
+        <div className="flex items-start justify-between">
+          <p className="text-muted-foreground">{today}</p>
+          <div className="flex flex-col items-end gap-1 min-w-[150px]">
+            <div className="flex items-center justify-between w-full text-xs">
+              <span className="text-muted-foreground">
+                Level:{" "}
+                <span className="font-medium text-foreground">
+                  {level.label}
+                </span>
+              </span>
+              <span className="text-muted-foreground">
+                {level.currentXp} / {level.nextLevelXp} XP
+              </span>
+            </div>
+            <Progress
+              value={(level.currentXp / level.nextLevelXp) * 100}
+              className="h-2 w-full"
+            />
+          </div>
+        </div>
       <div className="md:col-span-2 lg:col-span-3">
         <Separator />
       </div>
+      </header>
+
       {fetchError && (
         <div className="mb-4 rounded-md border border-amber-500/60 bg-amber-50 px-3 py-2 text-sm text-amber-900">
           {fetchError}
         </div>
       )}
+
+      {/* Next Workout */}
+      <section className="md:col-span-2 lg:col-span-2">
+        <Card
+          className="h-full cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 bg-linear-to-br from-background to-primary/5 py-8"
+          onClick={() => navigate("/workout")}
+        >
+          <div className="md:w-[50%] mx-auto flex flex-col gap-6">
+            <CardHeader className="block">
+              <CardTitle className={`h2-styles font-bold ${isTodayWorkoutCompleted ? "text-center" : "text-left"}`}>
+                {!isTodayWorkoutCompleted 
+                  ? `Today's Workout: ${plannedWorkout?.date ? new Date(plannedWorkout.date).toLocaleDateString('en-US', { weekday: 'long' }) : 'Today'}` 
+                  : `Congrats! Next workout is ${
+                      nextWorkout?.date 
+                        ? new Date(nextWorkout.date).toLocaleDateString('en-US', { weekday: 'long' })
+                        : "not scheduled yet"
+                    }`
+                }
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0 flex flex-col items-center gap-2">
+              {!isTodayWorkoutCompleted ? (
+                <>
+                  <div className="text-6xl">{nextWorkoutEmoji}</div>
+                  <div className="w-full px-6 text-left">
+                    <p className="body-styles text-muted-foreground font-semibold">
+                      Description:
+                    </p>
+                    <p className="body-styles">
+                      Description of the workout that you finished
+                    </p>
+                  </div>
+                  <p className="text-sm text-muted-foreground text-center mt-2">
+                    Ready to sweat? Tap to start.
+                  </p>
+                </>
+              ) : (
+                <div className="text-6xl">{nextWorkoutEmoji}</div>
+                
+              )}
+            </CardContent>
+            </div>
+        </Card>
+      </section>
 
       {/* Goal Section */}
       {isLoading && !dashboardData && (
@@ -324,7 +394,7 @@ export default function DashboardPage() {
         </p>
       )}
       <section>
-        <Card className="hover:scale-none">
+        <Card className="hover:scale-none h-full">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg">Weekly Goals</CardTitle>
@@ -351,10 +421,10 @@ export default function DashboardPage() {
         </Card>
       </section>
 
-      {/* Mood + Next workout */}
-      <section className="grid grid-cols-2 gap-4 md:flex md:flex-col md:h-full">
+      {/* Mood */}
+      <section>
         <Card
-          className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 bg-linear-to-br from-background to-primary/5 py-4 gap-2 md:flex-1 md:justify-center  "
+          className="h-full cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 bg-linear-to-br from-background to-primary/5 py-4 gap-2 flex flex-col justify-center"
           onClick={() => navigate("/mood")}
         >
           <CardHeader className="pb-0 px-4 flex flex-col items-center">
@@ -367,28 +437,11 @@ export default function DashboardPage() {
             </p>
           </CardContent>
         </Card>
-
-        <Card
-          className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 bg-linear-to-br from-background to-primary/5 py-4 gap-2 md:flex-1 md:justify-center"
-          onClick={() => navigate("/workout")}
-        >
-          <CardHeader className="pb-0 px-4 flex flex-col items-center">
-            <CardTitle className="text-base font-medium text-center">
-              Next Workout
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col items-center justify-center pb-2 px-4">
-            <div className="text-4xl mb-2">{nextWorkoutEmoji}</div>
-            <p className="text-[10px] text-muted-foreground text-center">
-              Ready to sweat?
-            </p>
-          </CardContent>
-        </Card>
       </section>
 
       {/* Streak + Level */}
       <section>
-        <Card className="hover:scale-none">
+        <Card className="hover:scale-none h-full">
           {streakDisplay && (
             <CardHeader className="pb-0">
               <div className="flex flex-col gap-1">

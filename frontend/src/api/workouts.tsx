@@ -4,7 +4,7 @@ import type {
   WorkoutEvaluation,
   LoggedWorkout,
 } from "@/lib/types/Workout";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueries } from "@tanstack/react-query";
 import { workoutService } from "@/lib/api/workoutService";
 
 /**
@@ -93,4 +93,26 @@ export function useAiFeedback(workoutId: string | undefined) {
     enabled: !!workoutId,
     staleTime: Infinity, // Feedback shouldn't change for a completed workout
   });
+}
+
+export function useNextPlannedWorkout(startDate: Date, daysToLookAhead: number = 7) {
+  const dates = Array.from({ length: daysToLookAhead }, (_, i) => {
+    const d = new Date(startDate);
+    d.setDate(d.getDate() + i + 1); // Start from tomorrow
+    return d;
+  });
+
+  const queries = useQueries({
+    queries: dates.map((date) => ({
+      queryKey: ["plannedWorkout", date.toDateString()],
+      queryFn: () => fetchPlannedWorkout(date),
+      gcTime: 60000,
+    })),
+  });
+
+  // Find the first successful query with data (non-null workoutId means a plan exists)
+  const nextWorkout = queries.find((q) => q.data && q.data.workoutId)?.data ?? null;
+  const isLoading = queries.some((q) => q.isLoading);
+
+  return { nextWorkout, isLoading };
 }
