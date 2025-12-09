@@ -4,8 +4,9 @@ import type { PlannedWorkout, PlannedExercise, TargetSet, ExerciseInformation } 
 export const workoutService = {
     async getPlannedWorkout(date: Date): Promise<PlannedWorkout | null> {
         try {
-            const dateStr = date.toISOString();
-            const response = await apiClient.get<any>('/api/workouts/planned', { date: dateStr });
+            const dateStr = date.toLocaleDateString('en-CA'); // YYYY-MM-DD in the user's local timezone
+            const tzOffset = date.getTimezoneOffset(); // minutes to add to local time to get UTC
+            const response = await apiClient.get<any>('/api/workouts/planned', { date: dateStr, tzOffset });
             
             if (!response) return null;
 

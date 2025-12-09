@@ -10,17 +10,14 @@ router.get('/planned', requireAuth, async (req: any, res) => {
   try {
     const userId = req.user.id;
     const dateStr = req.query.date as string;
+    const tzOffsetRaw = Number(req.query.tzOffset ?? 0);
+    const timezoneOffsetMinutes = Number.isFinite(tzOffsetRaw) ? tzOffsetRaw : 0;
     
     if (!dateStr) {
       return res.status(400).json({ error: 'Date parameter is required' });
     }
 
-    const date = new Date(dateStr);
-    if (isNaN(date.getTime())) {
-      return res.status(400).json({ error: 'Invalid date format' });
-    }
-
-    const { plan, isCompleted } = await workoutService.getWorkoutPlanForDate(userId, date);
+    const { plan, isCompleted } = await workoutService.getWorkoutPlanForDate(userId, dateStr, timezoneOffsetMinutes);
     
     // If multiple plans match, we might want to return the most relevant one.
     // For now, return the first one or null if none.
@@ -42,7 +39,8 @@ router.get('/planned', requireAuth, async (req: any, res) => {
     }
   } catch (error: any) {
     console.error('Error fetching planned workout:', error);
-    res.status(500).json({ error: error.message });
+    const status = error?.message === 'Invalid date input' ? 400 : 500;
+    res.status(status).json({ error: error.message });
   }
 });
 

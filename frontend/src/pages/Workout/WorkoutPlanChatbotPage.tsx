@@ -1,5 +1,5 @@
 import {Button} from "@/components/ui/button";
-import {AlertTriangle, ArrowLeft, Loader2, MoreVertical, Send, CheckCircle2, Sparkles} from "lucide-react";
+import {AlertTriangle, ArrowLeft, Loader2, MoreVertical, Send, Sparkles} from "lucide-react";
 import tomAvatar from "../../assets/avatars/tom_avatar.png";
 import sarahAvatar from "../../assets/avatars/sarah_avatar.png";
 import {Input} from "@/components/ui/input";
@@ -28,57 +28,28 @@ const AVATAR_MAP = {
 
 const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-const ProposedPlanPreview = ({ planData }: { planData: any }) => {
-    const plans = Array.isArray(planData) ? planData : (planData.proposed_plan || planData.plans);
-    const programName = planData.program_name || "New Workout Plan";
+const coachingHint = "I’ll draft a program after each request. If you like it, hit the button below to generate and apply the new plan.";
 
-    if (!plans || !Array.isArray(plans)) return null;
+const parseAssistantContent = (text: string): { cleanText: string; proposedPlan: any | null } => {
+    let plan: any | null = null;
+    let cleanText = text;
 
-    // Sort plans by day number
-    const sortedPlans = [...plans].sort((a, b) => a.day_number - b.day_number);
+    const fencedMatch = text.match(/```json[\s\S]*?```/i);
+    const inlineMatch = !fencedMatch ? text.match(/\{[\s\S]*\}/) : null;
+    const jsonCandidate = fencedMatch
+        ? fencedMatch[0].replace(/```json/i, "").replace(/```$/, "")
+        : inlineMatch?.[0];
 
-    return (
-        <div className="w-full flex flex-col gap-3 bg-white/60 p-4 rounded-xl border border-green-200/60 text-sm shadow-sm">
-            <div className="font-bold text-green-900 border-b border-green-200 pb-2">
-                {programName}
-            </div>
-            
-            <div className="flex flex-col gap-3">
-                {sortedPlans.map((dayPlan: any) => (
-                    <div key={dayPlan.day_number} className="flex flex-col gap-1">
-                        <div className="font-semibold text-green-800">
-                            {DAY_NAMES[dayPlan.day_number] || `Day ${dayPlan.day_number}`}
-                        </div>
-                        <div className="pl-3 flex flex-col gap-1">
-                            {dayPlan.plan_exercises?.map((ex: any, idx: number) => {
-                                const formatMetric = (metric?: string | null, value?: number | null) => {
-                                    if (value === undefined || value === null || metric === undefined || metric === null) return '';
-                                    if (metric === 'duration_s') return `${(value / 60).toFixed(1)}min`;
-                                    if (metric === 'weight') return `${value}kg`;
-                                    if (metric === 'distance') return `${value}m`;
-                                    if (metric === 'height') return `${value}cm`;
-                                    return `${value}`;
-                                };
+    if (jsonCandidate) {
+        try {
+            plan = JSON.parse(jsonCandidate);
+            cleanText = text.replace(jsonCandidate, "").replace(/```json[\s\S]*?```/i, "").trim();
+        } catch (err) {
+            plan = null;
+        }
+    }
 
-                                const primary = formatMetric(ex.metric, ex.target_value);
-                                const secondary = formatMetric(ex.metric2, ex.target_value2);
-                                const separator = primary && secondary ? ' + ' : '';
-
-                                return (
-                                    <div key={idx} className="grid grid-cols-[1fr_auto] gap-2 text-green-700">
-                                        <span>• {ex.exercise_name || ex.name}</span>
-                                        <span className="text-green-600/80 text-xs whitespace-nowrap">
-                                            {ex.target_sets} sets × {primary}{separator}{secondary}
-                                        </span>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
+    return { cleanText: cleanText || text, proposedPlan: plan };
 };
 
 const createMessageId = () => {
@@ -198,28 +169,6 @@ export default function WorkoutPlanChatbotPage() {
         }
     };
 
-    const extractProposedPlan = (content: string): any | null => {
-        try {
-            const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/) || content.match(/\{[\s\S]*"proposed_plan"[\s\S]*\}/);
-            if (jsonMatch) {
-                const jsonStr = jsonMatch[1] || jsonMatch[0];
-                const parsed = JSON.parse(jsonStr);
-                if (parsed.proposed_plan) {
-                    // Return the full object so we can access program_name/description
-                    return parsed;
-                }
-            }
-        } catch (e) {
-            console.warn("Failed to parse JSON from message", e);
-        }
-        return null;
-    };
-
-    const cleanMessageContent = (content: string): string => {
-        // Remove the JSON block from the message content for display
-        return content.replace(/```json\n[\s\S]*?\n```/g, "").replace(/\{[\s\S]*"proposed_plan"[\s\S]*\}/g, "").trim();
-    };
-
     const handleSendMessage = async () => {
         const trimmedValue = inputValue.trim();
         if (!trimmedValue || isSending) {
@@ -256,7 +205,9 @@ export default function WorkoutPlanChatbotPage() {
                 messages: buildPayloadMessages(updatedHistory),
                 metadata: {
                     language: preferredLanguage,
-                    workoutPlanContext: activePlan // Inject current plan
+                    workoutPlanContext: activePlan, // Inject current plan
+                    currentDate: new Date().toLocaleDateString("en-CA"),
+                    timezoneOffsetMinutes: new Date().getTimezoneOffset()
                 }
             });
 
@@ -266,18 +217,18 @@ export default function WorkoutPlanChatbotPage() {
                 setIsMentalHealthLock(true);
             }
 
-            const proposedPlan = extractProposedPlan(response.message.content);
-            const displayContent = proposedPlan ? cleanMessageContent(response.message.content) : response.message.content;
+            const { cleanText, proposedPlan } = parseAssistantContent(response.message.content);
+            const displayContent = cleanText || "Here's your updated plan draft. If you like it, hit the button below to generate it.";
 
             setMessages((prev) =>
                 prev.map((message) =>
                     message.id === typingMessage.id
                         ? {
                               ...message,
-                              content: displayContent || "I've prepared a new plan for you:", // Fallback text if message becomes empty
+                              content: displayContent,
                               status: "sent",
                               fallback: response.fallback,
-                              proposedPlan: proposedPlan
+                              proposedPlan
                           }
                         : message
                 )
@@ -302,34 +253,17 @@ export default function WorkoutPlanChatbotPage() {
         }
     };
 
-    const handleConfirmPlan = async (planData: any) => {
-        if (isUpdatingPlan) return;
-        setIsUpdatingPlan(true);
-        try {
-            await workoutService.updateActiveWorkoutProgram(planData);
-            toast.success("Workout plan updated successfully!");
-            // Optionally refresh the page or update local state
-            setTimeout(() => {
-                window.location.reload();
-            }, 1500);
-        } catch (error) {
-            console.error("Failed to update plan", error);
-            toast.error("Failed to update plan. Please try again.");
-        } finally {
-            setIsUpdatingPlan(false);
-        }
-    };
-
     const handleGeneratePlan = async () => {
         if (isGenerating) return;
         setIsGenerating(true);
         try {
-            await chatbotService.generatePlan(messages);
+            // Find the most recent message with a proposed plan
+            const latestPlanMessage = [...messages].reverse().find(m => m.proposedPlan);
+            const latestPlan = latestPlanMessage?.proposedPlan || null;
+            
+            await chatbotService.generatePlan(messages, latestPlan);
             toast.success("Workout plan generated successfully based on your chat!");
-            // Optionally refresh to show new plan
-             setTimeout(() => {
-                window.location.reload();
-            }, 1500);
+            navigate("/workout", { replace: true });
         } catch (error) {
             console.error("Failed to generate plan", error);
             toast.error("Failed to generate plan. Please try again.");
@@ -430,6 +364,42 @@ export default function WorkoutPlanChatbotPage() {
                 <div className="flex flex-col gap-4">
                     {messages.map((message) => {
                         if (message.role === "assistant") {
+                            const renderPlan = (plan: any) => {
+                                const days = Array.isArray(plan?.proposed_plan) ? plan.proposed_plan : [];
+                                const programTitle = plan?.program_name || plan?.programTitle || "Proposed Plan";
+                                return (
+                                    <div className="mt-3 flex flex-col gap-3 rounded-2xl border border-muted-foreground/10 bg-white p-4 shadow-sm">
+                                        <div className="flex items-center justify-between text-sm font-semibold text-slate-800">
+                                            <span>{programTitle}</span>
+                                            {plan?.program_description && (
+                                                <span className="text-xs text-slate-500">{plan.program_description}</span>
+                                            )}
+                                        </div>
+                                        {days.map((day: any, idx: number) => (
+                                            <div key={idx} className="rounded-xl border border-slate-200 bg-slate-50 p-3 flex flex-col gap-2">
+                                                <div className="flex items-center justify-between text-sm font-semibold text-slate-800">
+                                                    <span>Day {day?.day_number ?? idx + 1}</span>
+                                                    <span className="text-slate-600">{day?.plan_name || "Session"}</span>
+                                                </div>
+                                                {day?.plan_description && (
+                                                    <p className="text-sm text-slate-600">{day.plan_description}</p>
+                                                )}
+                                                <div className="flex flex-col gap-2">
+                                                    {Array.isArray(day?.plan_exercises) && day.plan_exercises.map((ex: any, exIdx: number) => (
+                                                        <div key={exIdx} className="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm">
+                                                            <span className="font-medium text-slate-800">{ex.exercise_name || ex.name || "Exercise"}</span>
+                                                            <span className="text-slate-600">
+                                                                {(ex.target_sets ?? ex.sets ?? 3)} sets • {(ex.target_value ?? ex.reps ?? "")} {ex.metric || ex.metric1 || "reps"}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                );
+                            };
+
                             return (
                                 <div key={message.id} className="flex flex-col gap-2">
                                     <div className="flex items-start gap-2">
@@ -441,6 +411,8 @@ export default function WorkoutPlanChatbotPage() {
                                                     {message.content}
                                                 </span>
                                             ) : message.content}</p>
+                                            {message.proposedPlan && renderPlan(message.proposedPlan)}
+                                            <p className="text-xs text-muted-foreground">{coachingHint}</p>
                                             {message.fallback && message.status === "sent" && (
                                                 <div className="text-xs text-amber-600 flex items-center gap-1">
                                                     <AlertTriangle className="h-3 w-3" />
@@ -454,46 +426,14 @@ export default function WorkoutPlanChatbotPage() {
                                             )}
                                         </div>
                                     </div>
-                                    {message.proposedPlan && (
-                                        <div className="ml-12 p-4 border rounded-xl bg-green-50 border-green-200">
-                                            <h4 className="font-bold text-green-800 mb-2 flex items-center gap-2">
-                                                <CheckCircle2 className="h-5 w-5" />
-                                                New Plan Proposed
-                                            </h4>
-                                            <p className="text-sm text-green-700 mb-4">
-                                                The coach has suggested a new workout plan based on your request.
-                                            </p>
-                                            
-                                            <div className="mb-4">
-                                                <ProposedPlanPreview planData={message.proposedPlan} />
-                                            </div>
-
-                                            <div className="flex justify-end">
-                                                <Button 
-                                                    onClick={() => handleConfirmPlan(message.proposedPlan)}
-                                                    disabled={isUpdatingPlan}
-                                                    className="bg-green-600 hover:bg-green-700 text-white"
-                                                >
-                                                    {isUpdatingPlan ? (
-                                                        <>
-                                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                            Applying Changes...
-                                                        </>
-                                                    ) : (
-                                                        "Confirm & Apply Changes"
-                                                    )}
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    )}
                                 </div>
                             );
                         }
 
                         return (
                             <div key={message.id} className="flex justify-end">
-                                <div className="inline-flex items-start gap-1 px-4 py-2.5 rounded-3xl max-w-[calc(100%-48px)] text-[var(--intuitive-names-app-background)] bg-[var(--intuitive-names-app-primary)]">
-                                    <p>{message.content}</p>
+                                <div className="inline-flex items-start gap-1 px-4 py-2.5 rounded-3xl max-w-[calc(100%-48px)] bg-[var(--color-primary)] text-white">
+                                    <p className="text-white">{message.content}</p>
                                 </div>
                             </div>
                         );
@@ -502,24 +442,22 @@ export default function WorkoutPlanChatbotPage() {
                 </div>
             </main>
             <footer className="px-6 mb-0 rounded-tl-[48px] bg-white sticky bottom-0 w-[90vw] lg:w-[60vw] inset-x-0 mx-auto flex flex-col gap-2 pt-4">
-                {!hasProposedPlan && (
-                    <div className="flex justify-end">
-                        <Button 
-                            variant="secondary" 
-                            size="sm" 
-                            onClick={handleGeneratePlan} 
-                            disabled={isGenerating || messages.length < 2 || isMentalHealthLock || !isSubscribed} 
-                            className="rounded-full px-6 shadow-sm hover:shadow-md transition-all bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-100 disabled:opacity-50"
-                            title={!isSubscribed ? "Upgrade to Pro to generate plans" : ""}
-                        >
-                            {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                            Generate Plan from Chat
-                        </Button>
-                    </div>
-                )}
+                <div className="flex justify-center">
+                    <Button 
+                        variant="secondary" 
+                        size="sm" 
+                        onClick={handleGeneratePlan} 
+                        disabled={isGenerating || messages.length < 2 || isMentalHealthLock || !isSubscribed} 
+                        className="rounded-full px-6 shadow-sm hover:shadow-md transition-all bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-100 disabled:opacity-50"
+                        title={!isSubscribed ? "Upgrade to Pro to generate plans" : ""}
+                    >
+                        {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                        Apply Plan from Chat
+                    </Button>
+                </div>
                 <div className="flex items-center gap-4">
                     <div onClick={handleInputClick} className="flex-1 flex items-center justify-between px-5 py-2.5 rounded-[48px] border-[1.5px] border-solid">
-                        <Input placeholder={isProfileLoading ? "Loading coach..." : "Tell me what you'd like to adjust, then click the button above to make your program. "} onChange={handleInputChange} value={inputValue} onKeyDown={handleKeyDown} disabled={isSending || isProfileLoading || isMentalHealthLock}
+                        <Input placeholder={isProfileLoading ? "Loading coach..." : "Tell me what you'd like to adjust. "} onChange={handleInputChange} value={inputValue} onKeyDown={handleKeyDown} disabled={isSending || isProfileLoading || isMentalHealthLock}
                             className="border-0 p-0 h-auto font-normal text-base leading-6 focus-visible:ring-0 focus-visible:ring-offset-0"
                         />
                     </div>

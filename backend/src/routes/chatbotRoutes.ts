@@ -64,7 +64,9 @@ const requestSchema = z.object({
         .object({
             language: z.string().optional(),
             onboardingSummary: z.string().optional(),
-            workoutPlanContext: z.any().optional()
+            workoutPlanContext: z.any().optional(),
+            currentDate: z.string().optional(),
+            timezoneOffsetMinutes: z.number().optional()
         })
         .optional()
 });
@@ -178,14 +180,17 @@ router.post('/', requireAuth, requireSubscription, async (req: AuthedRequest, re
     const onboardingSummary =
         metadata?.onboardingSummary ?? (await fetchOnboardingSummary(userId));
 
-    const availableDays = await fetchUserAvailableDays(userId);
+    const { availableDays, trainingDaysPerWeek } = await fetchUserTrainingDays(userId);
 
     const systemPrompt = buildSystemPrompt({
         persona,
         onboardingSummary,
         language: metadata?.language,
         workoutPlanContext: metadata?.workoutPlanContext,
-        availableDays
+        availableDays,
+        trainingDaysPerWeek,
+        currentDate: metadata?.currentDate,
+        timezoneOffsetMinutes: metadata?.timezoneOffsetMinutes
     });
 
     let assistantMessage: ChatResponseMessage | null = null;
@@ -250,7 +255,7 @@ router.post('/generate-plan', requireAuth, requireSubscription, async (req: Auth
         const userId = req.user?.id;
         if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
-        const { messages } = req.body;
+        const { messages, latestPlan } = req.body;
         if (!messages || !Array.isArray(messages)) {
             return res.status(400).json({ error: 'Invalid messages' });
         }
@@ -271,8 +276,22 @@ router.post('/generate-plan', requireAuth, requireSubscription, async (req: Auth
             }
         }
 
-        // 3. Generate plan
-        const result = await generateWorkoutPlanForUser(userId);
+        // 3. Generate plan: use latestPlan if provided, otherwise generate new
+        let result;
+        if (latestPlan && latestPlan.proposed_plan) {
+            console.log('[chatbot] Using proposed plan from chat history');
+            const programData = {
+                name: latestPlan.program_name || latestPlan.programName || 'AI Generated Program',
+                description: latestPlan.program_description || latestPlan.programDescription || 'Generated from chat',
+                weeks_count: latestPlan.weeks_count || 4,
+                plans: latestPlan.proposed_plan
+            };
+            const { workoutService } = await import('../services/workoutService');
+            result = await workoutService.updateActiveWorkoutProgram(userId, programData);
+        } else {
+            console.log('[chatbot] No plan in history, generating new plan');
+            result = await generateWorkoutPlanForUser(userId);
+        }
         
         res.json({ success: true, plan: result });
 
@@ -425,21 +444,24 @@ async function fetchOnboardingSummary(userId: string): Promise<string | null> {
     }
 }
 
-async function fetchUserAvailableDays(userId: string): Promise<number[]> {
+async function fetchUserTrainingDays(userId: string): Promise<{ availableDays: number[]; trainingDaysPerWeek: number | null }> {
     try {
         const { data, error } = await supabase
             .from('user_info')
-            .select('available_days')
+            .select('available_days, training_days_per_week')
             .eq('user_id', userId)
             .maybeSingle();
         
-        if (error || !data || !Array.isArray(data.available_days)) {
-            return [];
+        if (error || !data) {
+            return { availableDays: [], trainingDaysPerWeek: null };
         }
-        return data.available_days;
+        return {
+            availableDays: Array.isArray(data.available_days) ? data.available_days : [],
+            trainingDaysPerWeek: typeof data.training_days_per_week === 'number' ? data.training_days_per_week : null
+        };
     } catch (err) {
-        console.warn('Failed to fetch available days:', err);
-        return [];
+        console.warn('Failed to fetch training days:', err);
+        return { availableDays: [], trainingDaysPerWeek: null };
     }
 }
 
@@ -448,30 +470,47 @@ function buildSystemPrompt({
     onboardingSummary,
     language,
     workoutPlanContext,
-    availableDays
+    availableDays,
+    trainingDaysPerWeek,
+    currentDate,
+    timezoneOffsetMinutes
 }: {
     persona: TrainerPersona;
     onboardingSummary?: string | null;
     language?: string;
     workoutPlanContext?: any;
     availableDays?: number[];
+    trainingDaysPerWeek?: number | null;
+    currentDate?: string;
+    timezoneOffsetMinutes?: number;
 }): string {
     const lang = inferLanguage(language);
     const summary = onboardingSummary ? onboardingSummary : 'Limited user context provided.';
+    const dayLabel = currentDate ? buildDayLabel(currentDate, timezoneOffsetMinutes) : null;
     
     let planContext = '';
     if (workoutPlanContext) {
         const exerciseList = EXERCISE_LIBRARY.map((ex) => `- ${ex.name} (Log Mode: ${ex.logMode})`).join('\n');
-        const daysConstraint = availableDays && availableDays.length > 0 
-            ? `\nCRITICAL: Only schedule sessions on these day_numbers: ${availableDays.join(', ')} (0=Sun ... 6=Sat).`
-            : '';
+        
+        let daysConstraint = '';
+        if (availableDays && availableDays.length > 0) {
+            const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const allowedDaysList = availableDays.map(d => `${d} (${dayNames[d]})`).join(', ');
+            const daysPerWeekNote = trainingDaysPerWeek ? `\n- User wants to train ${trainingDaysPerWeek} days per week` : '';
+            daysConstraint = `\n\nCRITICAL DAY MAPPING RULES:
+- User can ONLY train on these weekdays: ${allowedDaysList}${daysPerWeekNote}
+- Each plan day MUST use one of these day_number values: ${availableDays.join(', ')}
+- DO NOT use any other day_number values (e.g., if available_days is [1,3,5], you can ONLY use day_number: 1, 3, or 5)
+- For a 3-day plan with available_days [1,3,5], use day_number: 1, 3, 5 (Monday, Wednesday, Friday)
+- NEVER use sequential 0,1,2 unless those exact values are in the available_days list`;
+        }
 
         const template = `{
   "program_name": "Modified Program Name",
   "program_description": "Brief description of the changes made",
   "proposed_plan": [
     {
-      "day_number": 0,
+      "day_number": ${availableDays && availableDays.length > 0 ? availableDays[0] : 0},
       "plan_name": "Example Plan Name",
       "plan_description": "Brief description",
       "plan_duration_estimate": 45,
@@ -489,7 +528,7 @@ function buildSystemPrompt({
   ]
 }`;
 
-        planContext = `\nCURRENT WORKOUT PLAN CONTEXT:\n${JSON.stringify(workoutPlanContext, null, 2)}\n\nIf the user asks to modify the plan, you MUST output the NEW plan in a JSON block with the key "proposed_plan".\n\nSTRICT CONSTRAINTS FOR MODIFICATIONS:\n1. Use ONLY the allowed exercise list below. Do NOT invent new names.\n2. ${daysConstraint}\n3. Ensure exercise_ids are valid UUIDs if reusing, or use slugs/names from the allowed list if new.\n4. Metric MUST be one of: 'reps', 'weight', 'distance', 'duration_s', 'height'. (Use 'duration_s' for time-based exercises).\n\nAllowed exercises:\n${exerciseList}\n\nJSON Structure Template for "proposed_plan":\n${template}`;
+        planContext = `\nCURRENT WORKOUT PLAN CONTEXT:\n${JSON.stringify(workoutPlanContext, null, 2)}\n\nIf the user asks to modify the plan, you MUST output the NEW plan in a JSON block with the key "proposed_plan". Unless the user clearly requests a completely new program, keep changes minimal on the current plan, but still output the full updated program.\n\nSTRICT CONSTRAINTS FOR MODIFICATIONS:\n1. Use ONLY the allowed exercise list below. Do NOT invent new names.${daysConstraint}\n2. Ensure exercise_ids are valid UUIDs if reusing, or use slugs/names from the allowed list if new.\n3. Metric MUST be one of: 'reps', 'weight', 'distance', 'duration_s', 'height'. (Use 'duration_s' for time-based exercises).\n\nAllowed exercises:\n${exerciseList}\n\nJSON Structure Template for "proposed_plan":\n${template}\nn5. provide a ${trainingDaysPerWeek}-days full plan based on the user's needs, even if the user only requests minor tweaks, and generate it based on user's foriginal plan.`;
     }
 
     return [
@@ -505,10 +544,24 @@ function buildSystemPrompt({
         `3. Gymtimidation: If user fears judgment, validate them. Suggest home workouts or off-peak times. Start small (e.g., 5 min stretch).`,
         `4. Body Image/Eating: If user mentions extreme fasting or self-hate, do NOT encourage weight loss. Pivot to health/feeling good. If extreme, suggest professional help.`,
         
+        dayLabel ? `User local date: ${dayLabel}. Always align "today" with this user-local date and weekday.` : null,
         `Keep the reply concise (under 100 words) unless the user explicitly requests a detailed plan.`,
         `User context: ${summary}`,
         planContext
     ].join('\n');
+}
+
+function buildDayLabel(dateStr: string, tzOffset?: number): string | null {
+    // dateStr expected as YYYY-MM-DD from client local time
+    const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!match) return null;
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+    const offset = Number.isFinite(tzOffset) ? tzOffset as number : 0;
+    const utcDate = Date.UTC(year, month - 1, day, 12, 0, 0, 0) + offset * 60000;
+    const weekday = new Date(utcDate).toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' });
+    return `${dateStr} (${weekday})`;
 }
 
 function buildFallbackResponse(
