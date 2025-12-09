@@ -35,4 +35,11 @@ export async function getPreferences(): Promise<OnboardingPayload> {
 export async function updatePreferences(data: OnboardingPayload): Promise<OnboardingPayload> {
     return apiClient.put<OnboardingPayload>('/api/profile/preferences', data);
 }
-
+/**
+ * Update user avatar preference
+ */
+export async function updateAvatarOption(avatarOption: number): Promise<ProfileResponse> {
+    return apiClient.put<ProfileResponse>('/api/profile/avatar', {
+        avatarOption,
+    });
+}

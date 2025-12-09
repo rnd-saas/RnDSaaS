@@ -221,7 +221,7 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
         const [profileResult, usersResult, userAchievementsResult, workoutsResult] = await Promise.all([
             supabase
                 .from('user_info')
-                .select('preferred_name, trainer')
+                .select('preferred_name, trainer, avatar_option')
                 .eq('user_id', userId)
                 .maybeSingle(),
             supabase
@@ -296,7 +296,8 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
                 avatarUrl: null,
                 bio: null,
                 trainer: profileResult.data?.trainer || false,
-                streakDays: streak
+                streakDays: streak,
+                avatarOption: profileResult.data?.avatar_option || 0
             },
             achievements,
             workoutGrid,
@@ -364,7 +365,7 @@ router.put('/preferences', requireAuth, async (req: AuthedRequest, res) => {
         }
 
         const updates = req.body;
-        
+
         // Helper to map kebab-case to snake_case
         const toSnakeCase = (val: string) => val ? val.replace(/-/g, '_') : val;
         const mapArrayToSnake = (arr: any[]) => Array.isArray(arr) ? arr.map(toSnakeCase) : [];
@@ -383,7 +384,45 @@ router.put('/preferences', requireAuth, async (req: AuthedRequest, res) => {
         if (updates.preferredSplit !== undefined) dbUpdates.preferred_split = mapArrayToSnake(updates.preferredSplit);
         if (updates.gymComfortLevel !== undefined) dbUpdates.gym_comfort_level = updates.gymComfortLevel;
         if (updates.experienceLevel !== undefined) dbUpdates.experience_level = updates.experienceLevel;
-        
+
+        dbUpdates.updated_at = new Date().toISOString();
+
+        const { data, error } = await supabase
+            .from('user_info')
+            .update(dbUpdates)
+            .eq('user_id', userId)
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Failed to update preferences:', error);
+            return res.status(500).json({ error: { message: 'Failed to update preferences' } });
+        }
+
+        res.json(data);
+    } catch (error: any) {
+        console.error('Preferences update error:', error);
+        res.status(500).json({ error: { message: 'Internal server error' } });
+    }
+});
+
+router.put('/avatar', requireAuth, async (req: AuthedRequest, res) => {
+    try {
+        const userId = req.user?.id;
+        if (!userId) {
+            return res.status(401).json({ error: { message: 'Unauthenticated' } });
+        }
+
+        const updates = req.body;
+
+        // Helper to map kebab-case to snake_case
+        const toSnakeCase = (val: string) => val ? val.replace(/-/g, '_') : val;
+        const mapArrayToSnake = (arr: any[]) => Array.isArray(arr) ? arr.map(toSnakeCase) : [];
+
+        // Map frontend camelCase to DB snake_case
+        const dbUpdates: any = {};
+        if (updates.avatarOption !== undefined) dbUpdates.avatar_option = updates.avatarOption;
+
         dbUpdates.updated_at = new Date().toISOString();
 
         const { data, error } = await supabase
