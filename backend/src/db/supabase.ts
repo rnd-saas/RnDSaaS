@@ -42,6 +42,13 @@ const createSupabaseClient = (key: string, label: string): SupabaseClient => {
             persistSession: false,
             autoRefreshToken: false,
             detectSessionInUrl: false
+        },
+        global: {
+            headers: {
+                // Note: Token expiry is controlled by Supabase project settings
+                // Go to Supabase Dashboard > Authentication > Settings > JWT Expiry
+                // Set to 86400 seconds (24 hours) for one login per day
+            }
         }
     });
 };

@@ -140,6 +140,8 @@ export interface ChatbotRequest {
         language?: string;
         onboardingSummary?: string;
         workoutPlanContext?: any;
+        currentDate?: string; // YYYY-MM-DD in user local time
+        timezoneOffsetMinutes?: number; // minutes to add to local to get UTC
     };
 }
 

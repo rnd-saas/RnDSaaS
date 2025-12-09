@@ -83,6 +83,14 @@ class ApiClient {
                 ? (data.error || { message: data.message || 'An error occurred' })
                 : { message: data || 'An error occurred' };
             
+            // Handle 401 Unauthorized - token expired or invalid
+            if (response.status === 401) {
+                this.clearToken();
+                if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
+                    window.location.href = '/login';
+                }
+            }
+            
             throw new ApiError(
                 error.message || 'An error occurred',
                 response.status,

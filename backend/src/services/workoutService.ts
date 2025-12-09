@@ -2,25 +2,23 @@ import { supabase } from '../db/supabase';
 import { triggerAchievementCheck } from './achievementService';
 
 export const workoutService = {
-  async getWorkoutPlanForDate(userId: string, date: Date) {
-    // JS getDay() returns 0 for Sunday, 1 for Monday, etc.
-    // We use 0=Sunday ... 6=Saturday mapping.
-    const dayOfWeek = date.getDay();
-    
-    const formattedDate = date.toISOString().split('T')[0];
+  async getWorkoutPlanForDate(userId: string, dateInput: string | Date, timezoneOffsetMinutes = 0) {
+    // Normalize the requested date to the user's local calendar day
+    const { year, month, day } = parseDateParts(dateInput);
+    const dayOfWeek = getDayOfWeek(year, month, day); // 0=Sunday ... 6=Saturday based on the user's local date
 
-    // Check for completed workout (with feedback)
-    const startOfDay = new Date(date);
-    startOfDay.setHours(0,0,0,0);
-    const endOfDay = new Date(date);
-    endOfDay.setHours(23,59,59,999);
+    const formattedDate = formatDateParts(year, month, day); // YYYY-MM-DD from the user's perspective
+
+    // Build the UTC window that corresponds to the user's local day
+    const startOfDayUtc = buildUtcDate(year, month, day, 0, 0, 0, 0, timezoneOffsetMinutes);
+    const endOfDayUtc = buildUtcDate(year, month, day, 23, 59, 59, 999, timezoneOffsetMinutes);
 
     const { data: completedWorkouts } = await supabase
         .from('workout_feedback')
         .select('id, workouts!inner(user_id, ended_at)')
         .eq('workouts.user_id', userId)
-        .gte('workouts.ended_at', startOfDay.toISOString())
-        .lte('workouts.ended_at', endOfDay.toISOString())
+        .gte('workouts.ended_at', startOfDayUtc.toISOString())
+        .lte('workouts.ended_at', endOfDayUtc.toISOString())
         .limit(1);
     
     const isCompleted = !!(completedWorkouts && completedWorkouts.length > 0);
@@ -376,3 +374,59 @@ export const workoutService = {
     return newProgram;
   }
 };
+
+function parseDateParts(dateInput: string | Date): { year: number; month: number; day: number } {
+  if (dateInput instanceof Date && !isNaN(dateInput.getTime())) {
+    return {
+      year: dateInput.getFullYear(),
+      month: dateInput.getMonth() + 1,
+      day: dateInput.getDate()
+    };
+  }
+
+  if (typeof dateInput === 'string') {
+    const match = dateInput.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (match) {
+      return {
+        year: Number(match[1]),
+        month: Number(match[2]),
+        day: Number(match[3])
+      };
+    }
+  }
+
+  const parsed = new Date(dateInput as any);
+  if (isNaN(parsed.getTime())) {
+    throw new Error('Invalid date input');
+  }
+
+  return {
+    year: parsed.getUTCFullYear(),
+    month: parsed.getUTCMonth() + 1,
+    day: parsed.getUTCDate()
+  };
+}
+
+function formatDateParts(year: number, month: number, day: number): string {
+  const mm = String(month).padStart(2, '0');
+  const dd = String(day).padStart(2, '0');
+  return `${year}-${mm}-${dd}`;
+}
+
+function getDayOfWeek(year: number, month: number, day: number): number {
+  return new Date(Date.UTC(year, month - 1, day)).getUTCDay();
+}
+
+function buildUtcDate(
+  year: number,
+  month: number,
+  day: number,
+  hours: number,
+  minutes: number,
+  seconds: number,
+  ms: number,
+  timezoneOffsetMinutes: number
+): Date {
+  const timestamp = Date.UTC(year, month - 1, day, hours, minutes, seconds, ms) + timezoneOffsetMinutes * 60000;
+  return new Date(timestamp);
+}
