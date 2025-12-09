@@ -5,7 +5,7 @@ import {useEffect, useState} from "react";
 import {Label} from "@/components/ui/label";
 import {goalOptions} from "@/utils/GoalOptionLabels";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {type GymComfortLevel, PrimaryGoal} from "@/utils/InputTypes";
+import type { GymComfortLevel, PrimaryGoal } from "@/utils/InputTypes";
 import {dayOptions} from "@/utils/DayOptionLabels";
 import {Checkbox} from "@/components/ui/checkbox";
 import {lengthOptions} from "@/utils/SessionLengthOptionLabels";

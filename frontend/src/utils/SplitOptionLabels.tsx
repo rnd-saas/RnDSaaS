@@ -1,4 +1,5 @@
-﻿import {PreferredSplit, PreferredSplitValues} from "@/utils/InputTypes";
+﻿import { PreferredSplitValues } from "@/utils/InputTypes";
+import type { PreferredSplit } from "@/utils/InputTypes";
 
 export const splitOptions: { value: PreferredSplit; label: string }[]  = [
     { value: PreferredSplitValues.DontKnow, label: "Suggest something for me" },

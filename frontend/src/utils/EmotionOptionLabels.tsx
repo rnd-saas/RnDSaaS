@@ -1,4 +1,5 @@
-﻿import {GymComfortLevel, GymComfortLevelValues} from "@/utils/InputTypes";
+﻿import { GymComfortLevelValues } from "@/utils/InputTypes";
+import type { GymComfortLevel } from "@/utils/InputTypes";
 
 export const emotionOptions: { value: GymComfortLevel; label: string }[] = [
     { value: GymComfortLevelValues.Interested, label: "Interested" },
