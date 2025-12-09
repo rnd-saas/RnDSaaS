@@ -44,9 +44,9 @@ export default function AchievementList({ achievements, isLoading }: Achievement
                     sub={a.sub}
                     image={a.emoji}
                     obtained={true}
-                    // Mobile: Fixed width (110px) for scrolling
-                    // Desktop: Full width, fixed height (280px) to match the Mood card neighbor
-                    className="w-[110px] md:w-full shrink-0 md:shrink md:h-[280px]"
+                    // Mobile: Fixed width (120px) for scrolling
+                    // Desktop: Full width, fixed height (~280px) to match the Mood card neighbor
+                    className="flex-1 md:w-full shrink-0 md:shrink md:h-[280px]"
                 />
             ))}
         </div>
