@@ -12,6 +12,7 @@ import { startOfWeek } from "date-fns";
 import { usePlannedWorkout } from "@/api/workouts";
 import type { PlannedExercise, PlannedWorkout } from "@/lib/types/Workout";
 import { useNavigate } from "react-router-dom";
+import { Separator } from "@/components/ui/separator"; // Added Separator import
 
 export default function WorkoutPage() {
   const isLarge = window.matchMedia("(min-width: 1024px)").matches;
@@ -59,6 +60,22 @@ export default function WorkoutPage() {
   } else {
     workoutContentBlock = (
       <div className="flex flex-col items-center justify-start flex-1 gap-5 md:gap-[30px] w-full">
+        {/* NEW: Workout Name & Description Header */}
+        <div className="w-4/5 max-w-[728px] flex flex-col gap-4 text-left">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground">
+              {plannedWorkout.name}
+            </h2>
+            {plannedWorkout.description && (
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {plannedWorkout.description}
+              </p>
+            )}
+          </div>
+          {/* Added Separator to distinguish header from list */}
+          <Separator className="bg-border/60" />
+        </div>
+
         {plannedWorkout.exercises.map((exercise: PlannedExercise) => (
           <PlannedExerciseItem key={exercise.exerciseId} exercise={exercise} />
         ))}
