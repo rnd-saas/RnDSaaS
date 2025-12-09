@@ -79,7 +79,7 @@ export default function ProfilePage() {
 
     const FALLBACK_PROFILE: ProfileData = {
         firstName: null,
-        avatarOption: null,
+        avatarOption: 0,
         level: { label: "Novice", currentXp: 0, nextLevelXp: 1200 },
         onboarding: {
             preferredName: displayName,
@@ -101,10 +101,15 @@ export default function ProfilePage() {
     const resolvedData = profileData ?? FALLBACK_PROFILE;
     // Use level from API if available, otherwise use fallback
     const level = profile?.level ?? resolvedData.level;
-    const [avatarOption, setAvatarOption] = useState(resolvedData.avatarOption?? 1);
+    const [avatarOption, setAvatarOption] = useState(profile?.user.avatarOption ?? resolvedData.avatarOption);
     const [previousAvatarOption, setPreviousAvatarOption] = useState(avatarOption);
     const onboardingResults = resolvedData.onboarding;
-
+    useEffect(() => {
+        if (profile?.user.avatarOption != null) {
+            setAvatarOption(profile.user.avatarOption);
+            setPreviousAvatarOption(profile.user.avatarOption);
+        }
+    }, [profile]);
     const sections = [
         {
             key: "level",
@@ -155,17 +160,13 @@ export default function ProfilePage() {
             <header className="flex flex-col items-center space-y-4 relative py-4">
                 <div className="relative inline-block">
                     <Avatar className="w-32 h-32 shadow-xl ring-4 ring-background">
-                        <AvatarImage src={AvatarOptionValues[avatarOption].src ?? avatarPlaceholder}/>
+                        <AvatarImage src={AvatarOptionValues[avatarOption].src}/>
                         <AvatarFallback
                             className="text-3xl font-serif">{displayName.slice(0, 2).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <Dialog onOpenChange={() => setAvatarOption(previousAvatarOption)}>
-                        <DialogTrigger>
-                            <Button variant={"outline"}
-                                className="absolute -bottom-2 -right-3 rounded-full bg-transparent transition"
-                            >
+                        <DialogTrigger className="absolute -bottom-2 -right-3 rounded-full bg-transparent transition">
                                 <Pencil className="w-4 h-4" />
-                            </Button>
                         </DialogTrigger>
                         <DialogContent className="max-w-[90vw] md:min-w-[60vw] lg:min-w-[40vw]">
                             <DialogHeader>

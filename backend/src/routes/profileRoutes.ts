@@ -221,7 +221,7 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
         const [profileResult, usersResult, userAchievementsResult, workoutsResult] = await Promise.all([
             supabase
                 .from('user_info')
-                .select('preferred_name, trainer')
+                .select('preferred_name, trainer, avatar_option')
                 .eq('user_id', userId)
                 .maybeSingle(),
             supabase
@@ -296,7 +296,8 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
                 avatarUrl: null,
                 bio: null,
                 trainer: profileResult.data?.trainer || false,
-                streakDays: streak
+                streakDays: streak,
+                avatarOption: profileResult.data?.avatar_option || 0
             },
             achievements,
             workoutGrid,

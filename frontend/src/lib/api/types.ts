@@ -190,6 +190,7 @@ export interface ProfileResponse {
         bio: string | null;
         trainer: boolean | null;
         streakDays: number;
+        avatarOption: number;
     };
     achievements: ProfileAchievement[];
     workoutGrid: ProfileWorkoutDay[][];
