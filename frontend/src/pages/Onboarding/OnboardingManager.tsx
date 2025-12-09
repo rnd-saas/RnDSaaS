@@ -348,7 +348,7 @@ export default function OnboardingManager() {
                         />
                     </div>
 
-                    <div className="w-[90vw] flex justify-start ml-10">
+                    <div className="w-[90vw] flex justify-start ml-10 mb-[10vh]">
                         <CurrentStep/>
                     </div>
 
@@ -362,7 +362,7 @@ export default function OnboardingManager() {
                             <p className="text-primary">{submitError}</p>
                         )}
                     </div>
-                    <div className="fixed w-[75vw] bottom-[5vh] p-4">
+                    <div className="bg-white fixed bottom-0 w-[75vw] p-4 ">
                         <StepNavigator
                             prevStep={back}
                             nextStep={next}
