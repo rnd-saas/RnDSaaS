@@ -102,6 +102,7 @@ export default function ProfilePage() {
     // Use level from API if available, otherwise use fallback
     const level = profile?.level ?? resolvedData.level;
     const [avatarOption, setAvatarOption] = useState(resolvedData.avatarOption?? 1);
+    const [previousAvatarOption, setPreviousAvatarOption] = useState(avatarOption);
     const onboardingResults = resolvedData.onboarding;
 
     const sections = [
@@ -142,6 +143,12 @@ export default function ProfilePage() {
             window.tidioChatApi.show();
         }
     }, []);
+
+    function handleSave() {
+        setPreviousAvatarOption(avatarOption);
+        //todo:save to db
+    }
+
     return (
         <div
             className="w-full md:w-[70vw] lg:w-[50vw] mx-auto p-6 pb-24 flex flex-col space-y-8 bg-background text-foreground font-sans">
@@ -152,7 +159,7 @@ export default function ProfilePage() {
                         <AvatarFallback
                             className="text-3xl font-serif">{displayName.slice(0, 2).toUpperCase()}</AvatarFallback>
                     </Avatar>
-                    <Dialog>
+                    <Dialog onOpenChange={() => setAvatarOption(previousAvatarOption)}>
                         <DialogTrigger>
                             <Button variant={"outline"}
                                 className="absolute -bottom-2 -right-3 rounded-full bg-transparent transition"
@@ -183,9 +190,13 @@ export default function ProfilePage() {
                             </ToggleGroup>
                             <DialogFooter>
                                 <DialogClose asChild>
-                                    <Button variant="outline">Cancel</Button>
+                                    <Button variant="outline" onClick={() => setAvatarOption(previousAvatarOption)}>Cancel</Button>
                                 </DialogClose>
-                                <Button type="submit">Save changes</Button>
+                                <DialogClose asChild>
+                                    <Button type="button" onClick={handleSave}>
+                                        Save changes
+                                    </Button>
+                                </DialogClose>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
