@@ -27,227 +27,58 @@ const DEFAULT_ACHIEVEMENTS: ProfileAchievement[] = [
     { id: 'fallback-3', title: 'Consistent', sub: 'Workout 12', emoji: '🔥' }
 ];
 
-router.get('/', requireAuth, async (req: AuthedRequest, res) => {
-    try {
-        const userId = req.user?.id;
+const XP_PER_WORKOUT = 50;
 
-        if (!userId) {
-            return res.status(401).json({
-                error: { message: 'Unauthenticated' }
-            });
+const LEVELS = [
+    { label: 'Novice', minXp: 0, maxXp: 500 },
+    { label: 'Apprentice', minXp: 500, maxXp: 1500 },
+    { label: 'Athlete', minXp: 1500, maxXp: 3000 },
+    { label: 'Challenger', minXp: 3000, maxXp: 5000 },
+    { label: 'Elite', minXp: 5000, maxXp: 8000 },
+    { label: 'Legend', minXp: 8000, maxXp: 11000 }
+];
+
+function resolveLevel(totalXp: number) {
+    let currentLevel = LEVELS[0];
+    for (const level of LEVELS) {
+        if (totalXp >= level.minXp) {
+            currentLevel = level;
+        } else {
+            break;
         }
-
-        console.log(`[Profile] Fetching profile data for user: ${userId}`);
-        
-        const [profileResult, usersResult, userAchievementsResult, workoutsResult] = await Promise.all([
-            supabase
-                .from('user_info')
-                .select('preferred_name, trainer')
-                .eq('user_id', userId)
-                .maybeSingle(),
-            supabase
-                .from('users')
-                .select('display_name')
-                .eq('id', userId)
-                .maybeSingle(),
-            supabase
-                .from('user_achievements')
-                .select('id, achievement_id, unlocked_at')
-                .eq('user_id', userId)
-                .order('unlocked_at', { ascending: false })
-                .limit(20), // Query more records to ensure we get 3 unique achievements after deduplication
-            supabase
-                .from('workouts')
-                .select('id, started_at', { count: 'exact' })
-                .eq('user_id', userId)
-                .order('started_at', { ascending: false })
-                .limit(100)  // Get last 100 workouts to ensure we cover all workouts in the displayed range
-        ]);
-
-        console.log(`[Profile] Query results:`, {
-            userAchievementsCount: userAchievementsResult.data?.length ?? 0,
-            userAchievementsError: userAchievementsResult.error?.message,
-            userAchievementsData: userAchievementsResult.data?.map(r => ({ id: r.id, achievement_id: r.achievement_id, unlocked_at: r.unlocked_at }))
-        });
-
-        if (profileResult.error) {
-            console.warn('Failed to read profile info:', profileResult.error.message);
-        }
-
-        if (usersResult.error) {
-            console.warn('Failed to read base user info:', usersResult.error.message);
-        }
-
-        if (userAchievementsResult.error) {
-            console.error('Failed to read profile achievements:', {
-                error: userAchievementsResult.error.message,
-                code: userAchievementsResult.error.code,
-                details: userAchievementsResult.error.details,
-                hint: userAchievementsResult.error.hint,
-                userId: userId
-            });
-            // Continue with empty data rather than failing completely
-        }
-
-        if (workoutsResult.error) {
-            console.warn('Failed to read workout history:', workoutsResult.error.message);
-        }
-
-        // Use data even if there was an error (data might still be available)
-        // Supabase sometimes returns data even when there's an error, so prioritize data
-        const achievementsData = userAchievementsResult.data ?? (userAchievementsResult.error ? null : null);
-        const achievements = await buildAchievements(achievementsData);
-        const { workoutGrid, streak } = buildWorkoutGrid(workoutsResult.error ? null : workoutsResult.data);
-
-        const preferredName =
-            profileResult.data?.preferred_name ??
-            usersResult.data?.display_name ??
-            null;
-
-        // Calculate level and XP (same logic as dashboard)
-        const workouts = workoutsResult.data ?? [];
-        const totalWorkouts = workoutsResult.count ?? workouts.length;
-        const workoutDates = new Set(
-            workouts
-                .map((row) => row.started_at)
-                .filter((iso): iso is string => Boolean(iso))
-                .map((iso) => iso.slice(0, 10))
-        );
-        const totalXp = calculateExperience(totalWorkouts, streak);
-        const level = resolveLevel(totalXp);
-
-        // Ensure we return exactly 3 achievements for the profile page
-        // Only use DEFAULT_ACHIEVEMENTS if we truly have no achievements (not just due to a query error)
-        const displayAchievements = achievements.length > 0 
-            ? achievements.slice(0, 3) 
-            : (userAchievementsResult.error ? [] : DEFAULT_ACHIEVEMENTS); // Return empty array on error, not fallback
-
-        return res.json({
-            user: {
-                preferredName,
-                avatarUrl: null,
-                bio: null,
-                trainer: typeof profileResult.data?.trainer === 'boolean' ? profileResult.data.trainer : null,
-                streakDays: streak
-            },
-            achievements: displayAchievements,
-            workoutGrid,
-            level
-        });
-    } catch (error: any) {
-        console.error('Failed to load profile summary:', error);
-        return res.status(500).json({
-            error: { message: 'Failed to load profile' }
-        });
     }
-});
+
+    const span = (currentLevel.maxXp ?? currentLevel.minXp + 1000) - currentLevel.minXp;
+    const progressWithinLevel = Math.max(0, Math.min(totalXp - currentLevel.minXp, span));
+
+    return {
+        label: currentLevel.label,
+        currentXp: progressWithinLevel,
+        nextLevelXp: span
+    };
+}
+
+function calculateExperience(totalWorkouts: number, streakDays: number): number {
+    const baseXp = totalWorkouts * XP_PER_WORKOUT;
+    if (baseXp === 0 || streakDays <= 0) {
+        return baseXp;
+    }
+
+    const cappedStreak = Math.min(streakDays, 45); // prevent runaway multipliers
+    const streakMultiplier = 1 + cappedStreak * 0.02; // +2% XP per streak day, up to +90%
+
+    return Math.round(baseXp * streakMultiplier);
+}
 
 async function buildAchievements(
     rows?: Array<{ id: string; achievement_id: string | null; unlocked_at: string | null }> | null
-): Promise<ProfileAchievement[]> {
+) {
     if (!rows || rows.length === 0) {
         return [];
     }
 
-    // Get unique achievement IDs
     const achievementIds = Array.from(
-        new Set(
-            rows
-                .map((row) => row.achievement_id)
-                .filter((id): id is string => Boolean(id))
-        )
-    );
-
-    if (achievementIds.length === 0) {
-        console.warn('buildAchievements: No valid achievement IDs found in rows');
-        return [];
-    }
-
-    const { data, error } = await supabase
-        .from('achievements')
-        .select('id, name, description, icon')
-        .in('id', achievementIds);
-
-    if (error) {
-        console.error('Failed to load achievements metadata:', {
-            error: error.message,
-            code: error.code,
-            details: error.details,
-            hint: error.hint,
-            achievementIds: achievementIds
-        });
-        return [];
-    }
-
-    if (!data || data.length === 0) {
-        console.warn('buildAchievements: No achievement metadata found for IDs:', achievementIds);
-        return [];
-    }
-
-    const meta = new Map<string, { name: string; description: string; icon: string | null }>();
-    data.forEach((record) => {
-        meta.set(record.id, {
-            name: record.name,
-            description: record.description,
-            icon: record.icon ?? '🏆'
-        });
-    });
-
-    // Check for missing metadata
-    const missingIds = achievementIds.filter(id => !meta.has(id));
-    if (missingIds.length > 0) {
-        console.warn('buildAchievements: Missing metadata for achievement IDs:', missingIds);
-    }
-
-    // Build achievements, keeping the order from rows (most recent first)
-    // Use a Set to track which achievement_ids we've already added (to avoid duplicates)
-    const seenAchievementIds = new Set<string>();
-    const result: ProfileAchievement[] = [];
-
-    for (const row of rows) {
-        if (!row.achievement_id) {
-            continue;
-        }
-
-        // Skip if we've already added this achievement_id
-        if (seenAchievementIds.has(row.achievement_id)) {
-            continue;
-        }
-
-        const record = meta.get(row.achievement_id);
-        if (!record) {
-            console.warn(`buildAchievements: Skipping row with missing metadata for achievement_id: ${row.achievement_id}, row.id: ${row.id}`);
-            continue;
-        }
-
-        seenAchievementIds.add(row.achievement_id);
-        result.push({
-            id: row.id,
-            title: record.name ?? 'Achievement',
-            sub: record.description ?? '',
-            emoji: record.icon ?? '🏆'
-        });
-    }
-
-    console.log(`buildAchievements: Built ${result.length} achievements from ${rows.length} rows (${achievementIds.length} unique achievement IDs)`);
-    return result;
-}
-
-// Build all achievements without deduplication (for "See More" page)
-async function buildAllAchievements(
-    rows?: Array<{ id: string; achievement_id: string | null; unlocked_at: string | null }> | null
-): Promise<ProfileAchievement[]> {
-    if (!rows || rows.length === 0) {
-        return [];
-    }
-
-    // Get all unique achievement IDs (for metadata lookup)
-    const achievementIds = Array.from(
-        new Set(
-            rows
-                .map((row) => row.achievement_id)
-                .filter((id): id is string => Boolean(id))
-        )
+        new Set(rows.map((row) => row.achievement_id).filter((id): id is string => Boolean(id)))
     );
 
     if (achievementIds.length === 0) {
@@ -273,12 +104,11 @@ async function buildAllAchievements(
         });
     });
 
-    // Build achievements, keeping order but removing duplicate achievement_ids
-    const result: ProfileAchievement[] = [];
-    const seenAchievementIds = new Set<string>();
+    const seen = new Set<string>();
+    const result: Array<{ id: string; title: string; sub: string; emoji: string }> = [];
 
     for (const row of rows) {
-        if (!row.achievement_id || seenAchievementIds.has(row.achievement_id)) {
+        if (!row.achievement_id || seen.has(row.achievement_id)) {
             continue;
         }
 
@@ -287,7 +117,7 @@ async function buildAllAchievements(
             continue;
         }
 
-        seenAchievementIds.add(row.achievement_id);
+        seen.add(row.achievement_id);
         result.push({
             id: row.id,
             title: record.name ?? 'Achievement',
@@ -297,98 +127,6 @@ async function buildAllAchievements(
     }
 
     return result;
-}
-
-function buildWorkoutGrid(
-    rows?: Array<{ started_at: string | null }> | null
-): { workoutGrid: WorkoutDay[][]; streak: number } {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const workoutDates = new Set<string>();
-    rows?.forEach((row) => {
-        if (row.started_at) {
-            // Parse the ISO string and convert to local date
-            // This ensures we get the correct local date regardless of UTC offset
-            const date = new Date(row.started_at);
-            if (!isNaN(date.getTime())) {
-                // Get local date components (not UTC)
-                const year = date.getFullYear();
-                const month = date.getMonth() + 1;
-                const day = date.getDate();
-                const formattedDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                workoutDates.add(formattedDate);
-                
-                // Debug logging
-                console.log(`[buildWorkoutGrid] Found workout: started_at=${row.started_at}, localDate=${formattedDate}`);
-            }
-        }
-    });
-    
-    console.log(`[buildWorkoutGrid] Total workout dates: ${workoutDates.size}`, Array.from(workoutDates));
-
-    // Find the Monday of the week that contains (today - 18 days)
-    // This ensures the calendar grid starts on Monday, matching CalendarPage
-    // Total: 18 days past + today + 2 days future = 21 days
-    const targetDate = new Date(today);
-    targetDate.setDate(targetDate.getDate() - 18); // 18 days before today
-    targetDate.setHours(0, 0, 0, 0);
-    
-    // Get the day of week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
-    const dayOfWeek = targetDate.getDay();
-    // Calculate days to subtract to get to Monday (1)
-    // If dayOfWeek is 0 (Sunday), we need to go back 6 days to get to Monday
-    // If dayOfWeek is 1 (Monday), we need to go back 0 days
-    const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-    
-    const start = new Date(targetDate);
-    start.setDate(targetDate.getDate() - daysToMonday);
-    start.setHours(0, 0, 0, 0);
-
-    const cells: WorkoutDay[] = [];
-    for (let i = 0; i < 21; i++) {
-        const current = new Date(start);
-        current.setDate(start.getDate() + i);
-        current.setHours(0, 0, 0, 0);
-
-        // Use local date string instead of ISO to avoid timezone issues
-        const year = current.getFullYear();
-        const month = String(current.getMonth() + 1).padStart(2, '0');
-        const day = String(current.getDate()).padStart(2, '0');
-        const dateStr = `${year}-${month}-${day}`;
-        
-        let state: WorkoutDay['state'] = 'rest';
-        // Compare dates using getTime() to ensure accurate comparison
-        // Both dates are normalized to midnight local time, so comparison should be accurate
-        const currentTime = current.getTime();
-        const todayTime = today.getTime();
-        if (currentTime > todayTime) {
-            state = 'future';
-        } else if (workoutDates.has(dateStr)) {
-            state = 'worked';
-            console.log(`[buildWorkoutGrid] Matched workout date: ${dateStr}`);
-        }
-
-        cells.push({
-            date: dateStr,
-            state,
-            isCurrent: current.getTime() === today.getTime()
-        });
-    }
-
-    const grid: WorkoutDay[][] = [];
-    for (let i = 0; i < cells.length; i += 7) {
-        grid.push(cells.slice(i, i + 7));
-    }
-
-    // Debug: Log the final grid
-    console.log(`[buildWorkoutGrid] Final grid:`, grid.map(week => 
-        week.map(day => `${day.date}:${day.state}`).join(', ')
-    ).join(' | '));
-
-    const streak = calculateStreak(workoutDates);
-
-    return { workoutGrid: grid, streak };
 }
 
 function calculateStreak(workoutDates: Set<string>): number {
@@ -425,58 +163,50 @@ function parseIsoDate(iso: string): Date {
     return new Date(`${iso}T00:00:00Z`);
 }
 
-// Level calculation constants (same as dashboardRoutes)
-const XP_PER_WORKOUT = 50;
+function buildWorkoutGrid(workouts: Array<{ id: string; started_at: string }> | null) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Build grid (last 28 days = 4 weeks)
+    const grid: WorkoutDay[][] = [];
+    const workoutDates = new Set(
+        workouts?.map(w => new Date(w.started_at).toDateString()) ?? []
+    );
 
-const LEVELS = [
-    { label: 'Novice', minXp: 0, maxXp: 500 },
-    { label: 'Apprentice', minXp: 500, maxXp: 1500 },
-    { label: 'Athlete', minXp: 1500, maxXp: 3000 },
-    { label: 'Challenger', minXp: 3000, maxXp: 5000 },
-    { label: 'Elite', minXp: 5000, maxXp: 8000 },
-    { label: 'Legend', minXp: 8000, maxXp: 11000 }
-];
+    // Start from 4 weeks ago (approx)
+    const endDate = new Date(today);
+    const startDate = new Date(endDate);
+    startDate.setDate(startDate.getDate() - 27); // 28 days total
 
-type LevelInfo = {
-    label: string;
-    currentXp: number;
-    nextLevelXp: number;
-};
+    let currentWeek: WorkoutDay[] = [];
+    
+    for (let i = 0; i < 28; i++) {
+        const d = new Date(startDate);
+        d.setDate(d.getDate() + i);
+        
+        const isToday = d.toDateString() === today.toDateString();
+        const hasWorkout = workoutDates.has(d.toDateString());
+        
+        currentWeek.push({
+            date: d.toISOString(),
+            state: hasWorkout ? 'worked' : (d > today ? 'future' : 'rest'),
+            isCurrent: isToday
+        });
 
-function calculateExperience(totalWorkouts: number, streakDays: number): number {
-    const baseXp = totalWorkouts * XP_PER_WORKOUT;
-    if (baseXp === 0 || streakDays <= 0) {
-        return baseXp;
-    }
-
-    const cappedStreak = Math.min(streakDays, 45); // prevent runaway multipliers
-    const streakMultiplier = 1 + cappedStreak * 0.02; // +2% XP per streak day, up to +90%
-
-    return Math.round(baseXp * streakMultiplier);
-}
-
-function resolveLevel(totalXp: number): LevelInfo {
-    let currentLevel = LEVELS[0];
-    for (const level of LEVELS) {
-        if (totalXp >= level.minXp) {
-            currentLevel = level;
-        } else {
-            break;
+        if (currentWeek.length === 7) {
+            grid.push(currentWeek);
+            currentWeek = [];
         }
     }
+    
+    if (currentWeek.length > 0) {
+        grid.push(currentWeek);
+    }
 
-    const span = (currentLevel.maxXp ?? currentLevel.minXp + 1000) - currentLevel.minXp;
-    const progressWithinLevel = Math.max(0, Math.min(totalXp - currentLevel.minXp, span));
-
-    return {
-        label: currentLevel.label,
-        currentXp: progressWithinLevel,
-        nextLevelXp: span
-    };
+    return { workoutGrid: grid };
 }
 
-// GET /api/profile/achievements - Get all achievements (obtained and un-obtained) for the current user
-router.get('/achievements', requireAuth, async (req: AuthedRequest, res) => {
+router.get('/', requireAuth, async (req: AuthedRequest, res) => {
     try {
         const userId = req.user?.id;
 
@@ -486,136 +216,192 @@ router.get('/achievements', requireAuth, async (req: AuthedRequest, res) => {
             });
         }
 
-        // Fetch all achievements from the database
-        const { data: allAchievements, error: allAchievementsError } = await supabase
-            .from('achievements')
-            .select('id, name, description, icon')
-            .order('created_at', { ascending: true });
-
-        if (allAchievementsError) {
-            console.error('Failed to load all achievements:', allAchievementsError);
-            return res.status(500).json({
-                error: { message: 'Failed to load achievements' }
-            });
-        }
-
-        // Fetch all user achievements using pagination
-        let userAchievementsResult: Array<{ id: string; achievement_id: string | null; unlocked_at: string | null }> = [];
-        let from = 0;
-        const pageSize = 1000;
-        let hasMore = true;
-
-        while (hasMore) {
-            const { data, error } = await supabase
+        console.log(`[Profile] Fetching profile data for user: ${userId}`);
+        
+        const [profileResult, usersResult, userAchievementsResult, workoutsResult] = await Promise.all([
+            supabase
+                .from('user_info')
+                .select('preferred_name, trainer')
+                .eq('user_id', userId)
+                .maybeSingle(),
+            supabase
+                .from('users')
+                .select('display_name')
+                .eq('id', userId)
+                .maybeSingle(),
+            supabase
                 .from('user_achievements')
                 .select('id, achievement_id, unlocked_at')
                 .eq('user_id', userId)
                 .order('unlocked_at', { ascending: false })
-                .range(from, from + pageSize - 1);
+                .limit(20), // Query more records to ensure we get 3 unique achievements after deduplication
+            supabase
+                .from('workouts')
+                .select('id, started_at', { count: 'exact' })
+                .eq('user_id', userId)
+                .order('started_at', { ascending: false })
+                // .limit(100)  // Removed limit to ensure accurate streak calculation
+        ]);
 
-            if (error) {
-                console.error('Failed to read user achievements:', {
-                    error: error.message,
-                    code: error.code,
-                    details: error.details,
-                    hint: error.hint,
-                    userId: userId,
-                    from: from,
-                    pageSize: pageSize
-                });
-                return res.status(500).json({
-                    error: { message: 'Failed to load achievements' }
-                });
-            }
+        // console.log(`[Profile] Query results:`, {
+        //     userAchievementsCount: userAchievementsResult.data?.length ?? 0,
+        //     userAchievementsError: userAchievementsResult.error?.message,
+        //     userAchievementsData: userAchievementsResult.data?.map(r => ({ id: r.id, achievement_id: r.achievement_id, unlocked_at: r.unlocked_at }))
+        // });
 
-            if (data && data.length > 0) {
-                userAchievementsResult = userAchievementsResult.concat(data);
-                hasMore = data.length === pageSize;
-                from += pageSize;
-            } else {
-                hasMore = false;
-            }
+        if (profileResult.error) {
+            console.warn('Failed to read profile info:', profileResult.error.message);
         }
 
-        // Create a set of obtained achievement IDs
-        const obtainedAchievementIds = new Set(
-            userAchievementsResult
-                .map(ua => ua.achievement_id)
-                .filter((id): id is string => Boolean(id))
+        if (usersResult.error) {
+            console.warn('Failed to read base user info:', usersResult.error.message);
+        }
+
+        if (userAchievementsResult.error) {
+            console.error('Failed to read profile achievements:', {
+                error: userAchievementsResult.error.message,
+                code: userAchievementsResult.error.code,
+                details: userAchievementsResult.error.details,
+                hint: userAchievementsResult.error.hint,
+                userId: userId
+            });
+            // Continue with empty data rather than failing completely
+        }
+
+        if (workoutsResult.error) {
+            console.warn('Failed to read workout history:', workoutsResult.error.message);
+        }
+
+        // Use data even if there was an error (data might still be available)
+        // Supabase sometimes returns data even when there's an error, so prioritize data
+        const achievementsData = userAchievementsResult.data ?? (userAchievementsResult.error ? null : null);
+        const achievements = await buildAchievements(achievementsData);
+        const { workoutGrid } = buildWorkoutGrid(workoutsResult.error ? null : workoutsResult.data);
+
+        const workouts = workoutsResult.data ?? [];
+        const totalWorkouts = workoutsResult.count ?? workouts.length;
+        const workoutDates = new Set(
+            workouts
+                .map((row) => row.started_at)
+                .filter((iso): iso is string => Boolean(iso))
+                .map((iso) => iso.slice(0, 10))
         );
+        const streak = calculateStreak(workoutDates);
+        const totalXp = calculateExperience(totalWorkouts, streak);
+        const level = resolveLevel(totalXp);
 
-        // Build response with all achievements, marking which ones are obtained
-        const achievements: Array<ProfileAchievement & { obtained: boolean }> = (allAchievements || []).map(achievement => ({
-            id: achievement.id,
-            title: achievement.name ?? 'Achievement',
-            sub: achievement.description ?? '',
-            emoji: achievement.icon ?? '🏆',
-            obtained: obtainedAchievementIds.has(achievement.id)
-        }));
-
-        return res.json({
-            achievements: achievements
+        res.json({
+            user: {
+                preferredName: profileResult.data?.preferred_name || usersResult.data?.display_name || 'User',
+                avatarUrl: null,
+                bio: null,
+                trainer: profileResult.data?.trainer || false,
+                streakDays: streak
+            },
+            achievements,
+            workoutGrid,
+            level
         });
     } catch (error: any) {
-        console.error('Failed to load achievements:', error);
-        return res.status(500).json({
-            error: { message: 'Failed to load achievements' }
-        });
+        console.error('Profile fetch error:', error);
+        res.status(500).json({ error: { message: 'Internal server error' } });
     }
 });
 
-// GET /api/profile/workouts - Get all workout history for the current user
-router.get('/workouts', requireAuth, async (req: AuthedRequest, res) => {
+router.get('/preferences', requireAuth, async (req: AuthedRequest, res) => {
     try {
         const userId = req.user?.id;
-
         if (!userId) {
-            return res.status(401).json({
-                error: { message: 'Unauthenticated' }
-            });
+            return res.status(401).json({ error: { message: 'Unauthenticated' } });
         }
 
-        const { data: workoutsResult, error } = await supabase
-            .from('workouts')
-            .select('id, started_at, ended_at, plan_id, workout_plans(name)')
+        const { data, error } = await supabase
+            .from('user_info')
+            .select('*')
             .eq('user_id', userId)
-            .order('started_at', { ascending: false })
-            .limit(1000);
+            .single();
 
         if (error) {
-            console.warn('Failed to read workout history:', error.message);
-            return res.status(500).json({
-                error: { message: 'Failed to load workout history' }
-            });
+            console.error('Failed to fetch preferences:', error);
+            return res.status(500).json({ error: { message: 'Failed to fetch preferences' } });
         }
 
-        const workouts = (workoutsResult || []).map((workout: any) => {
-            // Handle both array and object formats from Supabase join
-            let planName = 'Workout';
-            if (workout.workout_plans) {
-                if (Array.isArray(workout.workout_plans) && workout.workout_plans.length > 0) {
-                    planName = workout.workout_plans[0].name || 'Workout';
-                } else if (workout.workout_plans.name) {
-                    planName = workout.workout_plans.name;
-                }
-            }
-            
-            return {
-                id: workout.id,
-                title: planName,
-                from: workout.started_at,
-                to: workout.ended_at || null
-            };
-        });
+        // Helper to map snake_case to kebab-case
+        const toKebabCase = (val: string) => val ? val.replace(/_/g, '-') : val;
+        const mapArrayToKebab = (arr: any[]) => Array.isArray(arr) ? arr.map(toKebabCase) : [];
 
-        return res.json({
-            workouts: workouts
-        });
+        // Map DB fields to frontend expected format if necessary, or just return as is
+        // The frontend component seems to expect camelCase keys in OnboardingPayload
+        // Let's map them to match OnboardingPayload interface
+        const preferences = {
+            preferredName: data.preferred_name,
+            gender: toKebabCase(data.gender),
+            heightCm: data.height_cm,
+            weightKg: data.weight_kg,
+            primaryGoal: mapArrayToKebab(data.primary_goal),
+            trainingDaysPerWeek: data.training_days_per_week,
+            availableDays: data.available_days,
+            sessionDuration: data.session_duration,
+            problemAreas: data.problem_areas,
+            preferredSplit: mapArrayToKebab(data.preferred_split),
+            gymComfortLevel: data.gym_comfort_level, // These seem to match
+            experienceLevel: data.experience_level,
+            trainer: data.trainer
+        };
+
+        res.json(preferences);
     } catch (error: any) {
-        console.error('Failed to load workout history:', error);
-        return res.status(500).json({
-            error: { message: 'Failed to load workout history' }
-        });
+        console.error('Preferences fetch error:', error);
+        res.status(500).json({ error: { message: 'Internal server error' } });
+    }
+});
+
+router.put('/preferences', requireAuth, async (req: AuthedRequest, res) => {
+    try {
+        const userId = req.user?.id;
+        if (!userId) {
+            return res.status(401).json({ error: { message: 'Unauthenticated' } });
+        }
+
+        const updates = req.body;
+        
+        // Helper to map kebab-case to snake_case
+        const toSnakeCase = (val: string) => val ? val.replace(/-/g, '_') : val;
+        const mapArrayToSnake = (arr: any[]) => Array.isArray(arr) ? arr.map(toSnakeCase) : [];
+
+        // Map frontend camelCase to DB snake_case
+        const dbUpdates: any = {};
+        if (updates.preferredName !== undefined) dbUpdates.preferred_name = updates.preferredName;
+        if (updates.gender !== undefined) dbUpdates.gender = toSnakeCase(updates.gender);
+        if (updates.heightCm !== undefined) dbUpdates.height_cm = updates.heightCm;
+        if (updates.weightKg !== undefined) dbUpdates.weight_kg = updates.weightKg;
+        if (updates.primaryGoal !== undefined) dbUpdates.primary_goal = mapArrayToSnake(updates.primaryGoal);
+        if (updates.trainingDaysPerWeek !== undefined) dbUpdates.training_days_per_week = updates.trainingDaysPerWeek;
+        if (updates.availableDays !== undefined) dbUpdates.available_days = updates.availableDays;
+        if (updates.sessionDuration !== undefined) dbUpdates.session_duration = updates.sessionDuration;
+        if (updates.problemAreas !== undefined) dbUpdates.problem_areas = updates.problemAreas;
+        if (updates.preferredSplit !== undefined) dbUpdates.preferred_split = mapArrayToSnake(updates.preferredSplit);
+        if (updates.gymComfortLevel !== undefined) dbUpdates.gym_comfort_level = updates.gymComfortLevel;
+        if (updates.experienceLevel !== undefined) dbUpdates.experience_level = updates.experienceLevel;
+        
+        dbUpdates.updated_at = new Date().toISOString();
+
+        const { data, error } = await supabase
+            .from('user_info')
+            .update(dbUpdates)
+            .eq('user_id', userId)
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Failed to update preferences:', error);
+            return res.status(500).json({ error: { message: 'Failed to update preferences' } });
+        }
+
+        res.json(data);
+    } catch (error: any) {
+        console.error('Preferences update error:', error);
+        res.status(500).json({ error: { message: 'Internal server error' } });
     }
 });
 

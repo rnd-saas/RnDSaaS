@@ -1,5 +1,5 @@
 import apiClient from './client';
-import type { ProfileResponse, AchievementListResponse, WorkoutHistoryResponse } from './types';
+import type { ProfileResponse, AchievementListResponse, WorkoutHistoryResponse, OnboardingPayload } from './types';
 
 /**
  * Fetch aggregated profile data for the current user.
@@ -20,5 +20,19 @@ export async function getAllAchievements(): Promise<AchievementListResponse> {
  */
 export async function getWorkoutHistory(): Promise<WorkoutHistoryResponse> {
     return apiClient.get<WorkoutHistoryResponse>('/api/profile/workouts');
+}
+
+/**
+ * Fetch user workout preferences.
+ */
+export async function getPreferences(): Promise<OnboardingPayload> {
+    return apiClient.get<OnboardingPayload>('/api/profile/preferences');
+}
+
+/**
+ * Update user workout preferences.
+ */
+export async function updatePreferences(data: OnboardingPayload): Promise<OnboardingPayload> {
+    return apiClient.put<OnboardingPayload>('/api/profile/preferences', data);
 }
 

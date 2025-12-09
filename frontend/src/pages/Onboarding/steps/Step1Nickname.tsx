@@ -15,7 +15,7 @@ export default function Step1Nickname() {
             <FieldGroup>
                 <Field>
                     <FieldLabel htmlFor="nickname">Name:</FieldLabel>
-                    <Input id="nickname" type="text"
+                    <Input id="nickname" type="text" onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
                            {...register("nickname", { required: "Please provide a name" })}/>
                 </Field>
             </FieldGroup>

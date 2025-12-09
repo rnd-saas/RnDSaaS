@@ -157,12 +157,14 @@ export type Inputs = {
 }
 export default function OnboardingManager() {
     const [formStep, setStep] = useState(0);
-    const methods = useForm<Inputs>();
+    const methods = useForm<Inputs>({
+        mode: "onChange",
+        reValidateMode: "onChange",
+    });
     const navigate = useNavigate();
     const [submitError, setSubmitError] = useState<string | null>(null);
     const { isSubmitting } = methods.formState;
     const { triggerCheck } = useAchievements();
-
     //defining all quiz steps
     type Step = {
         component: ComponentType;
@@ -243,6 +245,8 @@ export default function OnboardingManager() {
         if (formStep < stepNames.length) {
             trackOnboardingStep(formStep, stepNames[formStep]);
         }
+        const { fields } = stepComponents[formStep];
+        methods.trigger(fields);
     }, [formStep]);
 
     const next = async () => {
@@ -329,12 +333,13 @@ export default function OnboardingManager() {
     useEffect(() => {
         window.tidioChatApi.hide();
     }, []);
+    const currentStepHasErrors = getStepErrors(formStep).length > 0;
     return (
         <FormProvider {...methods}>
             <div className="flex items-center justify-center p-4">
                 <form
                     onSubmit={methods.handleSubmit(onSubmit)}
-                    className="w-full max-w-md min-h-[75vh] min-w-[75vw] flex flex-col items-center gap-6"
+                    className="w-full max-w-md h-[95vh] min-w-[75vw] flex flex-col items-center gap-6"
                 >
                     <div className="w-full p-2">
                         <FormProgress
@@ -343,26 +348,27 @@ export default function OnboardingManager() {
                         />
                     </div>
 
-                    <div className="w-[90vw] flex justify-start ml-10">
+                    <div className="w-[90vw] flex justify-start ml-10 mb-[10vh]">
                         <CurrentStep/>
                     </div>
 
                     <div className="p-4">
                         {getStepErrors(formStep).map((error, i) => (
-                            <p key={i}>
+                            <p key={i} className="text-primary">
                                 {error?.message}
                             </p>
                         ))}
                         {submitError && (
-                            <p className="text-[var(--intuitive-names-error-message)]">{submitError}</p>
+                            <p className="text-primary">{submitError}</p>
                         )}
                     </div>
-                    <div className="fixed w-[75vw] bottom-[10vh] p-4">
+                    <div className="bg-white fixed bottom-0 w-[75vw] p-4 ">
                         <StepNavigator
                             prevStep={back}
                             nextStep={next}
                             prevDisabled={formStep == 0}
-                            nextDisabled={formStep == totalSteps}
+                            nextDisabled={currentStepHasErrors}
+                            shouldSubmit={formStep == totalSteps}
                             isSubmitting={isSubmitting}
                         />
                     </div>

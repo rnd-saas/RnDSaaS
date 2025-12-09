@@ -130,7 +130,9 @@ export default function ProfilePage() {
     ];
 
     useEffect(() => {
-        window.tidioChatApi.show();
+        if (window.tidioChatApi) {
+            window.tidioChatApi.show();
+        }
     }, []);
     return (
         <div

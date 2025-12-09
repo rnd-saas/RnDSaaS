@@ -5,6 +5,7 @@ interface ProgressDefinitions {
     nextStep: () => void;
     prevDisabled: boolean;
     nextDisabled: boolean;
+    shouldSubmit: boolean;
     isSubmitting?: boolean;
 }
 
@@ -13,6 +14,7 @@ export default function StepNavigator({
     nextStep,
     prevDisabled,
     nextDisabled,
+    shouldSubmit,
     isSubmitting,
 }: ProgressDefinitions) {
 
@@ -21,14 +23,16 @@ export default function StepNavigator({
             <Button type={"button"} variant={"outline"} size="sm" onClick={prevStep} disabled={prevDisabled}>
                 Previous
             </Button>
-            {nextDisabled && (
-                <Button type={"submit"} size="sm" disabled={isSubmitting}>
+            {shouldSubmit && (
+                <Button variant={"secondary"} type={"submit"} size="sm" disabled={isSubmitting || nextDisabled}>
                     {isSubmitting ? "Saving..." : "Submit"}
                 </Button>
             )}
-            {!nextDisabled && <Button type={"button"} size="sm" onClick={nextStep} disabled={isSubmitting}>
-                Next
-            </Button>}
+            {!shouldSubmit &&
+                <Button type={"button"} size="sm" onClick={nextStep} disabled={nextDisabled}>
+                    Next
+                </Button>
+            }
         </div>
     )
 }
