@@ -21,14 +21,20 @@ export default function OnboardingInvitePage() {
                     To help you along the way, we need to ask a few questions.
                 </p>
             </header>
-            <main className="flex-1 flex items-center justify-center w-full">
+            <main className="flex-1 flex flex-col items-center justify-center max-w-[70vw] lg:max-w-[40vw]">
                 <img
                     src={avatarSrc}
                     alt={`${name} waving`}
-                    className="max-h-[55vh]"
+                    className="max-h-[30vh]"
                 />
+                <p>
+                    Our app offers you personalised workout plans, helpful advice from a supportive virtual fitness
+                    buddy, as well as giving you the opportunity to track your anxiety levels at the gym so you can see
+                    your confidence improve as you go along your fitness journey.
+                    We only ask for €5 a month, making this a very affordable way to get started on your journey to self-improvement.
+                </p>
             </main>
-            <footer className="w-full max-w-xs space-y-8 my-5 flex flex-col items-center justify-center text-center">
+            <footer className="sticky bottom-0 w-full max-w-xs space-y-3 bg-white my-5 flex flex-col items-center justify-center text-center">
                 <Button onClick={() => navigate("/onboarding")}>
                     Take onboarding?
                 </Button>
