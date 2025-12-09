@@ -248,7 +248,7 @@ export default function WeeklyReview() {
         <div className="space-y-2">
           <h3 className="text-sm font-medium text-muted-foreground">Mood at Onboarding</h3>
           {onboardingMoodInfo && (
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/5">
               <span className="text-2xl">{onboardingMoodInfo.emoji}</span>
               <div className="flex-1">
                 <div className="font-medium">{onboardingMoodInfo.short}</div>
@@ -269,7 +269,7 @@ export default function WeeklyReview() {
         <div className="space-y-2">
           <h3 className="text-sm font-medium text-muted-foreground">Average Mood This Week</h3>
           {averageMoodInfo && (
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/5">
               <span className="text-2xl">{averageMoodInfo.emoji}</span>
               <div className="flex-1">
                 <div className="font-medium">{averageMoodInfo.short}</div>
