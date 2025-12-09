@@ -1,6 +1,7 @@
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useRef } from "react";
 import { useExercise } from "@/api/workouts";
 import { Rating, RatingButton } from "@/components/ui/shadcn-io/rating";
 import type { ExerciseInformation } from "@/lib/types/Workout";
@@ -27,6 +28,39 @@ export default function ExercisePage() {
   const { data, isLoading, isError } = useExercise(exerciseSlug as string);
   const exercise = data;
   const navigate = useNavigate();
+  const location = useLocation();
+  const returnPathRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    // 第一次进入此页面时，保存返回路径
+    // 只在非 chatbot 来源时设置
+    if (!location.state?.fromChatbot && !returnPathRef.current) {
+      // 记录当前的 history index - 1 作为返回点
+      const storageKey = `exerciseReturn_${exerciseSlug}`;
+      const historyLength = window.history.length;
+      sessionStorage.setItem(storageKey, String(historyLength - 1));
+    }
+  }, [exerciseSlug, location.state]);
+
+  const handleBack = () => {
+    const storageKey = `exerciseReturn_${exerciseSlug}`;
+    const savedLength = sessionStorage.getItem(storageKey);
+    
+    if (savedLength) {
+      const targetLength = parseInt(savedLength, 10);
+      const currentLength = window.history.length;
+      const stepsBack = currentLength - targetLength;
+      
+      if (stepsBack > 0) {
+        sessionStorage.removeItem(storageKey);
+        navigate(-stepsBack);
+        return;
+      }
+    }
+    
+    // 默认回退一步
+    navigate(-1);
+  };
 
   if (isLoading) {
     return (
@@ -57,7 +91,7 @@ export default function ExercisePage() {
         <div className="mb-8 flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => navigate(-1)}
+              onClick={handleBack}
               className="rounded-full p-1 hover:bg-accent transition-colors"
             >
               <ChevronLeft size={32} className="shrink-0" />
@@ -173,7 +207,7 @@ export default function ExercisePage() {
                 <Button
                   variant="default"
                   onClick={() => {
-                    navigate("/chatbot");
+                    navigate(`/exercise/${exerciseSlug}/chat`);
                   }}
                   className="w-full text-md shadow-sm"
                 >
@@ -187,7 +221,13 @@ export default function ExercisePage() {
 
       {/* Mobile Fixed Button */}
       <div className="fixed bottom-6 left-4 right-4 lg:hidden">
-        <Button variant="default" className="w-full text-md shadow-lg">
+        <Button 
+          variant="default" 
+          className="w-full text-md shadow-lg"
+          onClick={() => {
+            navigate(`/exercise/${exerciseSlug}/chat`);
+          }}
+        >
           Ask Workout Buddy
         </Button>
       </div>

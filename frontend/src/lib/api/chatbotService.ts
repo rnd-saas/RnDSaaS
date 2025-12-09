@@ -5,6 +5,10 @@ export async function sendMessage(payload: ChatbotRequest): Promise<ChatbotRespo
     return apiClient.post<ChatbotResponse>('/api/chatbot', payload);
 }
 
+export async function sendExerciseMessage(payload: ChatbotRequest): Promise<ChatbotResponse> {
+    return apiClient.post<ChatbotResponse>('/api/chatbot/exercise', payload);
+}
+
 export async function fetchProfile(): Promise<ChatbotTrainerProfile> {
     return apiClient.get<ChatbotTrainerProfile>('/api/chatbot/profile');
 }

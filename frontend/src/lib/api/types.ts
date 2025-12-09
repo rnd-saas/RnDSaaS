@@ -142,6 +142,14 @@ export interface ChatbotRequest {
         workoutPlanContext?: any;
         currentDate?: string; // YYYY-MM-DD in user local time
         timezoneOffsetMinutes?: number; // minutes to add to local to get UTC
+        exerciseContext?: {
+            name: string;
+            slug: string;
+            description?: string;
+            instructions?: string[];
+            muscleGroups?: string[];
+            difficulty?: string;
+        };
     };
 }
 

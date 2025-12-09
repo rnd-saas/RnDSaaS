@@ -27,6 +27,7 @@ import ActiveWorkoutPage from "@/pages/Workout/ActiveWorkoutPage";
 import ExercisePage from "@/pages/ExercisePage";
 import WorkoutEvaluationPage from "@/pages/Workout/WorkoutEvaluationPage";
 import WorkoutPlanChatbotPage from "@/pages/Workout/WorkoutPlanChatbotPage";
+import ExerciseChatbotPage from "@/pages/Workout/ExerciseChatbotPage";
 import Paywall from "@/components/Paywall";
 
 // Component to track page views on route changes
@@ -119,6 +120,11 @@ export default function AppRoutes() {
         <Route path="/exercise/:exerciseSlug" element={
             <Paywall>
                 <ExercisePage />
+            </Paywall>
+        } />
+        <Route path="/exercise/:exerciseSlug/chat" element={
+            <Paywall>
+                <ExerciseChatbotPage />
             </Paywall>
         } />
       </Routes>

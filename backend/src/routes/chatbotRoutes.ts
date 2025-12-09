@@ -71,6 +71,31 @@ const requestSchema = z.object({
         .optional()
 });
 
+const exerciseRequestSchema = z.object({
+    trainerId: z.number().int().min(0).optional(),
+    messages: z
+        .array(
+            z.object({
+                role: z.enum(['user', 'assistant']),
+                content: z.string().min(1, 'message content is required')
+            })
+        )
+        .min(1, 'messages array cannot be empty'),
+    metadata: z
+        .object({
+            language: z.string().optional(),
+            exerciseContext: z.object({
+                name: z.string(),
+                slug: z.string(),
+                description: z.string().optional(),
+                instructions: z.array(z.string()).optional(),
+                muscleGroups: z.array(z.string()).optional(),
+                difficulty: z.string().optional()
+            })
+        })
+        .optional()
+});
+
 const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
 const geminiApiKey = process.env.GEMINI_API_KEY;
 const { model: geminiModelName, normalized: geminiModelNormalized } = normalizeGeminiModel(
@@ -306,6 +331,136 @@ router.post('/generate-plan', requireAuth, requireSubscription, async (req: Auth
         console.error('[chatbot] Generate plan error:', error);
         res.status(500).json({ error: error.message });
     }
+});
+
+router.post('/exercise', requireAuth, requireSubscription, async (req: AuthedRequest, res) => {
+    const parseResult = exerciseRequestSchema.safeParse(req.body);
+
+    if (!parseResult.success) {
+        return res.status(400).json({
+            error: {
+                message: 'Invalid exercise chatbot payload',
+                details: parseResult.error.flatten()
+            }
+        });
+    }
+
+    const userId = req.user?.id;
+    if (!userId) {
+        return res.status(401).json({
+            error: { message: 'Unauthenticated' }
+        });
+    }
+
+    console.log('[chatbot/exercise] Incoming conversation for user', userId);
+    const resolvedTrainerId = await determineTrainerId(userId);
+    const requestedTrainerId = parseResult.data.trainerId ?? resolvedTrainerId;
+    const { messages, metadata } = parseResult.data;
+
+    // Safety Check: Crisis Intervention
+    const lastUserMessage = findLastUserMessage(messages);
+    if (lastUserMessage) {
+        const safetyResponse = checkCrisisKeywords(lastUserMessage.content);
+        if (safetyResponse) {
+            return res.json({
+                message: {
+                    role: 'assistant',
+                    content: safetyResponse,
+                    trainerId: requestedTrainerId
+                },
+                usage: null,
+                fallback: true
+            });
+        }
+
+        const mentalHealthResponse = checkMentalHealthKeywords(lastUserMessage.content);
+        if (mentalHealthResponse) {
+            return res.json({
+                message: {
+                    role: 'assistant',
+                    content: mentalHealthResponse,
+                    trainerId: requestedTrainerId
+                },
+                usage: null,
+                fallback: true,
+                isMentalHealthIntervention: true
+            });
+        }
+    }
+
+    const persona = resolvePersona(requestedTrainerId);
+    console.log('[chatbot/exercise] Using persona', persona.name, '(', persona.id, ')');
+    const normalizedMessages = normalizeMessages(messages);
+
+    const exerciseContext = metadata?.exerciseContext;
+    const systemPrompt = buildExerciseSystemPrompt({
+        persona,
+        language: metadata?.language,
+        exerciseContext
+    });
+
+    let assistantMessage: ChatResponseMessage | null = null;
+    let usage: {
+        prompt_tokens?: number | null;
+        completion_tokens?: number | null;
+        total_tokens?: number | null;
+    } | null = null;
+    let fallback = false;
+
+    if (geminiClient) {
+        try {
+            const model = geminiClient.getGenerativeModel({ 
+                model: geminiModelName,
+                generationConfig: {
+                    temperature: 0.3,
+                    topP: 0.8,
+                    topK: 40
+                }
+            });
+            const prompt = buildGeminiPrompt(systemPrompt, normalizedMessages, persona);
+            const response = await model.generateContent(prompt);
+            const content = response.response.text()?.trim();
+
+            if (content) {
+                assistantMessage = {
+                    role: 'assistant',
+                    content,
+                    trainerId: persona.id
+                };
+                const usageMetadata = response.response.usageMetadata;
+                usage = usageMetadata
+                    ? {
+                          prompt_tokens: usageMetadata.promptTokenCount ?? null,
+                          completion_tokens: usageMetadata.candidatesTokenCount ?? null,
+                          total_tokens: usageMetadata.totalTokenCount ?? null
+                      }
+                    : null;
+            }
+        } catch (error: any) {
+            console.error('Chatbot/exercise Gemini error:', error?.message || error);
+        }
+    }
+
+    if (!assistantMessage) {
+        fallback = true;
+        assistantMessage = {
+            role: 'assistant',
+            trainerId: persona.id,
+            content: buildExerciseFallbackResponse(
+                lastUserMessage?.content,
+                persona,
+                exerciseContext?.name,
+                metadata?.language
+            )
+        };
+        console.warn('[chatbot/exercise] Falling back to canned response for user', userId);
+    }
+
+    return res.json({
+        message: assistantMessage,
+        usage,
+        fallback
+    });
 });
 
 async function extractProfileFromChat(messages: any[]): Promise<any> {
@@ -557,6 +712,93 @@ function buildSystemPrompt({
         `User context: ${summary}`,
         planContext
     ].join('\n');
+}
+
+function buildExerciseSystemPrompt({
+    persona,
+    language,
+    exerciseContext
+}: {
+    persona: TrainerPersona;
+    language?: string;
+    exerciseContext?: {
+        name: string;
+        slug: string;
+        description?: string;
+        instructions?: string[];
+        muscleGroups?: string[];
+        difficulty?: string;
+    };
+}): string {
+    const lang = inferLanguage(language);
+    
+    let exerciseInfo = '';
+    if (exerciseContext) {
+        const parts = [
+            `Exercise: ${exerciseContext.name}`,
+            exerciseContext.description ? `Description: ${exerciseContext.description}` : null,
+            exerciseContext.difficulty ? `Difficulty: ${exerciseContext.difficulty}` : null,
+            exerciseContext.muscleGroups && exerciseContext.muscleGroups.length > 0 
+                ? `Muscle Groups: ${exerciseContext.muscleGroups.join(', ')}` 
+                : null,
+            exerciseContext.instructions && exerciseContext.instructions.length > 0
+                ? `Instructions:\n${exerciseContext.instructions.map((inst, i) => `${i + 1}. ${inst}`).join('\n')}`
+                : null
+        ].filter(Boolean);
+        
+        exerciseInfo = `\n\nEXERCISE CONTEXT:\n${parts.join('\n')}`;
+    }
+
+    return [
+        `You are ${persona.name}, a supportive fitness coach specializing in exercise technique and form.`,
+        `You are NOT a doctor or physical therapist. Do NOT diagnose injuries or prescribe medical treatments.`,
+        `Specialties: ${persona.specialties.join(', ')}.`,
+        `Tone: ${persona.tone}. Voice: ${persona.voice}.`,
+        `Language: Always respond in ${lang.description}.`,
+        
+        `YOUR ROLE:`,
+        `- Answer questions about proper form, technique, and execution`,
+        `- Suggest exercise variations and alternatives for different fitness levels`,
+        `- Explain common mistakes and how to avoid them`,
+        `- Provide tips for maximizing effectiveness and safety`,
+        `- Discuss muscle activation and benefits`,
+        `- DO NOT create workout plans or modify training schedules (that's for the workout plan chatbot)`,
+        
+        `GUIDELINES:`,
+        `1. Be specific and practical with form cues`,
+        `2. If user mentions pain or injury, recommend consulting a healthcare professional`,
+        `3. Keep responses focused on the specific exercise unless user asks otherwise`,
+        `4. Provide beginner-friendly alternatives when appropriate`,
+        `5. Keep responses concise (under 150 words) unless detailed explanation is requested`,
+        
+        exerciseInfo
+    ].filter(Boolean).join('\n');
+}
+
+function buildExerciseFallbackResponse(
+    lastUserMessage: string | undefined,
+    persona: TrainerPersona,
+    exerciseName?: string,
+    language?: string
+): string {
+    const lang = inferLanguage(language);
+    const intro =
+        lang.code === 'zh'
+            ? `抱歉，我暂时无法连接到智能教练云端，但${persona.name}仍然建议：`
+            : `Sorry, I'm having trouble reaching the smart coach service, but ${persona.name} is still here to help.`;
+
+    const exerciseRef = exerciseName
+        ? (lang.code === 'zh' 
+            ? ` 关于${exerciseName}的问题` 
+            : ` For ${exerciseName}`)
+        : '';
+
+    const advice =
+        lang.code === 'zh'
+            ? '，请专注于正确的动作形式，控制动作节奏，并记录你的感受。稍后我会提供更详细的建议。'
+            : ', focus on proper form, control the tempo, and pay attention to how it feels. I will provide more specific guidance once the assistant is back online.';
+
+    return `${intro}${exerciseRef}${advice}`.trim();
 }
 
 function buildDayLabel(dateStr: string, tzOffset?: number): string | null {
