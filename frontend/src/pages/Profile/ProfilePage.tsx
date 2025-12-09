@@ -24,7 +24,6 @@ import {Pencil} from "lucide-react";
 import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group.tsx";
 
 export default function ProfilePage() {
-    const navigate = useNavigate();
     const { state } = useLocation() as { state?: { firstName?: string } };
     const [profile, setProfile] = useState<ProfileResponse | null>(null);
     const [isLoading, setIsLoading] = useState(true);

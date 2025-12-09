@@ -29,6 +29,8 @@ import WorkoutEvaluationPage from "@/pages/Workout/WorkoutEvaluationPage";
 import WorkoutPlanChatbotPage from "@/pages/Workout/WorkoutPlanChatbotPage";
 import ExerciseChatbotPage from "@/pages/Workout/ExerciseChatbotPage";
 import Paywall from "@/components/Paywall";
+import PasswordResetPage from "@/pages/Login/PasswordResetPage.tsx";
+import PasswordChangePage from "@/pages/Login/PasswordChangePage.tsx";
 
 // Component to track page views on route changes
 function PageViewTracker() {
@@ -45,6 +47,8 @@ export default function AppRoutes() {
     <BrowserRouter>
       <PageViewTracker />
       <Routes>
+        <Route path="/password-reset" element={<PasswordResetPage />} />
+        <Route path="/password-change" element={<PasswordChangePage />} />
         <Route path="/" element={<DefaultPage />} />
         <Route path="/onboarding" element={<OnboardingManager />} />
         <Route path="/onboarding-invite" element={<OnboardingInvitePage />} />

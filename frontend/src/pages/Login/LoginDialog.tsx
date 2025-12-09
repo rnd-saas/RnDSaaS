@@ -5,6 +5,8 @@ import {Link, useNavigate} from "react-router-dom";
 import {DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 import { authService, ApiError } from "@/lib/api";
 import { trackLogin, trackFormSubmit, trackError } from "@/lib/analytics";
+import {Label} from "@/components/ui/label.tsx";
+import {Input} from "@/components/ui/input.tsx";
 
 type LoginDialogProps = {
     onSwitchToRegister: () => void;
@@ -61,12 +63,12 @@ export default function LoginDialog({ onSwitchToRegister }: LoginDialogProps) {
             </DialogHeader>
 
             <form
-                className="Login max-w-sm p-6 space-y-4"
+                className="Login max-w-sm py-6 space-y-4"
                 onSubmit={handleSubmit(onSubmit)}
             >
                 <div className="flex flex-col">
-                    <label htmlFor="email" className="mb-1 font-medium text-left">Email</label>
-                    <input id="email" type="email"{...register("email", { required: true })}
+                    <Label htmlFor="email" className="mb-1 font-medium text-left">Email</Label>
+                    <Input id="email" type="email"{...register("email", { required: true })}
                         placeholder="Enter your email"
                     />
                     {errors.email && (
@@ -75,8 +77,8 @@ export default function LoginDialog({ onSwitchToRegister }: LoginDialogProps) {
                 </div>
 
                 <div className="flex flex-col">
-                    <label htmlFor="password" className="mb-1 font-medium text-left">Password</label>
-                    <input id="password" type="password"{...register("password", { required: true })}
+                    <Label htmlFor="password" className="mb-1 font-medium text-left">Password</Label>
+                    <Input id="password" type="password"{...register("password", { required: true })}
                         placeholder="Enter your password"
                     />
                     {errors.password && (

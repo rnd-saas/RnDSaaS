@@ -5,6 +5,8 @@ import {DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/componen
 import {useNavigate} from "react-router-dom";
 import { authService, ApiError } from "@/lib/api";
 import { trackRegistration, trackFormSubmit, trackError } from "@/lib/analytics";
+import {Label} from "@/components/ui/label.tsx";
+import {Input} from "@/components/ui/input.tsx";
 
 type RegisterDialogProps = {
     onSwitchToLogin: () => void;
@@ -79,12 +81,12 @@ export default function RegisterDialog({onSwitchToLogin}:RegisterDialogProps) {
                 <DialogTitle>Registration Form</DialogTitle>
             </DialogHeader>
             <form
-                className="Register max-w-sm p-6 space-y-4"
+                className="Register max-w-sm py-6 space-y-4"
                 onSubmit={handleSubmit(onSubmit)}
             >
                 <div className="flex flex-col">
-                    <label htmlFor="email" className="mb-1 font-medium text-left">Email</label>
-                    <input
+                    <Label htmlFor="email" className="mb-1 font-medium text-left">Email</Label>
+                    <Input
                         id="email"
                         type="email"
                         {...register("email", {required: true})}
@@ -96,8 +98,8 @@ export default function RegisterDialog({onSwitchToLogin}:RegisterDialogProps) {
                 </div>
 
                 <div className="flex flex-col">
-                    <label htmlFor="username" className="mb-1 font-medium text-left">Username</label>
-                    <input
+                    <Label htmlFor="username" className="mb-1 font-medium text-left">Username</Label>
+                    <Input
                         id="username"
                         type="username"
                         {...register("username", {required: true})}
@@ -109,8 +111,8 @@ export default function RegisterDialog({onSwitchToLogin}:RegisterDialogProps) {
                 </div>
 
                 <div className="flex flex-col">
-                    <label htmlFor="password" className="mb-1 font-medium text-left">Password</label>
-                    <input
+                    <Label htmlFor="password" className="mb-1 font-medium text-left">Password</Label>
+                    <Input
                         id="password"
                         type="password"
                         {...register("password", {required: true})}
@@ -122,9 +124,9 @@ export default function RegisterDialog({onSwitchToLogin}:RegisterDialogProps) {
                 </div>
 
                 <div className="flex flex-col">
-                    <label htmlFor="passwordConfirmation" className="mb-1 font-medium text-left">Password
-                        Confirmation</label>
-                    <input
+                    <Label htmlFor="passwordConfirmation" className="mb-1 font-medium text-left">Password
+                        Confirmation</Label>
+                    <Input
                         id="passwordConfirm"
                         type="password"
                         {...register("passwordConfirmation", {
