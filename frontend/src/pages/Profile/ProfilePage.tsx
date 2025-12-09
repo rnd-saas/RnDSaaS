@@ -1,23 +1,18 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import avatarPlaceholder from "../../assets/avatars/tom_avatar.png";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import ChatbotButton from "@/components/chatbotButton";
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { profileService, ApiError } from "@/lib/api";
-import type { ProfileResponse, ProfileData } from "@/lib/api";
+import {useEffect, useState} from "react";
+import {useLocation, useNavigate} from "react-router-dom";
+import {Button} from "@/components/ui/button";
+import type {ProfileData, ProfileResponse} from "@/lib/api";
+import {ApiError, profileService} from "@/lib/api";
 import SettingsButton from "@/components/settingsButton";
-import { Separator } from "@/components/ui/separator";
+import {Separator} from "@/components/ui/separator";
 import {Progress} from "@/components/ui/progress";
-import {
-    GenderValues,
-    GymComfortLevelValues,
-    PreferredSplitValues,
-    PrimaryGoalValues
-} from "@/utils/InputTypes";
+import {GenderValues, GymComfortLevelValues, PreferredSplitValues, PrimaryGoalValues} from "@/utils/InputTypes";
 import {AvatarOptionValues} from "@/utils/AvatarOptionValues";
 import {
-    Dialog, DialogClose,
+    Dialog,
+    DialogClose,
     DialogContent,
     DialogFooter,
     DialogHeader,
@@ -38,34 +33,31 @@ export default function ProfilePage() {
     const fallbackName = state?.firstName ?? localStorage.getItem("firstName") ?? "User";
 
     const location = useLocation();
-
+    const loadProfile = async (active:boolean) => {
+        try {
+            setError(null);
+            setIsLoading(true);
+            const data = await profileService.getProfile();
+            if (!active) return;
+            console.log('[ProfilePage] Received profile data:', data);
+            console.log('[ProfilePage] WorkoutGrid:', data.workoutGrid);
+            setProfile(data);
+        } catch (err) {
+            if (!active) return;
+            if (err instanceof ApiError) {
+                setError(err.message);
+            } else {
+                setError("无法加载个人资料");
+            }
+        } finally {
+            if (active) {
+                setIsLoading(false);
+            }
+        }
+    };
     useEffect(() => {
         let active = true;
-
-        const loadProfile = async () => {
-            try {
-                setError(null);
-                setIsLoading(true);
-                const data = await profileService.getProfile();
-                if (!active) return;
-                console.log('[ProfilePage] Received profile data:', data);
-                console.log('[ProfilePage] WorkoutGrid:', data.workoutGrid);
-                setProfile(data);
-            } catch (err) {
-                if (!active) return;
-                if (err instanceof ApiError) {
-                    setError(err.message);
-                } else {
-                    setError("无法加载个人资料");
-                }
-            } finally {
-                if (active) {
-                    setIsLoading(false);
-                }
-            }
-        };
-
-        loadProfile();
+        loadProfile(active);
 
         return () => {
             active = false;
@@ -149,10 +141,20 @@ export default function ProfilePage() {
         }
     }, []);
 
-    function handleSave() {
+    const [isSaving, setIsSaving] = useState(false);
+    const handleSave = async () => {
         setPreviousAvatarOption(avatarOption);
-        //todo:save to db
-    }
+        try {
+            setIsSaving(true);
+            await profileService.updateAvatarOption(avatarOption);
+            await loadProfile(true); // Reload to confirm
+        } catch (error) {
+            console.error("Failed to save preferences:", error);
+            alert("Failed to save preferences. Please try again.");
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     return (
         <div
@@ -191,10 +193,10 @@ export default function ProfilePage() {
                             </ToggleGroup>
                             <DialogFooter>
                                 <DialogClose asChild>
-                                    <Button variant="outline" onClick={() => setAvatarOption(previousAvatarOption)}>Cancel</Button>
+                                    <Button variant="outline" disabled={isSaving} onClick={() => setAvatarOption(previousAvatarOption)}>Cancel</Button>
                                 </DialogClose>
                                 <DialogClose asChild>
-                                    <Button type="button" onClick={handleSave}>
+                                    <Button type="button" disabled={isSaving} onClick={handleSave}>
                                         Save changes
                                     </Button>
                                 </DialogClose>
