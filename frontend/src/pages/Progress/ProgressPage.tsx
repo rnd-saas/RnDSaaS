@@ -1,4 +1,5 @@
 import AchievementList from "@/pages/Profile/ProfileComponents/AchievementList";
+import SwipeableAchievementList from "@/components/SwipeableAchievementList";
 import ChatbotButton from "@/components/chatbotButton";
 import Goals from "@/pages/Progress/ProgressComponents/Goals";
 import Moods from "@/pages/Progress/ProgressComponents/Moods";
@@ -45,7 +46,12 @@ export default function ProgressPage() {
     const progressComponents = [
         { value:"achievements", render: () => {
             try {
-                return <AchievementList achievements={profile?.achievements ?? []} isLoading={loading} />;
+                return <SwipeableAchievementList 
+                    achievements={profile?.achievements ?? []} 
+                    isLoading={loading} 
+                    title="" 
+                    showViewAll={false} 
+                />;
             } catch (error) {
                 console.error('Error rendering achievements:', error);
                 return <div className="text-sm text-red-500">Error loading achievements</div>;
