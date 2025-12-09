@@ -78,6 +78,7 @@ export interface TargetSet {
   targetWeightKg?: number; //optional target weight for the set
   targetTimeSeconds?: number; //optional target time for the set
   targetDistanceMeters?: number; //optional target distance for the set
+  targetHeightCm?: number; //optional target height for the set (e.g., box jump)
 }
 
 /**
@@ -89,6 +90,7 @@ export interface LoggedSet {
   actualWeightKg?: number; //optional actual weight used
   actualTimeSeconds?: number; //optional actual time taken
   actualDistanceMeters?: number; //optional actual distance covered
+   actualHeightCm?: number; //optional actual height achieved
   completed: boolean; //whether the set was completed
 }
 

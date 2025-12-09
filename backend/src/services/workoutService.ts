@@ -353,7 +353,9 @@ export const workoutService = {
                 target_sets: ex.target_sets || 3,
                 metric: metric,
                 target_value: ex.target_value || 10,
-                rest_seconds: ex.rest_seconds || 60
+                rest_seconds: ex.rest_seconds || 60,
+                metric2: ex.metric2 || null,
+                target_value2: ex.target_value2 ?? null
               });
             } else {
               console.warn(`Skipping exercise without valid ID or match: ${lookupName || ex.slug}`);

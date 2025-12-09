@@ -147,11 +147,21 @@ export default function WorkoutList({ exerciseId }: { exerciseId: string }) {
                               : "";
                           case "time_weight":
                             return cellIndex === 1
-                              ? getValue(set.actualTimeSeconds)
+                              ? getValue(
+                                  (set.actualTimeSeconds ?? undefined) !==
+                                    undefined
+                                    ? (set.actualTimeSeconds as number) / 60
+                                    : undefined
+                                )
                               : getValue(set.actualWeightKg);
                           case "time":
                             return cellIndex === 1
-                              ? getValue(set.actualTimeSeconds)
+                              ? getValue(
+                                  (set.actualTimeSeconds ?? undefined) !==
+                                    undefined
+                                    ? (set.actualTimeSeconds as number) / 60
+                                    : undefined
+                                )
                               : "";
                           case "distance_weight":
                             return cellIndex === 1
@@ -194,21 +204,22 @@ export default function WorkoutList({ exerciseId }: { exerciseId: string }) {
                               });
                             break;
 
-                          case "time_weight":
+                          case "time_weight": {
                             if (cellIndex === 1)
                               updateExerciseSet(exerciseId, setNumber, {
-                                actualTimeSeconds: value,
+                                actualTimeSeconds: value * 60,
                               });
                             if (cellIndex === 2)
                               updateExerciseSet(exerciseId, setNumber, {
                                 actualWeightKg: value,
                               });
                             break;
+                          }
 
                           case "time":
                             if (cellIndex === 1)
                               updateExerciseSet(exerciseId, setNumber, {
-                                actualTimeSeconds: value,
+                                actualTimeSeconds: value * 60,
                               });
                             break;
 
@@ -271,12 +282,12 @@ export default function WorkoutList({ exerciseId }: { exerciseId: string }) {
                           updatePayload.actualReps = rowData[1];
                       } else if (logMode === "time_weight") {
                         if (isMissing(currentSet?.actualTimeSeconds))
-                          updatePayload.actualTimeSeconds = rowData[1];
+                          updatePayload.actualTimeSeconds = rowData[1] * 60;
                         if (isMissing(currentSet?.actualWeightKg))
                           updatePayload.actualWeightKg = rowData[2];
                       } else if (logMode === "time") {
                         if (isMissing(currentSet?.actualTimeSeconds))
-                          updatePayload.actualTimeSeconds = rowData[1];
+                          updatePayload.actualTimeSeconds = rowData[1] * 60;
                       } else if (logMode === "distance_weight") {
                         if (isMissing(currentSet?.actualDistanceMeters))
                           updatePayload.actualDistanceMeters = rowData[1];
@@ -317,8 +328,8 @@ function setTableHeadersByLogMode(
   if (logMode === "reps_weight") tableHeaders.push("Set", "Reps", "Kg");
   else if (logMode === "reps") tableHeaders.push("Set", "Reps");
   else if (logMode === "time_weight")
-    tableHeaders.push("Set", "Time (s)", "Kg");
-  else if (logMode === "time") tableHeaders.push("Set", "Time (s)");
+    tableHeaders.push("Set", "Time (min)", "Kg");
+  else if (logMode === "time") tableHeaders.push("Set", "Time (min)");
   else if (logMode === "distance_weight")
     tableHeaders.push("Set", "Distance (m)", "Kg");
   else if (logMode === "distance") tableHeaders.push("Set", "Distance (m)");
@@ -343,11 +354,11 @@ function setTableRowsByLogMode(
     else if (logMode === "time_weight")
       tableRows.push([
         set.setNumber,
-        set.targetTimeSeconds!,
+        (set.targetTimeSeconds || 0) / 60,
         set.targetWeightKg!,
       ]);
     else if (logMode === "time")
-      tableRows.push([set.setNumber, set.targetTimeSeconds!]);
+      tableRows.push([set.setNumber, (set.targetTimeSeconds || 0) / 60]);
     else if (logMode === "distance_weight")
       tableRows.push([
         set.setNumber,

@@ -23,13 +23,26 @@ export const workoutService = {
             }
 
             const exercises: PlannedExercise[] = response.exercises?.map((item: any) => {
+                const applyMetric = (metric: string | null | undefined, value: any, set: TargetSet) => {
+                    if (metric === 'reps') set.targetReps = Number(value ?? 0);
+                    else if (metric === 'weight') set.targetWeightKg = Number(value ?? 0);
+                    else if (metric === 'duration_s') set.targetTimeSeconds = Number(value ?? 0);
+                    else if (metric === 'distance') set.targetDistanceMeters = Number(value ?? 0);
+                    else if (metric === 'height') set.targetHeightCm = Number(value ?? 0);
+                };
+
                 const sets: TargetSet[] = [];
+                const requiresWeight = typeof item.exercise?.log_mode === 'string' && item.exercise.log_mode.includes('weight');
+
                 for (let i = 1; i <= item.target_sets; i++) {
                     const set: TargetSet = { setNumber: i };
-                    if (item.metric === 'reps') set.targetReps = Number(item.target_value);
-                    else if (item.metric === 'weight') set.targetWeightKg = Number(item.target_value);
-                    else if (item.metric === 'duration_s') set.targetTimeSeconds = Number(item.target_value);
-                    else if (item.metric === 'distance') set.targetDistanceMeters = Number(item.target_value);
+                    applyMetric(item.metric, item.target_value, set);
+                    if (item.metric2) {
+                        applyMetric(item.metric2, item.target_value2, set);
+                    } else if (requiresWeight && item.metric !== 'weight') {
+                        // Fallback to ensure weight column is populated for weight-based log modes
+                        applyMetric('weight', item.target_value2 ?? null, set);
+                    }
                     sets.push(set);
                 }
 

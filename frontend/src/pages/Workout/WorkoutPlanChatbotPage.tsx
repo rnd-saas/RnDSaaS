@@ -50,14 +50,29 @@ const ProposedPlanPreview = ({ planData }: { planData: any }) => {
                             {DAY_NAMES[dayPlan.day_number] || `Day ${dayPlan.day_number}`}
                         </div>
                         <div className="pl-3 flex flex-col gap-1">
-                            {dayPlan.plan_exercises?.map((ex: any, idx: number) => (
-                                <div key={idx} className="grid grid-cols-[1fr_auto] gap-2 text-green-700">
-                                    <span>• {ex.exercise_name || ex.name}</span>
-                                    <span className="text-green-600/80 text-xs whitespace-nowrap">
-                                        {ex.target_sets} sets × {ex.target_value}{ex.metric === 'duration_s' ? 's' : (ex.metric === 'weight' ? 'kg' : '')}
-                                    </span>
-                                </div>
-                            ))}
+                            {dayPlan.plan_exercises?.map((ex: any, idx: number) => {
+                                const formatMetric = (metric?: string | null, value?: number | null) => {
+                                    if (value === undefined || value === null || metric === undefined || metric === null) return '';
+                                    if (metric === 'duration_s') return `${(value / 60).toFixed(1)}min`;
+                                    if (metric === 'weight') return `${value}kg`;
+                                    if (metric === 'distance') return `${value}m`;
+                                    if (metric === 'height') return `${value}cm`;
+                                    return `${value}`;
+                                };
+
+                                const primary = formatMetric(ex.metric, ex.target_value);
+                                const secondary = formatMetric(ex.metric2, ex.target_value2);
+                                const separator = primary && secondary ? ' + ' : '';
+
+                                return (
+                                    <div key={idx} className="grid grid-cols-[1fr_auto] gap-2 text-green-700">
+                                        <span>• {ex.exercise_name || ex.name}</span>
+                                        <span className="text-green-600/80 text-xs whitespace-nowrap">
+                                            {ex.target_sets} sets × {primary}{separator}{secondary}
+                                        </span>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 ))}

@@ -17,6 +17,7 @@ export function convertPlannedToLogged(
       actualWeightKg: set.targetWeightKg,
       actualTimeSeconds: set.targetTimeSeconds,
       actualDistanceMeters: set.targetDistanceMeters,
+      actualHeightCm: set.targetHeightCm,
     })),
   }));
 }

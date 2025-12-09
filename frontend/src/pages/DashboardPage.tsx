@@ -108,7 +108,7 @@ const LOCAL_MOOD_TO_DB_INDEX: Record<LocalMoodKey, number> = {
 const DB_MOOD_EMOJI = ["😣", "😬", "🙂", "😌", "🤩"];
 
 export default function DashboardPage() {
-  const {data, isLoadingg, isError} = usePlannedWorkout(new Date());
+  const {data, isLoading: isPlannedLoading, isError} = usePlannedWorkout(new Date());
   const plannedWorkout = data ?? null;
   const isTodayWorkoutCompleted = plannedWorkout?.isCompleted;
   
@@ -365,7 +365,7 @@ export default function DashboardPage() {
                   <div className="text-6xl">🎉</div>
                   <div className="w-full px-6 text-center space-y-2">
                     <p className="body-styles font-medium">
-                      You crushed {plannedWorkout?.workoutName || "it"}!
+                      You crushed {plannedWorkout?.name || "it"}!
                     </p>
                     
                     {/* Mood Shift Visualization */}

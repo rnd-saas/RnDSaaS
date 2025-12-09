@@ -159,7 +159,9 @@ const workoutProgramSchema = z.object({
                             target_sets: z.number().int().min(1).max(10),
                             metric: metricEnum,
                             target_value: z.number().positive(),
-                            rest_seconds: z.number().int().min(0).max(600)
+                            rest_seconds: z.number().int().min(0).max(600),
+                            metric2: metricEnum.optional().nullable(),
+                            target_value2: z.number().positive().optional().nullable()
                         })
                     )
                     .min(1)
@@ -391,7 +393,9 @@ function buildPlannerPrompt(profile: RequiredUserProfile): string {
           "target_sets": 3,
           "metric": "reps",
           "target_value": 12,
-          "rest_seconds": 60
+                    "rest_seconds": 60,
+                    "metric2": "weight",
+                    "target_value2": 40
         }
       ]
     }
@@ -412,6 +416,8 @@ function buildPlannerPrompt(profile: RequiredUserProfile): string {
         '- Match exercise choices to the user goal, experience level, and gym comfort guidance.',
         '- If experience_level <= 2 or comfort is low, emphasize machine or dumbbell options and avoid complex bodyweight moves.',
         '- Metric must be one of reps, weight, distance, duration_s, or height.',
+        '- For any exercise that involves load (e.g., log_mode contains "weight"), include metric2:"weight" with target_value2 as the load in kg.',
+        '- For duration-based cardio like Treadmill Run/Walk, express time in MINUTES, but output target_value as total seconds (minutes × 60) with metric:"duration_s".',
         '- target_value and rest_seconds must be numeric and realistic.',
         '',
         'Allowed exercises:',
@@ -652,6 +658,8 @@ async function persistProgram(userId: string, plan: WorkoutProgram): Promise<Gen
             metric: string;
             target_value: number;
             rest_seconds: number;
+            metric2?: string | null;
+            target_value2?: number | null;
         }> = [];
 
         plan.workout_plans.forEach((dayPlan, index) => {
@@ -674,7 +682,9 @@ async function persistProgram(userId: string, plan: WorkoutProgram): Promise<Gen
                     target_sets: exercise.target_sets,
                     metric: exercise.metric,
                     target_value: exercise.target_value,
-                    rest_seconds: exercise.rest_seconds
+                    rest_seconds: exercise.rest_seconds,
+                    metric2: exercise.metric2 ?? null,
+                    target_value2: exercise.target_value2 ?? null
                 });
             });
         });

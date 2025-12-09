@@ -79,8 +79,8 @@ function setTableHeadersByLogMode(
   if (logMode === "reps_weight") tableHeaders.push("Set", "Reps", "Kg");
   else if (logMode === "reps") tableHeaders.push("Set", "Reps");
   else if (logMode === "time_weight")
-    tableHeaders.push("Set", "Time (s)", "Kg");
-  else if (logMode === "time") tableHeaders.push("Set", "Time (s)");
+    tableHeaders.push("Set", "Time (min)", "Kg");
+  else if (logMode === "time") tableHeaders.push("Set", "Time (min)");
   else if (logMode === "distance_weight")
     tableHeaders.push("Set", "Distance (m)", "Kg");
   else if (logMode === "distance") tableHeaders.push("Set", "Distance (m)");
@@ -104,11 +104,11 @@ function setTableRowsByLogMode(
     else if (logMode === "time_weight")
       tableRows.push([
         set.setNumber,
-        set.targetTimeSeconds!,
+        (set.targetTimeSeconds || 0) / 60,
         set.targetWeightKg!,
       ]);
     else if (logMode === "time")
-      tableRows.push([set.setNumber, set.targetTimeSeconds!]);
+      tableRows.push([set.setNumber, (set.targetTimeSeconds || 0) / 60]);
     else if (logMode === "distance_weight")
       tableRows.push([
         set.setNumber,
