@@ -203,7 +203,14 @@ router.post('/', requireAuth, requireSubscription, async (req: AuthedRequest, re
 
     if (geminiClient) {
         try {
-            const model = geminiClient.getGenerativeModel({ model: geminiModelName });
+            const model = geminiClient.getGenerativeModel({ 
+                model: geminiModelName,
+                generationConfig: {
+                    temperature: 0.3,  // Lower temperature for more consistent, deterministic responses
+                    topP: 0.8,
+                    topK: 40
+                }
+            });
             const prompt = buildGeminiPrompt(systemPrompt, normalizedMessages, persona);
             const response = await model.generateContent(prompt);
             const content = response.response.text()?.trim();
@@ -495,14 +502,15 @@ function buildSystemPrompt({
         let daysConstraint = '';
         if (availableDays && availableDays.length > 0) {
             const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            const allowedDaysList = availableDays.map(d => `${d} (${dayNames[d]})`).join(', ');
+            const allowedDaysList = availableDays.map(d => `day_number: ${d} = ${dayNames[d]}`).join(', ');
             const daysPerWeekNote = trainingDaysPerWeek ? `\n- User wants to train ${trainingDaysPerWeek} days per week` : '';
-            daysConstraint = `\n\nCRITICAL DAY MAPPING RULES:
-- User can ONLY train on these weekdays: ${allowedDaysList}${daysPerWeekNote}
-- Each plan day MUST use one of these day_number values: ${availableDays.join(', ')}
-- DO NOT use any other day_number values (e.g., if available_days is [1,3,5], you can ONLY use day_number: 1, 3, or 5)
-- For a 3-day plan with available_days [1,3,5], use day_number: 1, 3, 5 (Monday, Wednesday, Friday)
-- NEVER use sequential 0,1,2 unless those exact values are in the available_days list`;
+            daysConstraint = `\n\nCRITICAL DAY MAPPING RULES (ZERO-INDEXED WEEKDAYS):
+- Weekday encoding: 0=Sunday, 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday
+- User can ONLY train on: ${allowedDaysList}${daysPerWeekNote}
+- ONLY use these exact day_number values in your JSON: ${availableDays.join(', ')}
+- Example: For Tuesday/Thursday/Friday, use day_number: 2, 4, 5 (NOT 1, 3, 5)
+- DO NOT use sequential numbers like 0,1,2 or 1,2,3 unless those are the actual available weekdays
+- VERIFY each day_number matches the weekday name in the mapping above`;
         }
 
         const template = `{

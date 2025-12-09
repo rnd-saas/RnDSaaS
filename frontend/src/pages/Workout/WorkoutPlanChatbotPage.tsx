@@ -367,6 +367,8 @@ export default function WorkoutPlanChatbotPage() {
                             const renderPlan = (plan: any) => {
                                 const days = Array.isArray(plan?.proposed_plan) ? plan.proposed_plan : [];
                                 const programTitle = plan?.program_name || plan?.programTitle || "Proposed Plan";
+                                const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                                
                                 return (
                                     <div className="mt-3 flex flex-col gap-3 rounded-2xl border border-muted-foreground/10 bg-white p-4 shadow-sm">
                                         <div className="flex items-center justify-between text-sm font-semibold text-slate-800">
@@ -375,10 +377,16 @@ export default function WorkoutPlanChatbotPage() {
                                                 <span className="text-xs text-slate-500">{plan.program_description}</span>
                                             )}
                                         </div>
-                                        {days.map((day: any, idx: number) => (
+                                        {days.map((day: any, idx: number) => {
+                                            const dayNumber = day?.day_number ?? idx;
+                                            const dayLabel = typeof dayNumber === 'number' && dayNumber >= 0 && dayNumber <= 6 
+                                                ? dayNames[dayNumber] 
+                                                : `Day ${dayNumber}`;
+                                            
+                                            return (
                                             <div key={idx} className="rounded-xl border border-slate-200 bg-slate-50 p-3 flex flex-col gap-2">
                                                 <div className="flex items-center justify-between text-sm font-semibold text-slate-800">
-                                                    <span>Day {day?.day_number ?? idx + 1}</span>
+                                                    <span>{dayLabel}</span>
                                                     <span className="text-slate-600">{day?.plan_name || "Session"}</span>
                                                 </div>
                                                 {day?.plan_description && (
@@ -395,7 +403,8 @@ export default function WorkoutPlanChatbotPage() {
                                                     ))}
                                                 </div>
                                             </div>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
                                 );
                             };
