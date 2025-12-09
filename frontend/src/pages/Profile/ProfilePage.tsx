@@ -9,7 +9,12 @@ import type { ProfileResponse, ProfileData } from "@/lib/api";
 import SettingsButton from "@/components/settingsButton";
 import { Separator } from "@/components/ui/separator";
 import {Progress} from "@/components/ui/progress";
-import {GenderValues, GymComfortLevelValues, PreferredSplitValues, PrimaryGoalValues} from "@/utils/InputTypes";
+import {
+    GenderValues,
+    GymComfortLevelValues,
+    PreferredSplitValues,
+    PrimaryGoalValues
+} from "@/utils/InputTypes";
 import {AvatarOptionValues} from "@/utils/AvatarOptionValues";
 import {
     Dialog, DialogClose,
@@ -20,6 +25,8 @@ import {
     DialogTrigger
 } from "@/components/ui/dialog";
 import WorkoutPreferences from "@/pages/Profile/ProfileComponents/WorkoutPreferences";
+import {Pencil} from "lucide-react";
+import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group.tsx";
 
 export default function ProfilePage() {
     const navigate = useNavigate();
@@ -94,7 +101,7 @@ export default function ProfilePage() {
     const resolvedData = profileData ?? FALLBACK_PROFILE;
     // Use level from API if available, otherwise use fallback
     const level = profile?.level ?? resolvedData.level;
-    const avatarOption = resolvedData.avatarOption;
+    const [avatarOption, setAvatarOption] = useState(resolvedData.avatarOption?? 1);
     const onboardingResults = resolvedData.onboarding;
 
     const sections = [
@@ -139,27 +146,50 @@ export default function ProfilePage() {
         <div
             className="w-full md:w-[70vw] lg:w-[50vw] mx-auto p-6 pb-24 flex flex-col space-y-8 bg-background text-foreground font-sans">
             <header className="flex flex-col items-center space-y-4 relative py-4">
-                <Dialog>
-                    <DialogTrigger>
-                        <Avatar className="w-32 h-32 shadow-xl ring-4 ring-background">
-                            <AvatarImage src={AvatarOptionValues[avatarOption] ?? avatarPlaceholder}/>
-                            <AvatarFallback
-                                className="text-3xl font-serif">{displayName.slice(0, 2).toUpperCase()}</AvatarFallback>
-                        </Avatar>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                            <DialogTitle>Choose a profile image</DialogTitle>
-                        </DialogHeader>
-
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button variant="outline">Cancel</Button>
-                            </DialogClose>
-                            <Button type="submit">Save changes</Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
+                <div className="relative inline-block">
+                    <Avatar className="w-32 h-32 shadow-xl ring-4 ring-background">
+                        <AvatarImage src={AvatarOptionValues[avatarOption].src ?? avatarPlaceholder}/>
+                        <AvatarFallback
+                            className="text-3xl font-serif">{displayName.slice(0, 2).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <Dialog>
+                        <DialogTrigger>
+                            <Button variant={"outline"}
+                                className="absolute -bottom-2 -right-3 rounded-full bg-transparent transition"
+                            >
+                                <Pencil className="w-4 h-4" />
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-[90vw] md:min-w-[60vw] lg:min-w-[40vw]">
+                            <DialogHeader>
+                                <DialogTitle>Choose a profile image</DialogTitle>
+                            </DialogHeader>
+                            <ToggleGroup type="single" variant="outline" spacing={2}
+                                className="grid gap-4 w-full grid-cols-[repeat(auto-fit,minmax(100px,1fr))] md:grid-cols-[repeat(auto-fit,minmax(150px,1fr))]"
+                                value={String(avatarOption ?? 1)} onValueChange={(value) => setAvatarOption(Number(value))}
+                            >
+                                    {AvatarOptionValues.map((option) => (
+                                        <ToggleGroupItem key={option.value} value={String(option.value)}
+                                            className="p-0 w-20 h-20 md:w-25 md:h-25 rounded-full ring-2 ring-transparent data-[state=on]:ring-primary transition "
+                                        >
+                                            <Avatar className="w-20 h-20 md:w-25 md:h-25">
+                                                <AvatarImage src={option.src} />
+                                                <AvatarFallback className="text-3xl font-serif">
+                                                    {option.fallback}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                        </ToggleGroupItem>
+                                    ))}
+                            </ToggleGroup>
+                            <DialogFooter>
+                                <DialogClose asChild>
+                                    <Button variant="outline">Cancel</Button>
+                                </DialogClose>
+                                <Button type="submit">Save changes</Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                </div>
                 <h2 className="text-3xl font-bold tracking-tight font-serif text-primary">
             {displayName}
         </h2>
