@@ -380,15 +380,15 @@ export default function DashboardPage() {
               {!isTodayWorkoutCompleted ? (
                 <>
                   <div className="text-6xl group-hover:scale-110 transition-transform duration-300">{nextWorkoutEmoji}</div>
-                  <div className="w-full px-6 text-left">
+                  <div className="w-full px-0 md:px-6 text-left">
                     <p className="body-styles text-muted-foreground font-semibold tracking-wider mt-4">
                       Description
                     </p>
-                    <p className="body-styles line-clamp-3">
+                    <p className="body-styles text-sm md:body-styles line-clamp-3">
                       {plannedWorkout?.description || "Get ready to push your limits and build strength."}
                     </p>
                   </div>
-                  <p className="text-sm text-muted-foreground text-center mt-0">
+                  <p className="text-sm text-muted-foreground text-center mt-0 md:text-left md:px-6 md:mt-2">
                     Ready to sweat? Tap to start.
                   </p>
                 </>
@@ -422,9 +422,9 @@ export default function DashboardPage() {
               )}
 
               {/* Upcoming Schedule Calendar - Always Visible */}
-              <div className="w-full px-0 md:px-4 mt-6">
-                <p className="body-styles font-semibold text-muted-foreground mb-3 ">Upcoming Schedule</p>
-                <div className="flex justify-between md:justify-start items-center w-full gap-2">
+              <div className="w-full px-0 md:px-6 mt-6">
+                <p className="body-styles text-left font-semibold text-muted-foreground mb-3 ">Upcoming Schedule</p>
+                <div className="flex justify-between md:justify-start items-center w-full gap-1 md:gap-3">
                   {upcomingWorkouts?.map(({ date, workout }) => (
                     <div key={date.toISOString()} className="flex flex-col items-center gap-1.5">
                       <span className="text-[10px] font-medium text-muted-foreground">
@@ -527,7 +527,7 @@ export default function DashboardPage() {
       </section>
 
       {/* Achievements */}
-      <section className="lg:col-span-2">
+      <section className="md:col-span-2">
         <div className="flex items-center justify-between px-1 mb-4">
           <h3 className="h3-styles font-semibold">Achievements</h3>
           <Button

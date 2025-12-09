@@ -17,7 +17,7 @@ export default function Achievement({
   return (
     <Card
       className={cn(
-        "flex flex-col justify-between p-0 shadow-none border-0 hover:scale-none min-w-[100px]",
+        "flex flex-col justify-between p-0 shadow-none border-0 hover:scale-none",
         obtained
           ? "bg-primary/10 opacity-100"
           : "bg-muted/50 opacity-70 grayscale border border-border/50",
