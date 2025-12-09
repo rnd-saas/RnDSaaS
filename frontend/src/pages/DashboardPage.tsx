@@ -5,8 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { dashboardService, settingsService, moodService } from "@/lib/api";
+// Added progressService to imports
+import { dashboardService, settingsService, moodService, progressService } from "@/lib/api";
 import type { DashboardData, DashboardAchievement } from "@/lib/api/types";
+// Added Goal type import
+import type { Goal } from "@/lib/api/progressService";
 import AchievementList from "@/pages/Profile/ProfileComponents/AchievementList";
 import SettingsButton from "@/components/settingsButton";
 import {usePlannedWorkout, useNextPlannedWorkout} from "@/api/workouts"
@@ -115,6 +118,9 @@ export default function DashboardPage() {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
     null
   );
+  // Add state for dynamic user goals
+  const [userGoals, setUserGoals] = useState<Goal[]>([]);
+  
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [streakDisplay, setStreakDisplay] = useState<boolean>(true); // Default to true
@@ -190,12 +196,21 @@ export default function DashboardPage() {
     const loadDashboard = async () => {
       try {
         setFetchError(null);
-        const data = await dashboardService.fetchDashboard();
+        
+        // Fetch dashboard data AND user goals in parallel
+        const [dashData, goalsData] = await Promise.all([
+          dashboardService.fetchDashboard(),
+          progressService.getGoals()
+        ]);
+
         if (!active) return;
-        setDashboardData(data);
-        if (data.firstName) {
+        
+        setDashboardData(dashData);
+        setUserGoals(goalsData.goals); // Store the dynamic goals
+
+        if (dashData.firstName) {
           try {
-            localStorage.setItem("firstName", data.firstName);
+            localStorage.setItem("firstName", dashData.firstName);
           } catch {
             // ignore storage failures
           }
@@ -456,8 +471,17 @@ export default function DashboardPage() {
       )}
       <section>
         <Card 
-          className="h-full cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 bg-linear-to-br from-background to-primary/5 group"
-          onClick={() => navigate("/progress")}
+          // Conditionally apply hover effects
+          className={`h-full border-primary/10 bg-linear-to-br from-background to-primary/5 group
+            ${userGoals.length > 0 
+              ? "cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1" 
+              : "cursor-default"
+            }`}
+          onClick={() => {
+            // Only navigate if there are goals, or maybe navigate to "create goal" if empty?
+            // For now, let's keep navigation active but remove the visual cue if empty
+            navigate("/progress")
+          }}
         >
           <CardHeader className="pb-2">
             <div className="flex flex-col gap-1">
@@ -465,30 +489,44 @@ export default function DashboardPage() {
                 <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   Progress
                 </span>
-                <div className="flex items-center text-xs md:text-sm text-muted-foreground group-hover:text-primary transition-colors">
-                  <span>View Details</span>
-                  <ChevronRight className="h-4 w-4 ml-0.5" />
-                </div>
+                {/* Only show "View Details" link if there are goals */}
+                {userGoals.length > 0 && (
+                  <div className="flex items-center text-xs md:text-sm text-muted-foreground group-hover:text-primary transition-colors">
+                    <span>View Details</span>
+                    <ChevronRight className="h-4 w-4 ml-0.5" />
+                  </div>
+                )}
               </div>
               <CardTitle className="text-lg">Weekly Goals</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-5 pt-2">
-            <GoalRow
-              label="Workouts"
-              value={goal.workoutsCompleted.current}
-              target={goal.workoutsCompleted.target}
-            />
-            <GoalRow
-              label="Exercises"
-              value={goal.exercisesCompleted.current}
-              target={goal.exercisesCompleted.target}
-            />
-            <GoalRow
-              label="Streak"
-              value={goal.longestStreak.current}
-              target={goal.longestStreak.target}
-            />
+            {/* Render dynamic goals instead of hardcoded ones */}
+            {userGoals.length > 0 ? (
+              userGoals.map((g) => (
+                <GoalRow
+                  key={g.id}
+                  label={g.label}
+                  value={g.value}
+                  target={g.target}
+                />
+              ))
+            ) : (
+              <div className="flex flex-col items-center justify-center py-6 text-center space-y-2">
+                <p className="text-sm text-muted-foreground">No goals set yet.</p>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="h-8 text-xs"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent card click
+                    navigate("/progress"); // Or open a modal to create goal
+                  }}
+                >
+                  Set a Goal
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </section>
