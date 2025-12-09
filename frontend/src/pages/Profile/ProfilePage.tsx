@@ -136,7 +136,7 @@ export default function ProfilePage() {
     }, []);
     return (
         <div
-            className="w-full max-w-lg md:max-w-4xl lg:max-w-6xl mx-auto p-6 pb-24 flex flex-col space-y-8 bg-background text-foreground font-sans">
+            className="w-full md:w-[70vw] lg:w-[50vw] mx-auto p-6 pb-24 flex flex-col space-y-8 bg-background text-foreground font-sans">
             <header className="flex flex-col items-center space-y-4 relative py-4">
                 <Dialog>
                     <DialogTrigger>

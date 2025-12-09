@@ -301,7 +301,7 @@ export default function WorkoutPreferences({currentValues}: {currentValues?: Onb
                     <Separator/>
                     <div className={"my-3 space-y-3"}>
                         <Label>Emotions regarding gym</Label>
-                        <ToggleGroup type="multiple" variant="outline" size="sm" className="w-[75vw] flex-wrap justify-start"
+                        <ToggleGroup type="multiple" variant="outline" spacing={2} size="sm" className="w-[80vw] md:w-[60vw] lg:w-[40vw] flex-wrap justify-start"
                             value={emotions ?? []}
                             onValueChange={(value) => {setEmotions(value as GymComfortLevel[])}}
                         >
