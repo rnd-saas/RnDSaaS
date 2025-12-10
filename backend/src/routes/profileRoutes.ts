@@ -309,6 +309,64 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
     }
 });
 
+/**
+ * Return all achievements with obtained flag for current user.
+ */
+router.get('/achievements', requireAuth, async (req: AuthedRequest, res) => {
+    try {
+        const userId = req.user?.id;
+        if (!userId) {
+            return res.status(401).json({ error: { message: 'Unauthenticated' } });
+        }
+
+        const [metaResult, userResult] = await Promise.all([
+            supabase
+                .from('achievements')
+                .select('id, name, description, icon'),
+            supabase
+                .from('user_achievements')
+                .select('achievement_id, unlocked_at')
+                .eq('user_id', userId)
+        ]);
+
+        const unlockedMap = new Map<string, string | null>();
+        userResult.data?.forEach((row) => {
+            if (row.achievement_id) {
+                unlockedMap.set(row.achievement_id, row.unlocked_at);
+            }
+        });
+
+        const achievements = (metaResult.data ?? []).map((meta) => ({
+            id: meta.id,
+            title: meta.name ?? 'Achievement',
+            sub: meta.description ?? '',
+            emoji: meta.icon ?? '🏆',
+            obtained: unlockedMap.has(meta.id),
+            unlocked_at: unlockedMap.get(meta.id) ?? null
+        }));
+
+        // Sort: obtained first, then by unlocked_at desc
+        achievements.sort((a, b) => {
+            if (a.obtained && !b.obtained) return -1;
+            if (!a.obtained && b.obtained) return 1;
+            if (a.unlocked_at && b.unlocked_at) {
+                return b.unlocked_at.localeCompare(a.unlocked_at);
+            }
+            if (a.unlocked_at) return -1;
+            if (b.unlocked_at) return 1;
+            return 0;
+        });
+
+        // Strip unlocked_at before sending response
+        const response = achievements.map(({ unlocked_at, ...rest }) => rest);
+
+        res.json({ achievements: response });
+    } catch (error) {
+        console.error('Failed to load achievements:', error);
+        res.status(500).json({ error: { message: 'Internal server error' } });
+    }
+});
+
 router.get('/preferences', requireAuth, async (req: AuthedRequest, res) => {
     try {
         const userId = req.user?.id;
