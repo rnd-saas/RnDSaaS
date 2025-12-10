@@ -1,5 +1,7 @@
 ﻿import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
+import {Button} from "@/components/ui/button";
+import {Check} from "lucide-react";
 import {CartesianGrid, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis} from "recharts";
 import {useState, useEffect} from "react";
 import {progressService} from "@/lib/api";
@@ -199,17 +201,38 @@ export default function PersonalData(){
                         </ResponsiveContainer>
                     )}
                     {item.canEdit ? (
-                        <div className={"pb-10 pt-2 flex gap-2"}>
+                        <div className={"pb-10 pt-2 flex items-center gap-2"}>
                             <Label className={"font-normal"} htmlFor={item.value}>Log {item.value}:</Label>
-                            <Input id={item.value} type="number" className="w-20"
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter") {
-                                        const target = e.target as HTMLInputElement;
-                                        handleAddValue(item, target.value);
-                                        target.value = ""; // Clear input
-                                    }
-                                }}
-                            />
+                            <div className="flex gap-2">
+                                <Input 
+                                    id={item.value} 
+                                    type="number" 
+                                    className="w-24"
+                                    placeholder="kg"
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            const target = e.target as HTMLInputElement;
+                                            handleAddValue(item, target.value);
+                                            target.value = ""; // Clear input
+                                        }
+                                    }}
+                                />
+                                <Button 
+                                    size="icon" 
+                                    variant="outline"
+                                    className="h-10 w-10"
+                                    onClick={() => {
+                                        const input = document.getElementById(item.value) as HTMLInputElement;
+                                        if (input) {
+                                            handleAddValue(item, input.value);
+                                            input.value = "";
+                                        }
+                                    }}
+                                >
+                                    <Check className="h-4 w-4" />
+                                    <span className="sr-only">Confirm</span>
+                                </Button>
+                            </div>
                         </div>
                     ) : (
                         <div className={"pb-10 pt-2 text-sm text-muted-foreground"}>
