@@ -152,8 +152,8 @@ router.get('/friends', async (req: AuthedRequest, res) => {
             .from('friends')
             .select(
                 `id, requester_id, addressee_id, status, created_at, updated_at,
-                requester:users!friends_requester_id_fkey (id, username, display_name),
-                addressee:users!friends_addressee_id_fkey (id, username, display_name)`
+                requester:users!friends_requester_id_fkey (id, username, display_name, user_info( avatar_option )),
+                addressee:users!friends_addressee_id_fkey (id, username, display_name, user_info( avatar_option ))`
             )
             .or(`requester_id.eq.${currentUserId},addressee_id.eq.${currentUserId}`)
             .order('created_at', { ascending: false });
@@ -425,8 +425,8 @@ router.get('/friends/accepted', async (req: AuthedRequest, res) => {
             .from('friends')
             .select(
                 `id, requester_id, addressee_id, status, created_at, updated_at,
-                requester:users!friends_requester_id_fkey (id, username, display_name),
-                addressee:users!friends_addressee_id_fkey (id, username, display_name)`
+                requester:users!friends_requester_id_fkey (id, username, display_name, user_info( avatar_option )),
+                addressee:users!friends_addressee_id_fkey (id, username, display_name, user_info( avatar_option ))`
             )
             .eq('status', 'accepted')
             .or(`requester_id.eq.${currentUserId},addressee_id.eq.${currentUserId}`)

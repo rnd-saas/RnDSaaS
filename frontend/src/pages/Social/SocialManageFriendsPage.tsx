@@ -9,6 +9,7 @@ import { socialService, authService } from "@/lib/api";
 import type { FriendRequestWithUsers } from "@/lib/api/socialService";
 import { Loader2, CheckCircle2, Clock, Check, X } from "lucide-react";
 import { toast } from "sonner";
+import {AvatarOptionValues} from "@/utils/AvatarOptionValues.tsx";
 
 const initialsFromName = (value?: string | null) =>
   (value ?? "?")
@@ -207,7 +208,7 @@ export default function SocialManageFriendsPage() {
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           <Avatar className="h-10 w-10 shrink-0">
-                            <AvatarImage src={undefined} alt={otherUser.display_name} />
+                            <AvatarImage src={AvatarOptionValues[otherUser.user_info.avatar_option??0].src} alt={otherUser.display_name} />
                             <AvatarFallback className={"bg-primary/10"}>
                               {initialsFromName(otherUser.display_name)}
                             </AvatarFallback>
@@ -297,7 +298,7 @@ export default function SocialManageFriendsPage() {
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           <Avatar className="h-10 w-10 shrink-0">
-                            <AvatarImage src={undefined} alt={otherUser.display_name} />
+                            <AvatarImage src={AvatarOptionValues[otherUser.user_info.avatar_option??0].src} alt={otherUser.display_name} />
                             <AvatarFallback className={"bg-primary/10"}>
                               {initialsFromName(otherUser.display_name)}
                             </AvatarFallback>
