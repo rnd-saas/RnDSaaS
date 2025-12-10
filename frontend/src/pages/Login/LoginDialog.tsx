@@ -87,7 +87,7 @@ export default function LoginDialog({ onSwitchToRegister }: LoginDialogProps) {
                     {error && (
                         <span className="text-red-500 text-sm mt-1">{error}</span>
                     )}
-                    <Link to={'/'} style={{ fontSize: "14px", display: "block", textAlign: "left", color: "var(--color-link)" }}>Forgot password?</Link>
+                    <Link to={'/password-reset'} style={{ fontSize: "14px", display: "block", textAlign: "left", color: "var(--color-link)" }}>Forgot password?</Link>
                 </div>
                 <Button variant={"default"} type="submit" disabled={isLoading}>
                     {isLoading ? "Logging in..." : "Login"}
