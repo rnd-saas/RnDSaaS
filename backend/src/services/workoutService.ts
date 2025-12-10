@@ -169,8 +169,9 @@ export const workoutService = {
   async updateWorkoutEvaluation(workoutId: string, evaluationData: any) {
     const {
       difficultyRating,
-      comfortRating,
-      comfortNotes,
+      moodBeforeWorkout, // Changed from moodBefore
+      moodAfterWorkout,  // Changed from moodAfter
+      moodNotes,
       performanceNotes,
       feedbackAi,
       skipped
@@ -181,17 +182,22 @@ export const workoutService = {
       workouts_id: workoutId,
       ai_feedback: null,
       difficulty_level: null,
-      mood: null,
+      mood_before: null,
+      mood_after: null,
       mood_notes: null,
       workout_notes: null
     } : {
       workouts_id: workoutId,
       ai_feedback: feedbackAi,
       difficulty_level: difficultyRating,
-      mood: comfortRating,
-      mood_notes: comfortNotes,
+      mood_before: moodBeforeWorkout, // Map correctly
+      mood_after: moodAfterWorkout,   // Map correctly
+      mood_notes: moodNotes,
       workout_notes: performanceNotes
     };
+
+    // FIXED: Removed the '+' sign that was causing NaN
+    console.log("[Workout Feedback] Workout feedback data send to back end ", feedbackData);
 
     const { data, error } = await supabase
       .from('workout_feedback')

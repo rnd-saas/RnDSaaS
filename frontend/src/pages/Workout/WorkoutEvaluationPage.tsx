@@ -68,10 +68,11 @@ export default function WorkoutEvaluationPage() {
       workoutId: workoutId,
       feedbackAi: aiFeedback || "",
       difficultyRating: 0, // Default neutral
-      comfortRating: 3, // Default neutral
+      moodAfterWorkout: 3, // Default neutral
+      moodBeforeWorkout: 3, // Default neutral (added this)
       createdAt: new Date(),
-      skipped: true,
-    };
+      skipped: true, 
+    }; // Fixed syntax error here
 
     updateEvaluation(
       { workoutId, evaluation },
@@ -94,16 +95,12 @@ export default function WorkoutEvaluationPage() {
 
     const evaluation: WorkoutEvaluation = {
       workoutId: workoutId,
-      feedbackAi: aiFeedback || "Great job! You crushed it!", // Use AI feedback if available
+      feedbackAi: aiFeedback || "Great job! You crushed it!",
       difficultyRating: (difficulty || 0) as 0 | 1 | 2 | 3 | 4 | 5,
-      comfortRating: (feeling ? feelingMap[feeling] : 3) as
-        | 0
-        | 1
-        | 2
-        | 3
-        | 4
-        | 5,
-      comfortNotes: feelingNotes,
+      // Update property names here:
+      moodBeforeWorkout: (preWorkoutMood || 0) as 0 | 1 | 2 | 3 | 4 | 5,
+      moodAfterWorkout: (feeling ? feelingMap[feeling] : 3) as 0 | 1 | 2 | 3 | 4 | 5,
+      moodNotes: feelingNotes,       // Changed from comfortNotes
       performanceNotes: workoutNotes,
       createdAt: new Date(),
       skipped: false,
