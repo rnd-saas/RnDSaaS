@@ -163,7 +163,10 @@ function parseIsoDate(iso: string): Date {
     return new Date(`${iso}T00:00:00Z`);
 }
 
-function buildWorkoutGrid(workouts: Array<{ id: string; started_at: string }> | null) {
+function buildWorkoutGrid(
+    workouts: Array<{ id: string; started_at: string }> | null,
+    availableDays: Set<number>
+) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
@@ -186,10 +189,12 @@ function buildWorkoutGrid(workouts: Array<{ id: string; started_at: string }> | 
         
         const isToday = d.toDateString() === today.toDateString();
         const hasWorkout = workoutDates.has(d.toDateString());
+        const dayOfWeek = d.getDay(); // 0 = Sunday ... 6 = Saturday (JS default)
+        const isPlanned = !hasWorkout && availableDays.has(dayOfWeek) && d >= today;
         
         currentWeek.push({
             date: d.toISOString(),
-            state: hasWorkout ? 'worked' : (d > today ? 'future' : 'rest'),
+            state: hasWorkout ? 'worked' : (isPlanned ? 'future' : 'rest'),
             isCurrent: isToday
         });
 
@@ -218,10 +223,15 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
 
         console.log(`[Profile] Fetching profile data for user: ${userId}`);
         
-        const [profileResult, usersResult, userAchievementsResult, workoutsResult] = await Promise.all([
+        const [
+            profileResult,
+            usersResult,
+            userAchievementsResult,
+            workoutsResult
+        ] = await Promise.all([
             supabase
                 .from('user_info')
-                .select('preferred_name, trainer, avatar_option')
+                .select('preferred_name, trainer, avatar_option, available_days')
                 .eq('user_id', userId)
                 .maybeSingle(),
             supabase
@@ -240,7 +250,7 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
                 .select('id, started_at', { count: 'exact' })
                 .eq('user_id', userId)
                 .order('started_at', { ascending: false })
-                // .limit(100)  // Removed limit to ensure accurate streak calculation
+                // .limit(100)  // Removed limit to ensure accurate streak calculation,
         ]);
 
         // console.log(`[Profile] Query results:`, {
@@ -276,7 +286,17 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
         // Supabase sometimes returns data even when there's an error, so prioritize data
         const achievementsData = userAchievementsResult.data ?? (userAchievementsResult.error ? null : null);
         const achievements = await buildAchievements(achievementsData);
-        const { workoutGrid } = buildWorkoutGrid(workoutsResult.error ? null : workoutsResult.data);
+
+        const availableDays = new Set<number>(
+            Array.isArray(profileResult.data?.available_days)
+                ? profileResult.data?.available_days.map((d: any) => Number(d)).filter((n) => Number.isFinite(n))
+                : []
+        );
+
+        const { workoutGrid } = buildWorkoutGrid(
+            workoutsResult.error ? null : workoutsResult.data,
+            availableDays
+        );
 
         const workouts = workoutsResult.data ?? [];
         const totalWorkouts = workoutsResult.count ?? workouts.length;
