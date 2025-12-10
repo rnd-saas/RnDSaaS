@@ -4,7 +4,7 @@ import ChatbotButton from "@/components/chatbotButton";
 import Goals from "@/pages/Progress/ProgressComponents/Goals";
 import Moods from "@/pages/Progress/ProgressComponents/Moods";
 import Workouts from "@/pages/Progress/ProgressComponents/Workouts";
-import PlannedCalendar from "@/pages/Progress/ProgressComponents/PlannedCalendar";
+import WorkoutDisplay from "@/pages/Profile/ProfileComponents/WorkoutDisplay";
 import PersonalData from "@/pages/Progress/ProgressComponents/PersonalData";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -83,7 +83,7 @@ export default function ProgressPage() {
         }, label:"This week's workouts" },
         { value:"calendar", render: () => {
             try {
-                return <PlannedCalendar />;
+                return <WorkoutDisplay weeks={profile?.workoutGrid} />;
             } catch (error) {
                 console.error('Error rendering calendar:', error);
                 return <div className="text-sm text-red-500">Error loading calendar</div>;
