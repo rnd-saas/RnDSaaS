@@ -477,6 +477,19 @@ router.put('/preferences', requireAuth, async (req: AuthedRequest, res) => {
             return res.status(500).json({ error: { message: 'Failed to update preferences' } });
         }
 
+        // Keep users.display_name in sync when preferredName changes
+        if (updates.preferredName !== undefined) {
+            const { error: userUpdateError } = await supabase
+                .from('users')
+                .update({ display_name: updates.preferredName })
+                .eq('id', userId);
+
+            if (userUpdateError) {
+                console.error('Failed to update users.display_name:', userUpdateError);
+                return res.status(500).json({ error: { message: 'Failed to update display name' } });
+            }
+        }
+
         res.json(data);
     } catch (error: any) {
         console.error('Preferences update error:', error);

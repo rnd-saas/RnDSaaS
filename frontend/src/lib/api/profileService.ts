@@ -35,6 +35,13 @@ export async function getPreferences(): Promise<OnboardingPayload> {
 export async function updatePreferences(data: OnboardingPayload): Promise<OnboardingPayload> {
     return apiClient.put<OnboardingPayload>('/api/profile/preferences', data);
 }
+
+/**
+ * Update only preferred name (display name)
+ */
+export async function updatePreferredName(preferredName: string): Promise<void> {
+    await apiClient.put('/api/profile/preferences', { preferredName });
+}
 /**
  * Update user avatar preference
  */

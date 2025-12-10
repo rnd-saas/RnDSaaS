@@ -23,7 +23,6 @@ export default function WorkoutPreferences({currentValues}: {currentValues?: Onb
     const [isSaving, setIsSaving] = useState(false);
     
     // State for form values
-    const [name, setName] = useState("");
     const [weight, setWeight] = useState(0);
     const [height, setHeight] = useState(0);
     const [goal, setGoal] = useState<PrimaryGoal | undefined>(undefined);
@@ -56,7 +55,6 @@ export default function WorkoutPreferences({currentValues}: {currentValues?: Onb
     };
 
     const updateLocalState = (data: OnboardingPayload) => {
-        setName(data.preferredName || "");
         setWeight(data.weightKg || 0);
         setHeight(data.heightCm || 0);
         setGoal(data.primaryGoal?.[0] as PrimaryGoal);
@@ -72,7 +70,6 @@ export default function WorkoutPreferences({currentValues}: {currentValues?: Onb
         try {
             setIsSaving(true);
             const payload: OnboardingPayload = {
-                preferredName: name,
                 weightKg: weight,
                 heightCm: height,
                 primaryGoal: goal ? [goal] : [],
@@ -129,15 +126,15 @@ export default function WorkoutPreferences({currentValues}: {currentValues?: Onb
     };
 
     return (
-        <div className="relative">
-            <div className="flex justify-end mb-4">
+        <div className="relative pb-16">
+            <div className="absolute right-0 bottom-0 flex gap-2">
                 {!isEditing ? (
                     <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
                         <Edit2 className="h-4 w-4 mr-2" />
                         Edit Preferences
                     </Button>
                 ) : (
-                    <div className="flex gap-2">
+                    <>
                         <Button variant="ghost" size="sm" onClick={handleCancel} disabled={isSaving}>
                             <X className="h-4 w-4 mr-2" />
                             Cancel
@@ -146,24 +143,22 @@ export default function WorkoutPreferences({currentValues}: {currentValues?: Onb
                             {isSaving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
                             Save
                         </Button>
-                    </div>
+                    </>
                 )}
             </div>
 
             {!isEditing ? (
                 <div className="space-y-2">
-                    {renderStaticValue("Preferred Name", name)}
-                    <Separator />
                     {renderStaticValue("Weight", `${weight} kg`)}
                     {renderStaticValue("Height", `${height} cm`)}
                     <Separator />
                     {renderStaticValue("Primary Goal", getGoalLabel(goal))}
                     <Separator />
-                    {renderStaticValue("Days per Week", daysPerWeek)}
+                    {renderStaticValue("Workout days per Week", daysPerWeek)}
                     <Separator />
                     {renderStaticValue("Available Days", getAvailableDaysLabel(availableDays))}
                     <Separator />
-                    {renderStaticValue("Session Length", getSessionLengthLabel(sessionLength))}
+                    {renderStaticValue("Preferred session Length", getSessionLengthLabel(sessionLength))}
                     <Separator />
                     {renderStaticValue("Vulnerable Areas", getAreasLabel(areas))}
                     <Separator />
@@ -183,12 +178,6 @@ export default function WorkoutPreferences({currentValues}: {currentValues?: Onb
                 </div>
             ) : (
                 <div>
-                    <div className={"my-3 space-y-3"}>
-                        <Label htmlFor={"nickname"}>Preferred name</Label>
-                        <Input id="nickname" type="text" value={name}
-                               onChange={(e) => setName(e.target.value)}/>
-                    </div>
-                    <Separator/>
                     <div className={"my-3 space-y-3"}>
                         <Label htmlFor={"weight"}>Weight (kg)</Label>
                         <Input id="weight" type="number" className="max-w-[20vw] md:max-w-[10vw]" value={weight}
