@@ -83,7 +83,7 @@ export default function ProgressPage() {
         }, label:"This week's workouts" },
         { value:"calendar", render: () => {
             try {
-                return <PlannedCalendar weeks={profile?.workoutGrid} isLoading={loading} />;
+                return <PlannedCalendar />;
             } catch (error) {
                 console.error('Error rendering calendar:', error);
                 return <div className="text-sm text-red-500">Error loading calendar</div>;
