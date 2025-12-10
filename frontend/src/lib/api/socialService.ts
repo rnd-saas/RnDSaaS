@@ -5,6 +5,7 @@ export interface SocialUserSummary {
   username: string;
   display_name: string;
   status?: string | null;
+  friend_status?: string | null;
   user_info: userAvatar;
 }
 
