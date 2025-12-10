@@ -44,6 +44,14 @@ export default function ProgressPage() {
     }, []);
 
     const progressComponents = [
+        { value:"goals", render: () => {
+            try {
+                return <Goals />;
+            } catch (error) {
+                console.error('Error rendering goals:', error);
+                return <div className="text-sm text-red-500">Error loading goals</div>;
+            }
+        }, label:"Your goals" },
         { value:"achievements", render: () => {
             try {
                 return <SwipeableAchievementList 
@@ -57,14 +65,6 @@ export default function ProgressPage() {
                 return <div className="text-sm text-red-500">Error loading achievements</div>;
             }
         }, label: "Recent Achievements" },
-        { value:"goals", render: () => {
-            try {
-                return <Goals />;
-            } catch (error) {
-                console.error('Error rendering goals:', error);
-                return <div className="text-sm text-red-500">Error loading goals</div>;
-            }
-        }, label:"Your goals" },
         { value:"moods", render: () => {
             try {
                 return <Moods />;
