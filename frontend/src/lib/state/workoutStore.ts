@@ -10,6 +10,10 @@ interface ActiveWorkoutState {
   isRunning: boolean;
   elapsedTimeSeconds: number;
   workoutId: string;
+  // NEW: Store the mood before the workout starts
+  preWorkoutMood: number | null;
+  setPreWorkoutMood: (mood: number | null) => void;
+  
   expandedExerciseId: string | null;
   setExpandedExerciseId: (newId: string | null) => void;
   loggedWorkout: LoggedWorkout | null;
@@ -40,6 +44,10 @@ export const useWorkoutStore = create<ActiveWorkoutState>()(
       isRunning: false,
       elapsedTimeSeconds: 0,
       workoutId: "",
+      // NEW: Initialize preWorkoutMood
+      preWorkoutMood: null,
+      setPreWorkoutMood: (mood) => set({ preWorkoutMood: mood }),
+      
       expandedExerciseId: null,
       loggedWorkout: null,
       startWorkout: (id: string, loggedExercises: LoggedExercise[]) =>
@@ -47,6 +55,8 @@ export const useWorkoutStore = create<ActiveWorkoutState>()(
           isRunning: true,
           // elapsedTimeSeconds: 0,
           workoutId: id,
+          // NEW: Reset mood on start (optional, or keep it if set just before)
+          // preWorkoutMood: null, 
           loggedWorkout: {
             workoutId: id,
             exercises: loggedExercises,
@@ -66,15 +76,15 @@ export const useWorkoutStore = create<ActiveWorkoutState>()(
           isRunning: false,
         });
       },
-      resetWorkout: () => {
-        console.log("stopping timer / workout");
+      resetWorkout: () =>
         set({
           isRunning: false,
-          workoutId: "",
           elapsedTimeSeconds: 0,
+          workoutId: "",
           loggedWorkout: null,
-        });
-      },
+          // NEW: Reset mood when workout is fully reset
+          preWorkoutMood: null,
+        }),
       tick: () =>
         set((state) => ({ elapsedTimeSeconds: state.elapsedTimeSeconds + 1 })),
       addExercise: (exercise: LoggedExercise) =>

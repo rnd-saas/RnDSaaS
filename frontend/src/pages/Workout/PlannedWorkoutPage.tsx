@@ -13,13 +13,27 @@ import { startOfWeek } from "date-fns";
 import { usePlannedWorkout } from "@/api/workouts";
 import type { PlannedExercise, PlannedWorkout } from "@/lib/types/Workout";
 import { useNavigate } from "react-router-dom";
-import { Separator } from "@/components/ui/separator"; // Added Separator import
+import { Separator } from "@/components/ui/separator";
+// NEW IMPORTS
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { useWorkoutStore } from "@/lib/state/workoutStore";
 
 export default function WorkoutPage() {
   const isLarge = window.matchMedia("(min-width: 1024px)").matches;
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const { data, isLoading, error } = usePlannedWorkout(selectedDate);
   const navigate = useNavigate();
+  
+  // NEW: Store hook
+  const setPreWorkoutMood = useWorkoutStore((state) => state.setPreWorkoutMood);
+  // NEW: State for the modal
+  const [isMoodModalOpen, setIsMoodModalOpen] = useState(false);
 
   const plannedWorkout: PlannedWorkout | null = data ?? null;
   // Store today's ID for when user clicks on "Start Workout"
@@ -29,9 +43,25 @@ export default function WorkoutPage() {
       ? plannedWorkout.workoutId
       : null;
 
-  const handleWorkoutStart = () => {
+  // MODIFIED: Open modal instead of navigating directy
+  const handleWorkoutStartClick = () => {
+    setIsMoodModalOpen(true);
+  };
+
+  // NEW: Handle mood selection and start
+  const handleMoodSelect = (moodIndex: number) => {
+    setPreWorkoutMood(moodIndex);
+    setIsMoodModalOpen(false);
     navigate(`/workout/${todayWorkoutId}`);
   };
+
+  const MOOD_EMOJIS = [
+    { emoji: "😣", label: "Anxious", value: 0 },
+    { emoji: "😬", label: "Nervous", value: 1 },
+    { emoji: "🙂", label: "Okay", value: 2 },
+    { emoji: "😌", label: "Good", value: 3 },
+    { emoji: "🤩", label: "Great", value: 4 },
+  ];
 
   let workoutContentBlock;
   if (isLoading) {
@@ -123,14 +153,14 @@ export default function WorkoutPage() {
       </div>
       <div className="sticky bottom-12 z-20 w-full flex justify-center bg-background/50 backdrop-blur-sm">
         <div className="mx-auto w-4/5 flex items-center justify-center gap-4 max-w-[728px]">
-          {/* IMPORTANT: BUTTON WILL ONLY START TODAY'S WORKOUT... TODO: IF TODAY DOESN'T HAVE A WORKOUT, NOTHING WILL HAPPEN...!  */}
           <Button
             variant="default"
             className={`flex-1 text-base lg:hidden ${
               (!todayWorkoutId || plannedWorkout?.isCompleted) &&
               "pointer-events-none opacity-50"
             }`}
-            onClick={handleWorkoutStart}
+            // MODIFIED: Use the new handler
+            onClick={handleWorkoutStartClick}
           >
             {plannedWorkout?.isCompleted ? "Completed" : "Start Workout"}
           </Button>
@@ -149,6 +179,32 @@ export default function WorkoutPage() {
           </Button>
         </div>
       </div>
+
+      {/* NEW: Mood Check-in Dialog */}
+      <Dialog open={isMoodModalOpen} onOpenChange={setIsMoodModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center text-xl">Check-in</DialogTitle>
+            <DialogDescription className="text-center">
+              How are you feeling right now?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-between md:gap-2 gap-0 py-4">
+            {MOOD_EMOJIS.map((item) => (
+              <button
+                key={item.value}
+                onClick={() => handleMoodSelect(item.value)}
+                className="flex flex-col items-center gap-2 p-2 rounded-lg hover:bg-accent transition-colors"
+              >
+                <span className="text-3xl">{item.emoji}</span>
+                <span className="text-xs font-medium text-muted-foreground">
+                  {item.label}
+                </span>
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
