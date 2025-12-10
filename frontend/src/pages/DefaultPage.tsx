@@ -52,7 +52,7 @@ export default function DefaultPage() {
         </div>
       </header>
       <main className="flex-1 flex flex-col items-center justify-center w-full">
-        <Card className={"p-10"}>
+        <Card className={"p-10 hover:scale-none"}>
           <h1 className="h1-styles">Hello!</h1>
           <img
             src={tomImage}
