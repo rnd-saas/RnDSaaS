@@ -27,7 +27,7 @@ export default function Achievement({
       <CardContent className="flex flex-col items-center justify-center gap-2 py-4 px-2 h-full">
         <div
           className={cn(
-            "w-12 h-12 flex items-center justify-center overflow-hidden text-4xl mb-1",
+            "flex items-center justify-center overflow-hidden text-3xl mb-1",
             obtained ? "" : "grayscale opacity-60"
           )}
           style={{ lineHeight: "1" }}

@@ -1,7 +1,7 @@
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import ChatbotButton from "@/components/chatbotButton";
 import {useEffect, useState} from "react";
-import {useLocation, useNavigate} from "react-router-dom";
+import {useLocation} from "react-router-dom";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import type {ProfileData, ProfileResponse} from "@/lib/api";
@@ -23,6 +23,7 @@ import {
 import WorkoutPreferences from "@/pages/Profile/ProfileComponents/WorkoutPreferences";
 import {Pencil} from "lucide-react";
 import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group.tsx";
+import UserAvatar from "@/components/userAvatar.tsx";
 
 export default function ProfilePage() {
     const { state } = useLocation() as { state?: { firstName?: string } };
@@ -105,6 +106,7 @@ export default function ProfilePage() {
         if (profile?.user.avatarOption != null) {
             setAvatarOption(profile.user.avatarOption);
             setPreviousAvatarOption(profile.user.avatarOption);
+            localStorage.setItem("avatar", String(profile.user.avatarOption));
         }
     }, [profile]);
     const sections = [
@@ -152,6 +154,7 @@ export default function ProfilePage() {
         try {
             setIsSaving(true);
             await profileService.updateAvatarOption(avatarOption);
+            localStorage.setItem("avatar", String(profile.user.avatarOption));
             await loadProfile(true); // Reload to confirm
         } catch (error) {
             console.error("Failed to save preferences:", error);
@@ -182,13 +185,9 @@ export default function ProfilePage() {
             className="w-full md:w-[70vw] lg:w-[50vw] mx-auto p-6 pb-24 flex flex-col space-y-8 bg-background text-foreground font-sans">
             <header className="flex flex-col items-center space-y-4 relative py-4">
                 <div className="relative inline-block">
-                    <Avatar className="w-32 h-32 shadow-xl ring-4 ring-background">
-                        <AvatarImage src={AvatarOptionValues[avatarOption].src}/>
-                        <AvatarFallback
-                            className="text-3xl font-serif">{displayName.slice(0, 2).toUpperCase()}</AvatarFallback>
-                    </Avatar>
+                    <UserAvatar avatarOption={avatarOption} displayName={displayName}/>
                     <Dialog onOpenChange={() => setAvatarOption(previousAvatarOption)}>
-                        <DialogTrigger className="absolute -bottom-2 -right-3 rounded-full bg-transparent transition">
+                        <DialogTrigger className="absolute top-0 right-0 rounded-full bg-transparent transition">
                                 <Pencil className="w-4 h-4" />
                         </DialogTrigger>
                         <DialogContent className="max-w-[90vw] md:min-w-[60vw] lg:min-w-[40vw]">
@@ -230,7 +229,6 @@ export default function ProfilePage() {
                         <Input
                             value={nameInput}
                             onChange={(e) => setNameInput(e.target.value)}
-                            className="h-10 text-2xl font-bold"
                             maxLength={100}
                             disabled={isSaving}
                         />

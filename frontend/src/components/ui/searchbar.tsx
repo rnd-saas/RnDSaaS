@@ -23,10 +23,10 @@ export default function SocialSearchBar({
 
   return (
     <div className="w-full">
-      <div className="flex w-full items-center gap-2 rounded-2xl bg-white px-4 py-3 shadow-md">
+      <div className="flex w-full items-center gap-2 ">
         <Search className="h-5 w-5 text-muted-foreground" />
         <Input
-          className="flex-1 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 px-0"
+          // className="flex-1 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 px-0"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}

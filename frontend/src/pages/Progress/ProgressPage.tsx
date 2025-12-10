@@ -1,4 +1,3 @@
-import AchievementList from "@/pages/Profile/ProfileComponents/AchievementList";
 import SwipeableAchievementList from "@/components/SwipeableAchievementList";
 import ChatbotButton from "@/components/chatbotButton";
 import Goals from "@/pages/Progress/ProgressComponents/Goals";

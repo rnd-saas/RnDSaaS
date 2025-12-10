@@ -7,7 +7,8 @@ import { useLocation, useNavigate } from "react-router-dom"; // Added useNavigat
 import ChatbotButton from "@/components/chatbotButton";
 import AccountSettings from "@/pages/Settings/SettingGroups/AccountSettings";
 import { ChevronLeft } from "lucide-react"; // Added ChevronLeft icon
-import { Button } from "@/components/ui/button"; // Added Button component
+import { Button } from "@/components/ui/button";
+import UserAvatar from "@/components/userAvatar.tsx"; // Added Button component
 
 export default function SettingsPage() {
     const navigate = useNavigate(); // Hook for navigation
@@ -35,13 +36,10 @@ export default function SettingsPage() {
             </div>
 
             <div className="flex flex-col items-center space-y-4 mt-8"> {/* Added margin-top to clear the back button */}
-                <Avatar className="w-24 h-24 shadow-md ring-4 ring-background">
-                    <AvatarImage src={tomAvatar} />
-                    <AvatarFallback className="text-2xl">
-                        {userName.slice(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                </Avatar>
-                <h2 className="text-2xl font-bold tracking-tight">{userName}</h2>
+                <UserAvatar avatarOption={Number(localStorage.getItem("avatar") ?? 1)} displayName={userName}/>
+                <h2 className="text-3xl font-bold tracking-tight font-serif text-primary">
+                    {userName}
+                </h2>
             </div>
 
             {/* Accordion takes full width of the container */}

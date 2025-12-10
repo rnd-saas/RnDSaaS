@@ -467,7 +467,7 @@ export default function WorkoutPlanChatbotPage() {
                 <div className="flex items-center gap-4">
                     <div onClick={handleInputClick} className="flex-1 flex items-center justify-between px-5 py-2.5 rounded-[48px] border-[1.5px] border-solid">
                         <Input placeholder={isProfileLoading ? "Loading coach..." : "Tell me what you'd like to adjust. "} onChange={handleInputChange} value={inputValue} onKeyDown={handleKeyDown} disabled={isSending || isProfileLoading || isMentalHealthLock}
-                            className="border-0 p-0 h-auto font-normal text-base leading-6 focus-visible:ring-0 focus-visible:ring-offset-0"
+                            className="border-0 p-0 h-auto shadow-none font-normal text-base leading-6 focus-visible:ring-0 focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50"
                         />
                     </div>
                     <Button size="icon" className="h-11 w-11 rounded-full" onClick={handleSendMessage} disabled={isSending || !inputValue.trim() || isProfileLoading || isMentalHealthLock}>
