@@ -29,24 +29,15 @@ export default function WorkoutEvaluationPage() {
   const { mutate: updateEvaluation, isPending } = useUpdateWorkoutEvaluation();
   const { data: aiFeedback, isLoading: isAiLoading } = useAiFeedback(workoutId);
 
+  // UPDATED: Changed to 0-4 scale to match database and pre-workout mood
   const feelingMap: Record<string, number> = {
-    dead: 1,
-    sad: 2,
-    sceptic: 3,
-    happy: 4,
-    veryHappy: 5,
-  };
-
-  // NEW: Map workout feelings to Dashboard Moods (0-4 scale)
-  // This was missing!
-  const feelingToDashboardMood: Record<string, number> = {
     dead: 0,       // 😣 Anxious/Bad
     sad: 1,        // 😬 Nervous/Poor
     sceptic: 2,    // 🙂 Okay
     happy: 3,      // 😌 Comfortable
     veryHappy: 4,  // 🤩 Excited/Great
   };
-  
+
   // Helper for labels/emojis
   const MOOD_DATA = [
     { emoji: "😣", label: "Anxious" },
@@ -68,8 +59,8 @@ export default function WorkoutEvaluationPage() {
       workoutId: workoutId,
       feedbackAi: aiFeedback || "",
       difficultyRating: 0, // Default neutral
-      moodAfterWorkout: 3, // Default neutral
-      moodBeforeWorkout: 3, // Default neutral (added this)
+      moodAfterWorkout: 2, // UPDATED: Default neutral (2 = Okay)
+      moodBeforeWorkout: 2, // UPDATED: Default neutral (2 = Okay)
       createdAt: new Date(),
       skipped: true, 
     }; // Fixed syntax error here
@@ -98,8 +89,8 @@ export default function WorkoutEvaluationPage() {
       feedbackAi: aiFeedback || "Great job! You crushed it!",
       difficultyRating: (difficulty || 0) as 0 | 1 | 2 | 3 | 4 | 5,
       // Update property names here:
-      moodBeforeWorkout: (preWorkoutMood || 0) as 0 | 1 | 2 | 3 | 4 | 5,
-      moodAfterWorkout: (feeling ? feelingMap[feeling] : 3) as 0 | 1 | 2 | 3 | 4 | 5,
+      moodBeforeWorkout: (preWorkoutMood !== undefined ? preWorkoutMood : 2) as 0 | 1 | 2 | 3 | 4 | 5, // UPDATED: Default to 2 if undefined
+      moodAfterWorkout: (feeling ? feelingMap[feeling] : 2) as 0 | 1 | 2 | 3 | 4 | 5, // UPDATED: Default to 2
       moodNotes: feelingNotes,       // Changed from comfortNotes
       performanceNotes: workoutNotes,
       createdAt: new Date(),
@@ -229,14 +220,14 @@ export default function WorkoutEvaluationPage() {
             />
           </div>
         {/* MOVED: Show Mood Shift Card HERE (immediately after mood selection) */}
-        {feeling && preWorkoutMood !== null && feelingToDashboardMood[feeling] !== undefined && (
+        {feeling && preWorkoutMood !== null && feelingMap[feeling] !== undefined && (
            <MoodShiftCard 
              beforeMood={MOOD_DATA[preWorkoutMood]?.emoji || "?"}
              beforeLabel={MOOD_DATA[preWorkoutMood]?.label || "Unknown"}
-             afterMood={MOOD_DATA[feelingToDashboardMood[feeling]]?.emoji || "?"}
-             afterLabel={MOOD_DATA[feelingToDashboardMood[feeling]]?.label || "Unknown"}
+             afterMood={MOOD_DATA[feelingMap[feeling]]?.emoji || "?"}
+             afterLabel={MOOD_DATA[feelingMap[feeling]]?.label || "Unknown"}
              beforeValue={preWorkoutMood}
-             afterValue={feelingToDashboardMood[feeling]}
+             afterValue={feelingMap[feeling]}
            />
         )}
         </div>
