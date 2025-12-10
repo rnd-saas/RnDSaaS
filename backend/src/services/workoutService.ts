@@ -169,8 +169,9 @@ export const workoutService = {
   async updateWorkoutEvaluation(workoutId: string, evaluationData: any) {
     const {
       difficultyRating,
-      comfortRating,
-      comfortNotes,
+      moodBeforeWorkout, // Changed from moodBefore
+      moodAfterWorkout,  // Changed from moodAfter
+      moodNotes,
       performanceNotes,
       feedbackAi,
       skipped
@@ -181,17 +182,22 @@ export const workoutService = {
       workouts_id: workoutId,
       ai_feedback: null,
       difficulty_level: null,
-      mood: null,
+      mood_before: null,
+      mood_after: null,
       mood_notes: null,
       workout_notes: null
     } : {
       workouts_id: workoutId,
       ai_feedback: feedbackAi,
       difficulty_level: difficultyRating,
-      mood: comfortRating,
-      mood_notes: comfortNotes,
+      mood_before: moodBeforeWorkout, // Map correctly
+      mood_after: moodAfterWorkout,   // Map correctly
+      mood_notes: moodNotes,
       workout_notes: performanceNotes
     };
+
+    // FIXED: Removed the '+' sign that was causing NaN
+    console.log("[Workout Feedback] Workout feedback data send to back end ", feedbackData);
 
     const { data, error } = await supabase
       .from('workout_feedback')
@@ -200,6 +206,39 @@ export const workoutService = {
       .single();
 
     if (error) throw error;
+
+    // NEW: Sync to Daily Mood (if not skipped and moodAfterWorkout exists)
+    // We need userId for this. It wasn't passed in evaluationData, but we can get it from the workout.
+    if (!skipped && moodAfterWorkout !== undefined) {
+        // 1. Fetch userId from the workout
+        const { data: workout } = await supabase
+            .from('workouts')
+            .select('user_id')
+            .eq('id', workoutId)
+            .single();
+            
+        if (workout?.user_id) {
+            const today = new Date().toISOString().split('T')[0];
+            
+            // 2. Upsert daily mood
+            const { error: moodError } = await supabase
+                .from('daily_mood')
+                .upsert({
+                    user_id: workout.user_id,
+                    day: today,
+                    mood: moodAfterWorkout, // 0-4 scale matches
+                    note: "Auto-logged from workout",
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'user_id, day' });
+
+            if (moodError) {
+                console.error("[Workout Evaluation] Failed to sync workout mood to daily mood:", moodError);
+            } else {
+                console.log("[Workout Evaluation] Synced workout mood to daily mood for user:", workout.user_id);
+            }
+        }
+    }
+
     return data;
   },
 

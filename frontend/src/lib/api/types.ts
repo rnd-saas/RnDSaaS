@@ -101,6 +101,7 @@ export interface DashboardData {
     };
     achievements: DashboardAchievement[];
     mood: string;
+    latestWorkoutMoodShift?: { before: number; after: number } | null;
     nextWorkout: string;
     streakDays: number;
     advice: string;

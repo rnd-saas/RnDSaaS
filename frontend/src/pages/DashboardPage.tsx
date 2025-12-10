@@ -369,12 +369,14 @@ export default function DashboardPage() {
                     </p>
                     
                     {/* Mood Shift Visualization */}
+                    {dashboardData?.latestWorkoutMoodShift && (
                     <div className="flex items-center justify-center gap-2 bg-primary/5 py-1.5 px-4 rounded-full mx-auto w-fit mt-1">
                        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mr-1">Mood Shift</span>
-                       <span className="text-lg leading-none">😣</span>
+                       <span className="text-lg leading-none">{DB_MOOD_EMOJI[dashboardData.latestWorkoutMoodShift.before]}</span>
                        <ArrowRight className="h-3 w-3 text-muted-foreground/50" />
-                       <span className="text-lg leading-none">😌</span>
+                       <span className="text-lg leading-none">{DB_MOOD_EMOJI[dashboardData.latestWorkoutMoodShift.after]}</span>
                     </div>
+                    )}
 
                     {nextWorkout ? (
                       <div className="text-sm text-muted-foreground bg-background/50 p-3 rounded-lg border border-border/50 mt-2">

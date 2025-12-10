@@ -10,6 +10,8 @@ import { useUpdateWorkoutEvaluation, useAiFeedback } from "@/api/workouts";
 import { useLocation } from "react-router-dom";
 import type { WorkoutEvaluation } from "@/lib/types/Workout";
 import { Skeleton } from "@/components/ui/skeleton";
+// NEW: Import the card
+import MoodShiftCard from "@/components/WorkoutComponents/MoodShiftCard";
 
 export default function WorkoutEvaluationPage() {
   const navigate = useNavigate();
@@ -22,16 +24,28 @@ export default function WorkoutEvaluationPage() {
   const [workoutNotes, setWorkoutNotes] = useState("");
 
   const resetWorkout = useWorkoutStore((state) => state.resetWorkout);
+  // NEW: Get pre-workout mood
+  const preWorkoutMood = useWorkoutStore((state) => state.preWorkoutMood);
   const { mutate: updateEvaluation, isPending } = useUpdateWorkoutEvaluation();
   const { data: aiFeedback, isLoading: isAiLoading } = useAiFeedback(workoutId);
 
+  // UPDATED: Changed to 0-4 scale to match database and pre-workout mood
   const feelingMap: Record<string, number> = {
-    dead: 1,
-    sad: 2,
-    sceptic: 3,
-    happy: 4,
-    veryHappy: 5,
+    dead: 0,       // 😣 Anxious/Bad
+    sad: 1,        // 😬 Nervous/Poor
+    sceptic: 2,    // 🙂 Okay
+    happy: 3,      // 😌 Comfortable
+    veryHappy: 4,  // 🤩 Excited/Great
   };
+
+  // Helper for labels/emojis
+  const MOOD_DATA = [
+    { emoji: "😣", label: "Anxious" },
+    { emoji: "😬", label: "Nervous" },
+    { emoji: "🙂", label: "Okay" },
+    { emoji: "😌", label: "Good" },
+    { emoji: "🤩", label: "Great" },
+  ];
 
   const handleSkip = () => {
     if (!workoutId) {
@@ -45,10 +59,11 @@ export default function WorkoutEvaluationPage() {
       workoutId: workoutId,
       feedbackAi: aiFeedback || "",
       difficultyRating: 0, // Default neutral
-      comfortRating: 3, // Default neutral
+      moodAfterWorkout: 2, // UPDATED: Default neutral (2 = Okay)
+      moodBeforeWorkout: 2, // UPDATED: Default neutral (2 = Okay)
       createdAt: new Date(),
-      skipped: true,
-    };
+      skipped: true, 
+    }; // Fixed syntax error here
 
     updateEvaluation(
       { workoutId, evaluation },
@@ -71,16 +86,12 @@ export default function WorkoutEvaluationPage() {
 
     const evaluation: WorkoutEvaluation = {
       workoutId: workoutId,
-      feedbackAi: aiFeedback || "Great job! You crushed it!", // Use AI feedback if available
+      feedbackAi: aiFeedback || "Great job! You crushed it!",
       difficultyRating: (difficulty || 0) as 0 | 1 | 2 | 3 | 4 | 5,
-      comfortRating: (feeling ? feelingMap[feeling] : 3) as
-        | 0
-        | 1
-        | 2
-        | 3
-        | 4
-        | 5,
-      comfortNotes: feelingNotes,
+      // Update property names here:
+      moodBeforeWorkout: (preWorkoutMood !== undefined ? preWorkoutMood : 2) as 0 | 1 | 2 | 3 | 4 | 5, // UPDATED: Default to 2 if undefined
+      moodAfterWorkout: (feeling ? feelingMap[feeling] : 2) as 0 | 1 | 2 | 3 | 4 | 5, // UPDATED: Default to 2
+      moodNotes: feelingNotes,       // Changed from comfortNotes
       performanceNotes: workoutNotes,
       createdAt: new Date(),
       skipped: false,
@@ -96,10 +107,9 @@ export default function WorkoutEvaluationPage() {
       }
     );
   };
-// ...existing code...
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-background">
       {/* Header */}
       <div className="flex items-center justify-center p-4 pt-6">
         <Button
@@ -113,9 +123,9 @@ export default function WorkoutEvaluationPage() {
         <h2 className="h2-styles">Workout Evaluation</h2>
       </div>
 
-      <div className="px-5 mt-8 flex flex-col gap-10 pb-32">
+      <div className="flex-1 flex flex-col items-center p-6 gap-8 max-w-md mx-auto w-full">
         {/* AI Feedback */}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 w-full">
           <div className="flex items-center gap-1">
             <h3 className="text-xl font-bold text-black font-['Comfortaa']">
               AI Feedback
@@ -143,7 +153,7 @@ export default function WorkoutEvaluationPage() {
         </div>
 
         {/* Difficulty Level */}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 w-full">
           <div className="flex items-center gap-1">
             <h3 className="text-xl font-bold text-black font-['Comfortaa']">
               Difficulty level
@@ -176,7 +186,7 @@ export default function WorkoutEvaluationPage() {
         </div>
 
         {/* How do you feel */}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 w-full">
           <h3 className="text-xl font-bold text-black font-['Comfortaa']">
             Tell us... How do you feel?
           </h3>
@@ -209,10 +219,22 @@ export default function WorkoutEvaluationPage() {
               className="bg-white border-none shadow-sm h-11 rounded-lg"
             />
           </div>
+        {/* MOVED: Show Mood Shift Card HERE (immediately after mood selection) */}
+        {feeling && preWorkoutMood !== null && feelingMap[feeling] !== undefined && (
+           <MoodShiftCard 
+             beforeMood={MOOD_DATA[preWorkoutMood]?.emoji || "?"}
+             beforeLabel={MOOD_DATA[preWorkoutMood]?.label || "Unknown"}
+             afterMood={MOOD_DATA[feelingMap[feeling]]?.emoji || "?"}
+             afterLabel={MOOD_DATA[feelingMap[feeling]]?.label || "Unknown"}
+             beforeValue={preWorkoutMood}
+             afterValue={feelingMap[feeling]}
+           />
+        )}
         </div>
 
+
         {/* Workout Notes */}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 w-full">
           <h3 className="text-xl font-bold text-black font-['Comfortaa']">
             How did your workout go?
           </h3>
@@ -223,6 +245,7 @@ export default function WorkoutEvaluationPage() {
             className="bg-white border-none shadow-sm h-11 rounded-lg"
           />
         </div>
+
       </div>
 
       {/* Actions */}

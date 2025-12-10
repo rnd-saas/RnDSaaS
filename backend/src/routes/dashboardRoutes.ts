@@ -29,6 +29,7 @@ type DashboardResponse = {
     };
     achievements: Array<{ id: string; title: string; sub: string; emoji: string }>;
     mood: string;
+    latestWorkoutMoodShift?: { before: number; after: number } | null;
     nextWorkout: string;
     streakDays: number;
     advice: string;
@@ -124,6 +125,25 @@ router.get('/', requireAuth, requireSubscription, async (req: AuthedRequest, res
         }
 
         const workouts = workoutsResult.data ?? [];
+
+        // Fetch mood shift for the latest workout
+        let latestWorkoutMoodShift = null;
+        if (workouts.length > 0) {
+            const latestWorkoutId = workouts[0].id;
+            const { data: feedbackData } = await supabase
+                .from('workout_feedback')
+                .select('mood_before, mood_after')
+                .eq('workouts_id', latestWorkoutId)
+                .maybeSingle();
+            
+            if (feedbackData && feedbackData.mood_before != null && feedbackData.mood_after != null) {
+                latestWorkoutMoodShift = {
+                    before: Number(feedbackData.mood_before),
+                    after: Number(feedbackData.mood_after)
+                };
+            }
+        }
+
         const totalWorkouts = workoutsResult.count ?? workouts.length;
         const workoutDates = new Set(
             workouts
@@ -191,6 +211,7 @@ router.get('/', requireAuth, requireSubscription, async (req: AuthedRequest, res
             level,
             achievements: achievements.length > 0 ? achievements : DEFAULT_ACHIEVEMENTS,
             mood: '😐', // Frontend currently uses local state for mood, keep neutral fallback
+            latestWorkoutMoodShift,
             nextWorkout,
             streakDays,
             advice: 'Stay consistent and plan your next workout today.'
