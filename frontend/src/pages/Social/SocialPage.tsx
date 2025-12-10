@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import SocialSearchBar from "@/components/ui/searchbar";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
-import { Loader2, PlusSquare, UserPlus, Users } from "lucide-react";
+import { Check, Clock, Loader2, PlusSquare, UserPlus, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -184,31 +184,60 @@ export default function SocialPage() {
               </div>
             </div>
 
-            <Button
-              type="button"
-              variant="secondary"
-              size="icon"
-              className="rounded-xl shrink-0"
-              onClick={() =>
-                friendRequestMutation.mutate({
-                  userId: user.id,
-                  displayName: user.display_name,
-                })
-              }
-              disabled={
+            {(() => {
+              const status = user.friend_status;
+              const isMutating =
                 friendRequestMutation.isPending &&
-                friendRequestMutation.variables?.userId === user.id
-              }
-              aria-label={`Add ${user.display_name} as friend`}
-              title="Add friend"
-            >
-              {friendRequestMutation.isPending &&
-              friendRequestMutation.variables?.userId === user.id ? (
+                friendRequestMutation.variables?.userId === user.id;
+
+              const handleClick = () => {
+                if (status === 'accepted' || status === 'pending_outgoing') return;
+                friendRequestMutation.mutate({ userId: user.id, displayName: user.display_name });
+              };
+
+              const disabled =
+                isMutating || status === 'accepted' || status === 'pending_outgoing';
+
+              const icon = isMutating ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
+              ) : status === 'accepted' ? (
+                <Check className="h-5 w-5" />
+              ) : status === 'pending_outgoing' ? (
+                <Clock className="h-5 w-5" />
               ) : (
                 <UserPlus className="h-5 w-5" />
-              )}
-            </Button>
+              );
+
+              const title =
+                status === 'accepted'
+                  ? 'Already friends'
+                  : status === 'pending_outgoing'
+                  ? 'Friend request sent'
+                  : 'Add friend';
+
+              const variant = status === 'accepted' ? 'outline' : 'secondary';
+              const classes =
+                status === 'accepted'
+                  ? 'rounded-xl shrink-0 text-muted-foreground border-muted-foreground/30'
+                  : status === 'pending_outgoing'
+                  ? 'rounded-xl shrink-0 text-muted-foreground'
+                  : 'rounded-xl shrink-0';
+
+              return (
+                <Button
+                  type="button"
+                  variant={variant as any}
+                  size="icon"
+                  className={classes}
+                  onClick={handleClick}
+                  disabled={disabled}
+                  aria-label={title}
+                  title={title}
+                >
+                  {icon}
+                </Button>
+              );
+            })()}
           </div>
         ))}
 

@@ -34,7 +34,45 @@ router.get('/users', async (req: AuthedRequest, res) => {
             return res.status(400).json({ error: { message: error.message } });
         }
 
-        res.json(data ?? []);
+        const users = data ?? [];
+
+        // If no current user or no results, return as is
+        if (!currentUserId || users.length === 0) {
+            return res.json(users);
+        }
+
+        const targetIds = users.map((u) => u.id);
+        const { data: relations, error: relError } = await supabase
+            .from('friends')
+            .select('requester_id, addressee_id, status')
+            .or(
+                `and(requester_id.eq.${currentUserId},addressee_id.in.(${targetIds.join(',')})),` +
+                `and(requester_id.in.(${targetIds.join(',')}),addressee_id.eq.${currentUserId})`
+            );
+
+        if (relError) {
+            return res.status(400).json({ error: { message: relError.message } });
+        }
+
+        const statusMap = new Map<string, string>();
+        (relations || []).forEach((r) => {
+            if (r.status === 'accepted') {
+                statusMap.set(r.requester_id === currentUserId ? r.addressee_id : r.requester_id, 'accepted');
+            } else if (r.status === 'pending') {
+                if (r.requester_id === currentUserId) {
+                    statusMap.set(r.addressee_id, 'pending_outgoing');
+                } else if (r.addressee_id === currentUserId) {
+                    statusMap.set(r.requester_id, 'pending_incoming');
+                }
+            }
+        });
+
+        const merged = users.map((u) => ({
+            ...u,
+            friend_status: statusMap.get(u.id) || null
+        }));
+
+        res.json(merged);
     } catch (error: any) {
         console.error('Social search users error:', error);
         res.status(500).json({ error: { message: 'Internal server error' } });
@@ -210,10 +248,12 @@ router.post('/friends', async (req: AuthedRequest, res) => {
         }
 
         if (existingRelation) {
+            // Already friends
             if (existingRelation.status === 'accepted') {
-                return res.json(existingRelation);
+                return res.status(400).json({ error: { message: 'You are already friends' } });
             }
 
+            // The other user sent a pending request to current user → auto-accept
             if (
                 existingRelation.status === 'pending' &&
                 existingRelation.requester_id === targetUserId &&
@@ -233,7 +273,17 @@ router.post('/friends', async (req: AuthedRequest, res) => {
                 return res.json(updatedRelation);
             }
 
-            return res.json(existingRelation);
+            // Current user already sent a pending request → block duplicate
+            if (
+                existingRelation.status === 'pending' &&
+                existingRelation.requester_id === currentUserId &&
+                existingRelation.addressee_id === targetUserId
+            ) {
+                return res.status(400).json({ error: { message: 'Friend request already sent' } });
+            }
+
+            // Fallback: block any other state
+            return res.status(400).json({ error: { message: 'Cannot create duplicate friend request' } });
         }
 
         const { data: newRelation, error } = await supabase
