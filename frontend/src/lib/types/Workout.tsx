@@ -101,8 +101,9 @@ export interface WorkoutEvaluation {
   workoutId: string; // link to logged workout
   feedbackAi: string; // AI generated text
   difficultyRating: 0 | 1 | 2 | 3 | 4 | 5; // 1 to 5 stars
-  comfortRating: 0 | 1 | 2 | 3 | 4 | 5; // 1 to 5 emoji scale
-  comfortNotes?: string; // optional note for feelings
+  moodBeforeWorkout: 0 | 1 | 2 | 3 | 4 | 5; // 1 to 5 emoji scale
+  moodAfterWorkout: 0 | 1 | 2 | 3 | 4 | 5; // 1 to 5 emoji scale
+  moodNotes?: string; // optional note for feelings
   performanceNotes?: string; // optional note for workout performance
   // property if filled in or skipped
   createdAt: Date;

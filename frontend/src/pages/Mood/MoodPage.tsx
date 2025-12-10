@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import BackButton from "@/components/backButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
@@ -90,6 +90,32 @@ export default function MoodPage() {
 
   const savedMoodKey = (localStorage.getItem(STORAGE_KEY) as MoodKey | null) ?? "okay";
   const [selected, setSelected] = useState<MoodKey>(savedMoodKey);
+
+  // NEW: Fetch the latest mood from the server on mount
+  useEffect(() => {
+    const fetchServerMood = async () => {
+      try {
+        const { mood } = await moodService.getTodayMood();
+        
+        if (mood !== null && mood !== undefined) {
+          // Find the key (e.g., "happy") that matches the DB value (e.g., 3)
+          const serverMoodKey = (Object.keys(MOOD_KEY_TO_DB_INDEX) as MoodKey[]).find(
+            (key) => MOOD_KEY_TO_DB_INDEX[key] === mood
+          );
+
+          if (serverMoodKey) {
+            setSelected(serverMoodKey);
+            // Update local storage so it stays in sync
+            localStorage.setItem(STORAGE_KEY, serverMoodKey);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to sync mood from server:", error);
+      }
+    };
+
+    fetchServerMood();
+  }, []);
 
   const selectedMood = useMemo(
     () => MOODS.find((m) => m.key === selected) ?? MOODS[2],
