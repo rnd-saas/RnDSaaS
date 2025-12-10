@@ -235,8 +235,9 @@ export async function generateWorkoutPlanForUser(userId: string): Promise<Genera
 
         const workoutProgram = await requestPlanFromAi(profile);
         const normalizedPlan = normalizePlanSchedule(workoutProgram, profile);
-        validatePlanAgainstUser(normalizedPlan, profile);
-        return await persistProgram(userId, normalizedPlan);
+        const planWithLoads = applyLoadFallbacks(normalizedPlan, profile);
+        validatePlanAgainstUser(planWithLoads, profile);
+        return await persistProgram(userId, planWithLoads);
     } catch (error: any) {
         console.error('[planner] Failed to generate workout program:', error?.message || error);
         throw error;
@@ -373,6 +374,11 @@ async function requestPlanFromAi(profile: RequiredUserProfile): Promise<WorkoutP
     return workoutProgramSchema.parse(parsed);
 }
 
+function getLogModeForExercise(name: ExerciseName): ExerciseDefinition['logMode'] | undefined {
+    const found = EXERCISE_LIBRARY.find((ex) => ex.name === name);
+    return found?.logMode;
+}
+
 function buildPlannerPrompt(profile: RequiredUserProfile): string {
     const exerciseList = EXERCISE_NAMES.map((name) => `- ${name}`).join('\n');
     const template = `{
@@ -394,8 +400,8 @@ function buildPlannerPrompt(profile: RequiredUserProfile): string {
           "metric": "reps",
           "target_value": 12,
                     "rest_seconds": 60,
-                    "metric2": "weight",
-                    "target_value2": 40
+                                        "metric2": "weight",
+                                        "target_value2": 40
         }
       ]
     }
@@ -416,7 +422,7 @@ function buildPlannerPrompt(profile: RequiredUserProfile): string {
         '- Match exercise choices to the user goal, experience level, and gym comfort guidance.',
         '- If experience_level <= 2 or comfort is low, emphasize machine or dumbbell options and avoid complex bodyweight moves.',
         '- Metric must be one of reps, weight, distance, duration_s, or height.',
-        '- For any exercise that involves load (e.g., log_mode contains "weight"), include metric2:"weight" with target_value2 as the load in kg.',
+        '- For any exercise that involves load (log_mode contains "weight"), you MUST include both metric2:"weight" AND target_value2 (load in kg). Missing target_value2 is invalid.',
         '- For duration-based cardio like Treadmill Run/Walk, express time in MINUTES, but output target_value as total seconds (minutes × 60) with metric:"duration_s".',
         '- target_value and rest_seconds must be numeric and realistic.',
         '',
@@ -437,6 +443,51 @@ function buildPlannerPrompt(profile: RequiredUserProfile): string {
     ]
         .filter(Boolean)
         .join('\n');
+}
+
+function estimateLoadKg(profile: RequiredUserProfile): number {
+    const bodyWeight = profile.weight_kg ?? 60;
+    let factor = 0.3; // ~30% bodyweight default
+    if (profile.experience_level !== null && profile.experience_level !== undefined) {
+        if (profile.experience_level >= 4) factor = 0.4;
+        else if (profile.experience_level <= 1) factor = 0.2;
+    }
+    const estimated = bodyWeight * factor;
+    return Math.max(5, Math.min(60, Math.round(estimated))); // clamp to reasonable gym loads
+}
+
+function applyLoadFallbacks(plan: WorkoutProgram, profile: RequiredUserProfile): WorkoutProgram {
+    const fallbackLoad = estimateLoadKg(profile);
+
+    const updatedPlans = plan.workout_plans.map((dayPlan) => ({
+        ...dayPlan,
+        plan_exercises: dayPlan.plan_exercises.map((exercise) => {
+            const logMode = getLogModeForExercise(exercise.exercise_name);
+            const needsWeight = exercise.metric2 === 'weight' || (logMode && logMode.includes('weight'));
+
+            let metric2 = exercise.metric2 ?? null;
+            let target_value2 = exercise.target_value2 ?? null;
+
+            if (needsWeight && !metric2) {
+                metric2 = 'weight';
+            }
+
+            if (needsWeight && (!target_value2 || target_value2 <= 0)) {
+                target_value2 = fallbackLoad;
+            }
+
+            return {
+                ...exercise,
+                metric2,
+                target_value2
+            };
+        })
+    }));
+
+    return {
+        ...plan,
+        workout_plans: updatedPlans
+    };
 }
 
 function buildUserProfilePayload(profile: RequiredUserProfile): string {
@@ -666,6 +717,7 @@ async function persistProgram(userId: string, plan: WorkoutProgram): Promise<Gen
             const planId = planIds[index];
             dayPlan.plan_exercises.forEach((exercise) => {
                 const exerciseId = exerciseCatalog[exercise.exercise_name];
+                const logMode = getLogModeForExercise(exercise.exercise_name);
                 if (!exerciseId) {
                     console.warn('[planner] Missing exercise id for', exercise.exercise_name);
                     return;
@@ -675,6 +727,12 @@ async function persistProgram(userId: string, plan: WorkoutProgram): Promise<Gen
                     return;
                 }
                 seen.add(comboKey);
+                let metric2 = exercise.metric2 ?? null;
+                // Ensure load-based movements carry weight metric2 even if model omitted it
+                if (!metric2 && logMode && logMode.includes('weight')) {
+                    metric2 = 'weight';
+                }
+
                 planExerciseRows.push({
                     plan_id: planId,
                     exercise_id: exerciseId,
@@ -683,7 +741,7 @@ async function persistProgram(userId: string, plan: WorkoutProgram): Promise<Gen
                     metric: exercise.metric,
                     target_value: exercise.target_value,
                     rest_seconds: exercise.rest_seconds,
-                    metric2: exercise.metric2 ?? null,
+                    metric2,
                     target_value2: exercise.target_value2 ?? null
                 });
             });

@@ -312,11 +312,12 @@ router.post('/generate-plan', requireAuth, requireSubscription, async (req: Auth
         let result;
         if (latestPlan && latestPlan.proposed_plan) {
             console.log('[chatbot] Using proposed plan from chat history');
+            const enrichedPlan = await applyWeightFallbackFromChatPlan(userId, latestPlan);
             const programData = {
-                name: latestPlan.program_name || latestPlan.programName || 'AI Generated Program',
-                description: latestPlan.program_description || latestPlan.programDescription || 'Generated from chat',
-                weeks_count: latestPlan.weeks_count || 4,
-                plans: latestPlan.proposed_plan
+                name: enrichedPlan.program_name || enrichedPlan.programName || 'AI Generated Program',
+                description: enrichedPlan.program_description || enrichedPlan.programDescription || 'Generated from chat',
+                weeks_count: enrichedPlan.weeks_count || 4,
+                plans: enrichedPlan.proposed_plan
             };
             const { workoutService } = await import('../services/workoutService');
             result = await workoutService.updateActiveWorkoutProgram(userId, programData);
@@ -332,6 +333,72 @@ router.post('/generate-plan', requireAuth, requireSubscription, async (req: Auth
         res.status(500).json({ error: error.message });
     }
 });
+
+async function applyWeightFallbackFromChatPlan(userId: string, latestPlan: any) {
+    // gather exercise names
+    const names = new Set<string>();
+    (latestPlan.proposed_plan || []).forEach((day: any) => {
+        (day?.plan_exercises || []).forEach((ex: any) => {
+            if (ex?.exercise_name) names.add(ex.exercise_name);
+            else if (ex?.name) names.add(ex.name);
+        });
+    });
+
+    let logModeMap = new Map<string, string>();
+    if (names.size) {
+        const { data } = await supabase.from('exercises').select('name, log_mode').in('name', Array.from(names));
+        data?.forEach((row: any) => logModeMap.set(row.name, row.log_mode));
+    }
+
+    const { data: profile } = await supabase
+        .from('user_info')
+        .select('weight_kg, experience_level')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+    const fallbackLoad = estimateLoadKg(profile?.weight_kg, profile?.experience_level);
+
+    const enrichedPlanExercises = (exList: any[]) => {
+        return (exList || []).map((ex) => {
+            const name = ex?.exercise_name || ex?.name;
+            const logMode = name ? logModeMap.get(name) : null;
+            const needsWeight = ex?.metric2 === 'weight' || (logMode && logMode.includes('weight'));
+
+            let metric2 = ex?.metric2 ?? null;
+            let targetValue2 = ex?.target_value2 ?? ex?.targetValue2 ?? null;
+
+            if (needsWeight && !metric2) metric2 = 'weight';
+            if (needsWeight && (!targetValue2 || targetValue2 <= 0)) targetValue2 = fallbackLoad;
+
+            return {
+                ...ex,
+                metric2,
+                target_value2: targetValue2
+            };
+        });
+    };
+
+    const enrichedPlan = {
+        ...latestPlan,
+        proposed_plan: (latestPlan.proposed_plan || []).map((day: any) => ({
+            ...day,
+            plan_exercises: enrichedPlanExercises(day?.plan_exercises)
+        }))
+    };
+
+    return enrichedPlan;
+}
+
+function estimateLoadKg(weightKg?: number | null, experienceLevel?: number | null) {
+    const bodyWeight = weightKg ?? 60;
+    let factor = 0.3;
+    if (experienceLevel !== null && experienceLevel !== undefined) {
+        if (experienceLevel >= 4) factor = 0.4;
+        else if (experienceLevel <= 1) factor = 0.2;
+    }
+    const estimated = bodyWeight * factor;
+    return Math.max(5, Math.min(60, Math.round(estimated)));
+}
 
 router.post('/exercise', requireAuth, requireSubscription, async (req: AuthedRequest, res) => {
     const parseResult = exerciseRequestSchema.safeParse(req.body);
@@ -691,7 +758,7 @@ function buildSystemPrompt({
   ]
 }`;
 
-        planContext = `\nCURRENT WORKOUT PLAN CONTEXT:\n${JSON.stringify(workoutPlanContext, null, 2)}\n\nIf the user asks to modify the plan, you MUST output the NEW plan in a JSON block with the key "proposed_plan". Unless the user clearly requests a completely new program, keep changes minimal on the current plan, but still output the full updated program.\n\nSTRICT CONSTRAINTS FOR MODIFICATIONS:\n1. Use ONLY the allowed exercise list below. Do NOT invent new names.${daysConstraint}\n2. Ensure exercise_ids are valid UUIDs if reusing, or use slugs/names from the allowed list if new.\n3. Metric MUST be one of: 'reps', 'weight', 'distance', 'duration_s', 'height'. (Use 'duration_s' for time-based exercises).\n\nAllowed exercises:\n${exerciseList}\n\nJSON Structure Template for "proposed_plan":\n${template}\nn5. provide a ${trainingDaysPerWeek}-days full plan based on the user's needs, even if the user only requests minor tweaks, and generate it based on user's foriginal plan.`;
+        planContext = `\nCURRENT WORKOUT PLAN CONTEXT:\n${JSON.stringify(workoutPlanContext, null, 2)}\n\nIf the user asks to modify the plan, you MUST output the NEW plan in a JSON block with the key "proposed_plan". Unless the user clearly requests a completely new program, keep changes minimal on the current plan, but still output the full updated program.\n\nSTRICT CONSTRAINTS FOR MODIFICATIONS:\n1. Use ONLY the allowed exercise list below. Do NOT invent new names.${daysConstraint}\n2. Ensure exercise_ids are valid UUIDs if reusing, or use slugs/names from the allowed list if new.\n3. Metric MUST be one of: 'reps', 'weight', 'distance', 'duration_s', 'height'. (Use 'duration_s' for time-based exercises).\n\nAllowed exercises:\n${exerciseList}\n\nJSON Structure Template for "proposed_plan":\n${template}\nn5. provide a ${trainingDaysPerWeek}-days full plan based on the user's needs, even if the user only requests minor tweaks, and generate it based on user's foriginal plan.\n6.        '- For any exercise that involves load (log_mode contains "weight"), you MUST include both metric2:"weight" AND target_value2 (load in kg). Missing target_value2 is invalid.',`;
     }
 
     return [

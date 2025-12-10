@@ -368,7 +368,27 @@ export default function WorkoutPlanChatbotPage() {
                                 const days = Array.isArray(plan?.proposed_plan) ? plan.proposed_plan : [];
                                 const programTitle = plan?.program_name || plan?.programTitle || "Proposed Plan";
                                 const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-                                
+
+                                const weightLike = /press|row|curl|raise|fly|pulldown|pull-down|pull-up|bench|squat|deadlift|lunge|extension|shoulder|bicep|tricep|cable|dumbbell|barbell/i;
+
+                                const hydrateExercise = (ex: any) => {
+                                    const name = ex?.exercise_name || ex?.name || '';
+                                    const metricStr = ex?.metric ? String(ex.metric) : '';
+                                    const metric2Str = ex?.metric2 ? String(ex.metric2) : '';
+                                    const needsWeight = metric2Str === 'weight' || metricStr.includes('weight') || weightLike.test(name);
+
+                                    let metric2 = ex?.metric2 ?? null;
+                                    let targetValue2 = ex?.target_value2 ?? ex?.targetValue2 ?? null;
+
+                                    if (!metric2 && needsWeight) metric2 = 'weight';
+
+                                    return {
+                                        ...ex,
+                                        metric2,
+                                        target_value2: targetValue2
+                                    };
+                                };
+
                                 return (
                                     <div className="mt-3 flex flex-col gap-3 rounded-2xl border border-muted-foreground/10 bg-white p-4 shadow-sm">
                                         <div className="flex items-center justify-between text-sm font-semibold text-slate-800">
@@ -393,11 +413,12 @@ export default function WorkoutPlanChatbotPage() {
                                                     <p className="text-sm text-slate-600">{day.plan_description}</p>
                                                 )}
                                                 <div className="flex flex-col gap-2">
-                                                    {Array.isArray(day?.plan_exercises) && day.plan_exercises.map((ex: any, exIdx: number) => (
+                                                    {Array.isArray(day?.plan_exercises) && day.plan_exercises.map(hydrateExercise).map((ex: any, exIdx: number) => (
                                                         <div key={exIdx} className="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm">
                                                             <span className="font-medium text-slate-800">{ex.exercise_name || ex.name || "Exercise"}</span>
                                                             <span className="text-slate-600">
                                                                 {(ex.target_sets ?? ex.sets ?? 3)} sets • {(ex.target_value ?? ex.reps ?? "")} {ex.metric || ex.metric1 || "reps"}
+                                                                {ex.metric2 === 'weight' && ex.target_value2 ? ` • ${ex.target_value2} kg` : ex.metric2 === 'weight' ? ' • weight TBD' : ''}
                                                             </span>
                                                         </div>
                                                     ))}
