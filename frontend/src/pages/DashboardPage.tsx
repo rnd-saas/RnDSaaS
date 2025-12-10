@@ -334,7 +334,7 @@ export default function DashboardPage() {
                 </div>
                 <CardTitle className={`h2-styles font-bold px-0! leading-tight ${isTodayWorkoutCompleted ? "text-center" : "text-left"}`}>
                   {!isTodayWorkoutCompleted 
-                    ? (plannedWorkout?.name || "Training Session")
+                    ? (plannedWorkout?.name || "Rest Day")
                     : `Congrats! Next workout is ${
                         nextWorkout?.date 
                           ? new Date(nextWorkout.date).toLocaleDateString('en-US', { weekday: 'long' })
@@ -353,7 +353,7 @@ export default function DashboardPage() {
                       Description
                     </p>
                     <p className="body-styles text-sm md:body-styles line-clamp-3">
-                      {plannedWorkout?.description || "Get ready to push your limits and build strength."}
+                      {plannedWorkout?.description || "Take some well deserved rest today!"}
                     </p>
                   </div>
                   <p className="text-sm text-muted-foreground text-center mt-0 md:text-left md:px-6 md:mt-2">

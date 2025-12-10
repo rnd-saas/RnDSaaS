@@ -1,5 +1,6 @@
 import PlannedExerciseItem from "@/components/WorkoutComponents/PlannedExerciseItem";
 import { Button } from "@/components/WorkoutComponents/button";
+import ChatbotIcon from "@/assets/chatbotIcon.svg?react";
 import { MessageSquareMore } from "lucide-react";
 import {
   MiniCalendar,
@@ -139,9 +140,11 @@ export default function WorkoutPage() {
             className="lg:flex-1 lg:h-9"
             onClick={() => navigate("/workout/plan-chatbot")}
           >
-            <MessageSquareMore size={isLarge ? 32 : 24} />
+                    <ChatbotIcon className={`${isLarge ? "w-5 h-5" : "w-3 h-3"}`} />
+            
+            {/* <MessageSquareMore size={isLarge ? 32 : 24} /> */}
             <p className="lg:inline hidden button-styles text-base">
-              Chat with workout agent
+              Plan with your workout buddy
             </p>
           </Button>
         </div>

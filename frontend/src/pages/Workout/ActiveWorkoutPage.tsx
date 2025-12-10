@@ -1,5 +1,6 @@
 import LoggedExerciseItem from "@/components/WorkoutComponents/LoggedExerciseItem";
 import { Button } from "@/components/WorkoutComponents/button";
+import ChatbotIcon from "@/assets/chatbotIcon.svg?react";
 import {
   MessageSquareMore,
   MoreVertical,
@@ -62,7 +63,7 @@ export default function ActiveWorkoutPage() {
       onSuccess: (data) => {
         // Check for achievements
         if (data.newAchievements && data.newAchievements.length > 0) {
-          data.newAchievements.forEach((achievement ) => {
+          data.newAchievements.forEach((achievement: any) => {
             toast.success(`Achievement Unlocked: ${achievement.name}!`, {
               description: achievement.description,
               duration: 5000,
@@ -219,73 +220,58 @@ export default function ActiveWorkoutPage() {
                 })}
               </h3>
             </div>
-            <div className="absolute right-4">
-              <Popover>
-                <PopoverTrigger asChild>
+            <div className="absolute right-4 flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 p-0 hover:bg-zinc-100"
+                onClick={() => {
+                  if (isRunning) {
+                    pauseWorkout();
+                  } else {
+                    resumeWorkout();
+                  }
+                }}
+              >
+                {isRunning ? (
+                  <Pause className="h-6 w-6 text-zinc-700" />
+                ) : (
+                  <Play className="h-6 w-6 text-zinc-700" />
+                )}
+              </Button>
+
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 p-0 hover:bg-zinc-100"
+                    className="h-8 w-8 p-0 hover:bg-zinc-100 text-red-600"
                   >
-                    <MoreVertical className="h-6 w-6 text-zinc-700" />
+                    <X className="h-6 w-6" />
                   </Button>
-                </PopoverTrigger>
-                <PopoverContent align="end" className="w-48 p-1">
-                  <div className="flex flex-col">
-                    <button
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Quit Workout?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to quit? Your current progress
+                      will be lost.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
                       onClick={() => {
-                        if (isRunning) {
-                          pauseWorkout();
-                        } else {
-                          resumeWorkout();
-                        }
+                        resetWorkout();
+                        navigate("/workout");
                       }}
-                      className="flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-zinc-100 focus:bg-zinc-100"
+                      className="bg-red-600 hover:bg-red-700"
                     >
-                      {isRunning ? (
-                        <>
-                          <Pause className="h-4 w-4" />
-                          <span>Pause Workout</span>
-                        </>
-                      ) : (
-                        <>
-                          <Play className="h-4 w-4" />
-                          <span>Resume Workout</span>
-                        </>
-                      )}
-                    </button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <button className="flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-red-600 outline-none hover:bg-zinc-100 focus:bg-zinc-100">
-                          <X className="h-4 w-4" />
-                          <span>Quit Workout</span>
-                        </button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Quit Workout?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to quit? Your current progress
-                            will be lost.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => {
-                              resetWorkout();
-                              navigate("/workout");
-                            }}
-                            className="bg-red-600 hover:bg-red-700"
-                          >
-                            Quit
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </PopoverContent>
-              </Popover>
+                      Quit
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
 
@@ -326,31 +312,23 @@ export default function ActiveWorkoutPage() {
             <>
               <Button
                 variant="secondary"
-                className="flex-1 text-md "
+                className="flex-1 text-md"
                 onClick={handleFinishWorkout}
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Saving..." : "Finish Workout"}
               </Button>
-              <AlertDialog
-                open={isFinishDialogOpen}
-                onOpenChange={setIsFinishDialogOpen}
-              >
+              <AlertDialog open={isFinishDialogOpen} onOpenChange={setIsFinishDialogOpen}>
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>Finish Workout?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      You haven't completed all sets. Are you sure you want to
-                      finish?
+                      You haven't completed all sets. Are you sure you want to finish?
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={onFinishConfirmed}
-                    >
-                      Finish
-                    </AlertDialogAction>
+                    <AlertDialogAction onClick={onFinishConfirmed}>Finish</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
@@ -365,10 +343,9 @@ export default function ActiveWorkoutPage() {
             </Button>
           )}
           <Button
-            size={"icon"}
+            size="icon"
             variant={isRunning ? "secondary" : "default"}
-            className=""
-            onClick={() => navigate("/chatbot")}
+            onClick={() => navigate("/workout/plan-chatbot")}
           >
             <MessageSquareMore size={24} />
           </Button>
