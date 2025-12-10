@@ -5,12 +5,17 @@ export interface SocialUserSummary {
   username: string;
   display_name: string;
   status?: string | null;
+  user_info: userAvatar;
 }
 
 export interface SocialPostAuthor {
   id: string;
   username: string;
   display_name: string;
+  user_info: userAvatar;
+}
+interface userAvatar{
+  avatar_option: number | 0;
 }
 
 export interface SocialPost {

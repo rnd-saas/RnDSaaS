@@ -24,7 +24,7 @@ router.get('/users', async (req: AuthedRequest, res) => {
 
         const { data, error } = await supabase
             .from('users')
-            .select('id, username, display_name')
+            .select(`id, username, display_name, user_info( avatar_option ) `)
             .or(`display_name.ilike.%${sanitizedQuery}%,username.ilike.%${sanitizedQuery}%`)
             .neq('id', currentUserId ?? '')
             .order('display_name', { ascending: true })
@@ -75,7 +75,7 @@ router.get('/posts', async (req: AuthedRequest, res) => {
             .from('posts')
             .select(
                 `id, body, created_at,
-                author:users!posts_author_id_fkey (id, username, display_name)`
+                author:users!posts_author_id_fkey (id, username, display_name, user_info( avatar_option ))`
             )
             .in('author_id', authorIds)
             .order('created_at', { ascending: false })
