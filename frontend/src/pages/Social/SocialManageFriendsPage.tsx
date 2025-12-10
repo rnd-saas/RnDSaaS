@@ -208,10 +208,13 @@ export default function SocialManageFriendsPage() {
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           <Avatar className="h-10 w-10 shrink-0">
-                            <AvatarImage src={AvatarOptionValues[otherUser.user_info.avatar_option??0].src} alt={otherUser.display_name} />
-                            <AvatarFallback className={"bg-primary/10"}>
-                              {initialsFromName(otherUser.display_name)}
-                            </AvatarFallback>
+                            {otherUser.user_info?.avatar_option != null ? (
+                                <AvatarImage src={AvatarOptionValues[otherUser.user_info.avatar_option].src} alt={otherUser.display_name} />
+                            ) : (
+                                <AvatarFallback className={"bg-primary/10"}>
+                                  {initialsFromName(otherUser.display_name)}
+                                </AvatarFallback>
+                            )}
                           </Avatar>
                           <div className="flex flex-col min-w-0 flex-1">
                             <span className="text-sm font-medium truncate">
@@ -298,10 +301,13 @@ export default function SocialManageFriendsPage() {
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           <Avatar className="h-10 w-10 shrink-0">
-                            <AvatarImage src={AvatarOptionValues[otherUser.user_info.avatar_option??0].src} alt={otherUser.display_name} />
-                            <AvatarFallback className={"bg-primary/10"}>
-                              {initialsFromName(otherUser.display_name)}
-                            </AvatarFallback>
+                            {otherUser.user_info?.avatar_option != null ? (
+                                <AvatarImage src={AvatarOptionValues[otherUser.user_info.avatar_option].src} alt={otherUser.display_name} />
+                            ) : (
+                                <AvatarFallback className={"bg-primary/10"}>
+                                  {initialsFromName(otherUser.display_name)}
+                                </AvatarFallback>
+                            )}
                           </Avatar>
                           <div className="flex flex-col min-w-0 flex-1">
                             <span className="text-sm font-medium truncate">
@@ -372,10 +378,13 @@ export default function SocialManageFriendsPage() {
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           <Avatar className="h-10 w-10 shrink-0">
-                            <AvatarImage src={undefined} alt={otherUser.display_name} />
-                            <AvatarFallback className={"bg-primary/10"}>
-                              {initialsFromName(otherUser.display_name)}
-                            </AvatarFallback>
+                            {otherUser.user_info?.avatar_option != null ? (
+                                <AvatarImage src={AvatarOptionValues[otherUser.user_info.avatar_option].src} alt={otherUser.display_name} />
+                            ) : (
+                                <AvatarFallback className={"bg-primary/10"}>
+                                  {initialsFromName(otherUser.display_name)}
+                                </AvatarFallback>
+                            )}
                           </Avatar>
                           <div className="flex flex-col min-w-0 flex-1">
                             <span className="text-sm font-medium truncate">
