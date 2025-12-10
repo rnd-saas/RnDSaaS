@@ -5,6 +5,7 @@
 
 import { Router } from 'express';
 import { supabase, supabaseAuth } from '../db/supabase';
+import jwt from 'jsonwebtoken';
 import { requireAuth } from '../middleware/requireAuth';
 import withTimeout from '../utils/withTimeout';
 
@@ -524,6 +525,111 @@ router.delete('/account', requireAuth, async (req: any, res) => {
 
     } catch (error: any) {
         console.error('Delete account error:', error);
+        res.status(500).json({ 
+            error: { message: 'Internal server error' } 
+        });
+    }
+});
+
+/**
+ * POST /api/auth/reset-password
+ * Request password reset email
+ */
+router.post('/reset-password', async (req, res) => {
+    try {
+        const { email, redirectTo } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ 
+                error: { message: 'Email is required' } 
+            });
+        }
+
+        // Send password reset email
+        const { error } = await supabaseAuth.auth.resetPasswordForEmail(email, {
+            redirectTo: redirectTo || `${process.env.FRONTEND_URL || 'http://localhost:5173'}/password-change`
+        });
+
+        if (error) {
+            console.error('Password reset error:', error);
+            // Don't reveal if email exists or not for security
+            // Always return success to prevent email enumeration
+        }
+
+        // Always return success message (security best practice)
+        res.json({ 
+            message: 'If an account exists with this email, you will receive a password reset link.' 
+        });
+
+    } catch (error: any) {
+        console.error('Reset password error:', error);
+        res.status(500).json({ 
+            error: { message: 'Internal server error' } 
+        });
+    }
+});
+
+/**
+ * POST /api/auth/update-password
+ * Update user password (after clicking reset link)
+ */
+router.post('/update-password', async (req, res) => {
+    try {
+        const { password } = req.body;
+
+        if (!password) {
+            return res.status(400).json({ 
+                error: { message: 'New password is required' } 
+            });
+        }
+
+        if (password.length < 6) {
+            return res.status(400).json({ 
+                error: { message: 'Password must be at least 6 characters long' } 
+            });
+        }
+
+        // Get the access token from the authorization header
+        const authHeader = req.headers.authorization;
+        const token = authHeader?.split(' ')[1];
+
+        if (!token) {
+            return res.status(401).json({ 
+                error: { message: 'Authentication required' } 
+            });
+        }
+
+        // Decode JWT to extract user id (sub)
+        let userId: string | undefined;
+        try {
+            const decoded = jwt.decode(token) as { sub?: string } | null;
+            userId = decoded?.sub;
+        } catch (err) {
+            console.error('JWT decode error:', err);
+        }
+
+        if (!userId) {
+            return res.status(401).json({ 
+                error: { message: 'Invalid token' } 
+            });
+        }
+
+        // Use admin client to update password directly without relying on session
+        const { error } = await supabase.auth.admin.updateUserById(userId, { password });
+
+        if (error) {
+            console.error('Update password error:', error);
+            return res.status(400).json({ 
+                error: { message: error.message || 'Failed to update password' } 
+            });
+        }
+
+        res.json({ 
+            message: 'Password updated successfully' 
+        });
+
+    } catch (error: any) {
+        console.error('Update password error:', error);
         res.status(500).json({ 
             error: { message: 'Internal server error' } 
         });

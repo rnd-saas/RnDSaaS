@@ -79,11 +79,35 @@ export async function deleteAccount(): Promise<void> {
     apiClient.clearToken();
 }
 
+/**
+ * Request password reset
+ * Sends a password reset email to the user
+ */
+export async function requestPasswordReset(email: string): Promise<{ message: string }> {
+    const redirectTo = `${window.location.origin}/password-change`;
+    return await apiClient.post<{ message: string }>('/api/auth/reset-password', { 
+        email,
+        redirectTo 
+    });
+}
+
+/**
+ * Update user password
+ * Used after clicking the reset password link
+ */
+export async function updatePassword(newPassword: string): Promise<{ message: string }> {
+    return await apiClient.post<{ message: string }>('/api/auth/update-password', { 
+        password: newPassword 
+    });
+}
+
 export const authService = {
     login,
     register,
     logout,
     getCurrentUser,
-    deleteAccount
+    deleteAccount,
+    requestPasswordReset,
+    updatePassword
 };
 

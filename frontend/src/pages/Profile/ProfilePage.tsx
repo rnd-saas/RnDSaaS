@@ -3,6 +3,7 @@ import ChatbotButton from "@/components/chatbotButton";
 import {useEffect, useState} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
 import type {ProfileData, ProfileResponse} from "@/lib/api";
 import {ApiError, profileService} from "@/lib/api";
 import SettingsButton from "@/components/settingsButton";
@@ -64,6 +65,11 @@ export default function ProfilePage() {
     }, [location.pathname]); // Reload when route changes (e.g., after login)
 
     const displayName = profile?.user.preferredName ?? fallbackName;
+    const [isEditingName, setIsEditingName] = useState(false);
+    const [nameInput, setNameInput] = useState(displayName);
+    useEffect(() => {
+        setNameInput(displayName);
+    }, [displayName]);
     const [profileData, setProfileData] = useState<ProfileData | null>(
         null
     )
@@ -109,11 +115,11 @@ export default function ProfilePage() {
                 <div className="flex flex-col items-end gap-1 min-w-[150px]">
                     <div className="flex items-center justify-between w-full text-xs">
               <span className="text-muted-foreground">
-                Level:{" "}
-                  <span className="font-medium text-foreground">
-                  {level.label}
-                </span>
-              </span>
+                                Level: {" "}
+                                    <span className="font-medium text-foreground">
+                                    {level.label}
+                                </span>
+                            </span>
                         <span className="text-muted-foreground">
                 {level.currentXp} / {level.nextLevelXp} XP
               </span>
@@ -127,7 +133,7 @@ export default function ProfilePage() {
         },
         {
             key: "onboarding",
-            label: "Workout preferences",
+            label: "Personal information",
             content: (
                 <WorkoutPreferences currentValues={onboardingResults}/>
             ),
@@ -150,6 +156,22 @@ export default function ProfilePage() {
         } catch (error) {
             console.error("Failed to save preferences:", error);
             alert("Failed to save preferences. Please try again.");
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const handleNameSave = async () => {
+        const trimmed = nameInput.trim();
+        if (!trimmed) return;
+        setIsSaving(true);
+        try {
+            await profileService.updatePreferences({ preferredName: trimmed } as any);
+            await loadProfile(true);
+            setIsEditingName(false);
+        } catch (error) {
+            console.error("Failed to update name:", error);
+            alert("Failed to update name. Please try again.");
         } finally {
             setIsSaving(false);
         }
@@ -203,9 +225,35 @@ export default function ProfilePage() {
                         </DialogContent>
                     </Dialog>
                 </div>
-                <h2 className="text-3xl font-bold tracking-tight font-serif text-primary">
-            {displayName}
-        </h2>
+                <div className="flex items-center gap-3">
+                    {isEditingName ? (
+                        <Input
+                            value={nameInput}
+                            onChange={(e) => setNameInput(e.target.value)}
+                            className="h-10 text-2xl font-bold"
+                            maxLength={100}
+                            disabled={isSaving}
+                        />
+                    ) : (
+                        <h2 className="text-3xl font-bold tracking-tight font-serif text-primary">
+                            {displayName}
+                        </h2>
+                    )}
+                    {isEditingName ? (
+                        <div className="flex gap-2">
+                            <Button size="sm" variant="default" onClick={handleNameSave} disabled={isSaving || !nameInput.trim()}>
+                                Save
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => { setIsEditingName(false); setNameInput(displayName); }} disabled={isSaving}>
+                                Cancel
+                            </Button>
+                        </div>
+                    ) : (
+                        <Button size="icon" variant="ghost" onClick={() => setIsEditingName(true)}>
+                            <Pencil className="w-4 h-4" />
+                        </Button>
+                    )}
+                </div>
         <div className="absolute top-0 right-0">
           <SettingsButton />
         </div>

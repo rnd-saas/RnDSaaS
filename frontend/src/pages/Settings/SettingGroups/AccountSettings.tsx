@@ -109,6 +109,17 @@ export default function AccountSettings() {
 
     return (
         <div className="space-y-6 w-full max-w-xl">
+            {/* Change Password */}
+            <div className="flex flex-col gap-2 w-full">
+                <Button
+                    id="change-password"
+                    className="mr-4 w-fit"
+                    variant={"link"}
+                    onClick={() => navigate("/password-reset")}
+                >
+                    Change Password
+                </Button>
+            </div>
             {/* Logout */}
             <div className="flex flex-col gap-2 w-full">
                 {logoutError && (
