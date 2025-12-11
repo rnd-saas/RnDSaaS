@@ -347,7 +347,7 @@ export default function ActiveWorkoutPage() {
             variant={isRunning ? "secondary" : "default"}
             onClick={() => navigate("/workout/plan-chatbot")}
           >
-            <MessageSquareMore size={24} />
+            <ChatbotIcon className={"w-3 h-3"} />
           </Button>
         </div>
       </div>
