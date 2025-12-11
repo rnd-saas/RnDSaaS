@@ -113,10 +113,10 @@ export default function PlannedCalendar() {
                                                     <div className="h-2 w-2 rounded-full bg-[var(--color-primary-pressed)] absolute bottom-1 left-1/2 -translate-x-1/2" />
                                                 )}
                                                 {!isWorked && isPlanned && (
-                                                    <div className="h-2 w-2 rounded-full bg-[var(--color-primary-hover)] absolute bottom-1 left-1/2 -translate-x-1/2" />
+                                                    <div className="h-2 w-2 rounded-full bg-primary/50 absolute bottom-1 left-1/2 -translate-x-1/2" />
                                                 )}
                                                 {isCurrent && (
-                                                    <div className="size-4 rounded-full border border-background absolute inset-0 m-auto" />
+                                                    <div className="size-4 rounded-full border border-muted-foreground/60 absolute inset-0 m-auto" />
                                                 )}
                                             </>
                                         )}
@@ -133,7 +133,7 @@ export default function PlannedCalendar() {
                             Completed
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="size-4 rounded-md bg-[var(--color-primary-hover)]" />
+                            <div className="size-4 rounded-md bg-primary/50" />
                             Planned / Upcoming
                         </div>
                     </div>
