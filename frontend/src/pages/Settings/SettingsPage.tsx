@@ -64,12 +64,6 @@ export default function SettingsPage() {
                 ))}
             </Accordion>
 
-            {/* Floating action button consistent with other pages */}
-            <div className="fixed bottom-20 right-6 z-50">
-                <div className="shadow-lg">
-                    <ChatbotButton variant={"default"}/>
-                </div>
-            </div>
         </div>
     )
 }
