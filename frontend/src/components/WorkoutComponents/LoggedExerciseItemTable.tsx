@@ -119,7 +119,7 @@ export default function WorkoutList({ exerciseId }: { exerciseId: string }) {
                         }
                       }}
                       // Fix: Show placeholder if cellData exists, otherwise empty string (avoids "undefined")
-                   q   placeholder={cellData !== undefined && cellData !== null ? `${cellData}` : ""}
+                      placeholder={cellData !== undefined && cellData !== null ? `${cellData}` : ""}
                       // Fix: Default value should be empty string if actual value is undefined/null
                       defaultValue={(() => {
                         const setNumber = rowData[0];
