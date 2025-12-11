@@ -240,6 +240,15 @@ export default function SocialPage() {
             })()}
           </div>
         ))}
+        {hasQuery && (
+            <div className="w-full text-left">
+              <Button variant="link" className="text-sm p-0"
+                      onClick={() => navigate("/settings", { state: { openAccordion: "subscription" } })}
+              >
+                Refer a friend
+              </Button>
+            </div>
+        )}
 
         {hasQuery && userResults.length > 0 && <div className="h-3" />}
       </div>

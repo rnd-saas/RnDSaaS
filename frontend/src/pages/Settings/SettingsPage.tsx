@@ -5,7 +5,8 @@ import { useLocation, useNavigate } from "react-router-dom"; // Added useNavigat
 import AccountSettings from "@/pages/Settings/SettingGroups/AccountSettings";
 import { ChevronLeft } from "lucide-react"; // Added ChevronLeft icon
 import { Button } from "@/components/ui/button";
-import UserAvatar from "@/components/userAvatar.tsx"; // Added Button component
+import UserAvatar from "@/components/userAvatar.tsx";
+import {useEffect, useState} from "react"; // Added Button component
 
 export default function SettingsPage() {
     const navigate = useNavigate(); // Hook for navigation
@@ -14,9 +15,21 @@ export default function SettingsPage() {
         { value: "subscription", component: SubscriptionSettings, label: "Subscription Settings" },
         { value: "account", component: AccountSettings, label: "Account Settings" },
     ];
-    const { state } = useLocation() as { state?: { firstName?: string } };
+    const { state } = useLocation() as {
+        state?: {
+            firstName?: string;
+            openAccordion?: string;
+        };
+    };
     const userName = state?.firstName ?? localStorage.getItem("firstName") ?? "User";
 
+    const [accordionValue, setAccordionValue] = useState("");
+
+    useEffect(() => {
+        if (state?.openAccordion) {
+            setAccordionValue(state.openAccordion);
+        }
+    }, [state]);
     return (
         <div className="w-full max-w-lg md:max-w-xl mx-auto p-6 pb-24 flex flex-col items-center space-y-8 min-h-screen relative">
             {/* Header with Back Button */}
@@ -40,7 +53,7 @@ export default function SettingsPage() {
             </div>
 
             {/* Accordion takes full width of the container */}
-            <Accordion type="single" collapsible className="w-full space-y-4">
+            <Accordion type="single" collapsible value={accordionValue} onValueChange={setAccordionValue} className="w-full space-y-4">
                 {settingsComponents.map((g) => (
                     <AccordionItem 
                         key={g.value} 
