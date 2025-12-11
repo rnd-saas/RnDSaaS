@@ -64,14 +64,14 @@ export default function ProgressPage() {
                 return <div className="text-sm text-red-500">Error loading achievements</div>;
             }
         }, label: "Recent Achievements" },
-        { value:"moods", render: () => {
+        { value:"calendar", render: () => {
             try {
-                return <Moods />;
+                return <PlannedCalendar />;
             } catch (error) {
-                console.error('Error rendering moods:', error);
-                return <div className="text-sm text-red-500">Error loading moods</div>;
+                console.error('Error rendering calendar:', error);
+                return <div className="text-sm text-red-500">Error loading calendar</div>;
             }
-        }, label:"This week's mood" },
+        }, label:"Consistency History" },
         { value:"workouts", render: () => {
             try {
                 return <Workouts />;
@@ -80,14 +80,14 @@ export default function ProgressPage() {
                 return <div className="text-sm text-red-500">Error loading workouts</div>;
             }
         }, label:"This week's workouts" },
-        { value:"calendar", render: () => {
+        { value:"moods", render: () => {
             try {
-                return <PlannedCalendar />;
+                return <Moods />;
             } catch (error) {
-                console.error('Error rendering calendar:', error);
-                return <div className="text-sm text-red-500">Error loading calendar</div>;
+                console.error('Error rendering moods:', error);
+                return <div className="text-sm text-red-500">Error loading moods</div>;
             }
-        }, label:"Workout Calendar" },
+        }, label:"This week's mood" },
         { value:"data", render: () => {
             try {
                 return <PersonalData />;
