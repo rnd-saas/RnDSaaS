@@ -118,8 +118,9 @@ export default function WorkoutList({ exerciseId }: { exerciseId: string }) {
                           e.preventDefault();
                         }
                       }}
-                      placeholder={`${cellData}`}
-                      // Bind the value to the store state
+                      // Fix: Show placeholder if cellData exists, otherwise empty string (avoids "undefined")
+                   q   placeholder={cellData !== undefined && cellData !== null ? `${cellData}` : ""}
+                      // Fix: Default value should be empty string if actual value is undefined/null
                       defaultValue={(() => {
                         const setNumber = rowData[0];
                         const set = loggedExercise?.sets.find(
@@ -127,13 +128,9 @@ export default function WorkoutList({ exerciseId }: { exerciseId: string }) {
                         );
                         if (!set) return "";
 
-                        // Helper to get the logged value or fallback to the planned value (cellData)
-                        const getValue = (
-                          loggedVal: number | undefined | null
-                        ) => {
-                          if (loggedVal !== undefined && loggedVal !== null)
-                            return loggedVal;
-                          return ""; // If no logged value, return empty string so placeholder shows
+                        const getValue = (val: number | undefined | null) => {
+                          if (val !== undefined && val !== null) return val;
+                          return "";
                         };
 
                         switch (loggedExercise?.exerciseInfo.logMode) {
@@ -148,8 +145,7 @@ export default function WorkoutList({ exerciseId }: { exerciseId: string }) {
                           case "time_weight":
                             return cellIndex === 1
                               ? getValue(
-                                  (set.actualTimeSeconds ?? undefined) !==
-                                    undefined
+                                  (set.actualTimeSeconds ?? undefined) !== undefined
                                     ? (set.actualTimeSeconds as number) / 60
                                     : undefined
                                 )
@@ -157,8 +153,7 @@ export default function WorkoutList({ exerciseId }: { exerciseId: string }) {
                           case "time":
                             return cellIndex === 1
                               ? getValue(
-                                  (set.actualTimeSeconds ?? undefined) !==
-                                    undefined
+                                  (set.actualTimeSeconds ?? undefined) !== undefined
                                     ? (set.actualTimeSeconds as number) / 60
                                     : undefined
                                 )
@@ -268,34 +263,43 @@ export default function WorkoutList({ exerciseId }: { exerciseId: string }) {
                         (s) => s.setNumber === setNumber
                       );
                       const logMode = loggedExercise?.exerciseInfo.logMode;
-                      const isMissing = (val: any) =>
-                        val === null || val === undefined;
+                      
+                      // Helper: check if the user has NOT entered a value (undefined, null, or empty)
+                      const isMissing = (val: any) => val === undefined || val === null;
 
-                      // rowData: [setNumber, PrimaryMetric, SecondaryMetric?]
+                      // We use the TARGET values stored in the set (thanks to the fix in workout.ts)
+                      // Cast to any to access target props if TS complains, or assume LoggedSet now has them
+                      const s = currentSet as any; 
+
                       if (logMode === "reps_weight") {
-                        if (isMissing(currentSet?.actualReps))
-                          updatePayload.actualReps = rowData[1];
-                        if (isMissing(currentSet?.actualWeightKg))
-                          updatePayload.actualWeightKg = rowData[2];
-                      } else if (logMode === "reps") {
-                        if (isMissing(currentSet?.actualReps))
-                          updatePayload.actualReps = rowData[1];
-                      } else if (logMode === "time_weight") {
-                        if (isMissing(currentSet?.actualTimeSeconds))
-                          updatePayload.actualTimeSeconds = rowData[1] * 60;
-                        if (isMissing(currentSet?.actualWeightKg))
-                          updatePayload.actualWeightKg = rowData[2];
-                      } else if (logMode === "time") {
-                        if (isMissing(currentSet?.actualTimeSeconds))
-                          updatePayload.actualTimeSeconds = rowData[1] * 60;
-                      } else if (logMode === "distance_weight") {
-                        if (isMissing(currentSet?.actualDistanceMeters))
-                          updatePayload.actualDistanceMeters = rowData[1];
-                        if (isMissing(currentSet?.actualWeightKg))
-                          updatePayload.actualWeightKg = rowData[2];
-                      } else if (logMode === "distance") {
-                        if (isMissing(currentSet?.actualDistanceMeters))
-                          updatePayload.actualDistanceMeters = rowData[1];
+                        if (isMissing(currentSet?.actualReps) && s?.targetReps != null) 
+                            updatePayload.actualReps = s.targetReps;
+                        if (isMissing(currentSet?.actualWeightKg) && s?.targetWeightKg != null) 
+                            updatePayload.actualWeightKg = s.targetWeightKg;
+                      }
+                      else if (logMode === "reps") {
+                        if (isMissing(currentSet?.actualReps) && s?.targetReps != null) 
+                            updatePayload.actualReps = s.targetReps;
+                      }
+                      else if (logMode === "time_weight") {
+                        if (isMissing(currentSet?.actualTimeSeconds) && s?.targetTimeSeconds != null) 
+                            updatePayload.actualTimeSeconds = s.targetTimeSeconds;
+                        if (isMissing(currentSet?.actualWeightKg) && s?.targetWeightKg != null) 
+                            updatePayload.actualWeightKg = s.targetWeightKg;
+                      }
+                      else if (logMode === "time") {
+                        if (isMissing(currentSet?.actualTimeSeconds) && s?.targetTimeSeconds != null) 
+                            updatePayload.actualTimeSeconds = s.targetTimeSeconds;
+                      }
+                      else if (logMode === "distance_weight") {
+                        if (isMissing(currentSet?.actualDistanceMeters) && s?.targetDistanceMeters != null) 
+                            updatePayload.actualDistanceMeters = s.targetDistanceMeters;
+                        if (isMissing(currentSet?.actualWeightKg) && s?.targetWeightKg != null) 
+                            updatePayload.actualWeightKg = s.targetWeightKg;
+                      }
+                      else if (logMode === "distance") {
+                        if (isMissing(currentSet?.actualDistanceMeters) && s?.targetDistanceMeters != null) 
+                            updatePayload.actualDistanceMeters = s.targetDistanceMeters;
                       }
                     }
 
