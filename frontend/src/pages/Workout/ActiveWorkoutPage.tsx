@@ -29,6 +29,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/alert-dialog";
 import { toast } from "sonner";
+import { trackWorkoutComplete, trackAchievementUnlock } from "@/lib/analytics";
 
 // GENERAL NOTE: first render is test, second render is actual first render due to strict mode in dev.
 // Note: the first render will have null for loggedWorkout since the workout is only started in useEffect after first render.
@@ -61,9 +62,15 @@ export default function ActiveWorkoutPage() {
 
     submitWorkout(loggedWorkout, {
       onSuccess: (data) => {
+        // Track workout completion
+        const exercisesCount = loggedWorkout.exercises?.length || 0;
+        trackWorkoutComplete(data.id, elapsedTimeSeconds, exercisesCount);
+
         // Check for achievements
         if (data.newAchievements && data.newAchievements.length > 0) {
           data.newAchievements.forEach((achievement: any) => {
+            // Track achievement unlock
+            trackAchievementUnlock(achievement.id || achievement.name, achievement.name);
             toast.success(`Achievement Unlocked: ${achievement.name}!`, {
               description: achievement.description,
               duration: 5000,

@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/card';
 import { CheckCircle2 } from 'lucide-react';
+import { trackPaymentSuccess } from '@/lib/analytics';
 
 export default function PaymentSuccessPage() {
   const navigate = useNavigate();
@@ -10,7 +11,10 @@ export default function PaymentSuccessPage() {
   const sessionId = searchParams.get('session_id');
 
   useEffect(() => {
-    if (!sessionId) {
+    if (sessionId) {
+      // Track successful payment
+      trackPaymentSuccess(sessionId, 5.0);
+    } else {
       // Optionally redirect if no session ID
       // navigate('/subscription');
     }

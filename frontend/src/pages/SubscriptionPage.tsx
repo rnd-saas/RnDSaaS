@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/card';
 import { toast } from 'sonner';
+import { trackSubscriptionStart } from '@/lib/analytics';
 
 export default function SubscriptionPage() {
   const [loading, setLoading] = useState(false);
@@ -16,6 +17,9 @@ export default function SubscriptionPage() {
       // Replace with your actual Stripe Price ID
       // You can find this in your Stripe Dashboard -> Products -> Pricing
       const PRICE_ID = 'price_1SYNoHGK6AjiY8KvH2XjRpfF'; 
+
+      // Track subscription start
+      trackSubscriptionStart(PRICE_ID, referralCode || undefined);
 
       const response = await paymentService.createCheckoutSession(PRICE_ID, referralCode);
       

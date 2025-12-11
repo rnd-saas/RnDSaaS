@@ -12,6 +12,7 @@ import type { WorkoutEvaluation } from "@/lib/types/Workout";
 import { Skeleton } from "@/components/ui/skeleton";
 // NEW: Import the card
 import MoodShiftCard from "@/components/WorkoutComponents/MoodShiftCard";
+import { trackWorkoutEvaluation, trackWorkoutSkip } from "@/lib/analytics";
 
 export default function WorkoutEvaluationPage() {
   const navigate = useNavigate();
@@ -69,6 +70,8 @@ export default function WorkoutEvaluationPage() {
       { workoutId, evaluation },
       {
         onSuccess: () => {
+          // Track workout skip
+          trackWorkoutSkip(workoutId);
           resetWorkout();
           navigate("/dashboard", { replace: true });
         },
@@ -101,6 +104,8 @@ export default function WorkoutEvaluationPage() {
       { workoutId, evaluation },
       {
         onSuccess: () => {
+          // Track workout evaluation
+          trackWorkoutEvaluation(workoutId, evaluation.difficultyRating, evaluation.moodAfterWorkout);
           resetWorkout();
           navigate("/dashboard", { replace: true });
         },

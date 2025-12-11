@@ -164,3 +164,109 @@ export function clearUserId(): void {
   });
 }
 
+/**
+ * Track subscription/payment events
+ */
+export function trackSubscriptionStart(priceId?: string, referralCode?: string): void {
+  trackEvent('begin_checkout', {
+    currency: 'EUR',
+    value: 5.0,
+    items: [{
+      item_id: priceId || 'pro_plan',
+      item_name: 'Pro Plan',
+      price: 5.0,
+      quantity: 1
+    }],
+    referral_code: referralCode || undefined,
+  });
+}
+
+export function trackPaymentSuccess(sessionId?: string, value?: number): void {
+  trackEvent('purchase', {
+    transaction_id: sessionId,
+    currency: 'EUR',
+    value: value || 5.0,
+    items: [{
+      item_id: 'pro_plan',
+      item_name: 'Pro Plan',
+      price: value || 5.0,
+      quantity: 1
+    }]
+  });
+}
+
+export function trackPaymentCancel(): void {
+  trackEvent('checkout_progress', {
+    checkout_step: 0,
+    checkout_option: 'cancelled'
+  });
+}
+
+/**
+ * Track workout events
+ */
+export function trackWorkoutStart(workoutId: string, moodBefore?: number): void {
+  trackEvent('workout_start', {
+    workout_id: workoutId,
+    mood_before: moodBefore,
+  });
+}
+
+export function trackWorkoutComplete(workoutId: string, duration?: number, exercisesCount?: number): void {
+  trackEvent('workout_complete', {
+    workout_id: workoutId,
+    duration_seconds: duration,
+    exercises_count: exercisesCount,
+  });
+}
+
+export function trackWorkoutSkip(workoutId: string): void {
+  trackEvent('workout_skip', {
+    workout_id: workoutId,
+  });
+}
+
+export function trackWorkoutEvaluation(workoutId: string, difficulty?: number, moodAfter?: number): void {
+  trackEvent('workout_evaluation', {
+    workout_id: workoutId,
+    difficulty_rating: difficulty,
+    mood_after: moodAfter,
+  });
+}
+
+/**
+ * Track mood logging
+ */
+export function trackMoodLog(mood: number, source?: string): void {
+  trackEvent('mood_log', {
+    mood_value: mood,
+    mood_source: source || 'manual',
+  });
+}
+
+/**
+ * Track achievement unlocks
+ */
+export function trackAchievementUnlock(achievementId: string, achievementName: string): void {
+  trackEvent('achievement_unlock', {
+    achievement_id: achievementId,
+    achievement_name: achievementName,
+  });
+}
+
+/**
+ * Track chatbot usage
+ */
+export function trackChatbotMessage(messageLength?: number, trainerId?: number): void {
+  trackEvent('chatbot_message', {
+    message_length: messageLength,
+    trainer_id: trainerId,
+  });
+}
+
+export function trackChatbotSessionStart(trainerId?: number): void {
+  trackEvent('chatbot_session_start', {
+    trainer_id: trainerId,
+  });
+}
+

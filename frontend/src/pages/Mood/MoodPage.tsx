@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { moodService } from "@/lib/api";
 import WeeklyReview from "./WeeklyReview";
+import { trackMoodLog } from "@/lib/analytics";
 
 type MoodKey = "anxious" | "nervous" | "okay" | "comfortable" | "never";
 
@@ -127,6 +128,8 @@ export default function MoodPage() {
     const moodIndex = MOOD_KEY_TO_DB_INDEX[selected];
     try {
       await moodService.saveTodayMood(moodIndex);
+      // Track mood logging
+      trackMoodLog(moodIndex, 'manual');
     } catch (error) {
       console.warn("Failed to sync mood with server", error);
     }

@@ -1,4 +1,4 @@
-﻿import {Button} from "@/components/ui/button";
+import {Button} from "@/components/ui/button";
 import {AlertTriangle, ArrowLeft, Loader2, MoreVertical, Send, Sparkles} from "lucide-react";
 import tomAvatar from "@/assets/avatars/tom_avatar.png";
 import sarahAvatar from "@/assets/avatars/sarah_avatar.png";
@@ -10,6 +10,7 @@ import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {chatbotService} from "@/lib/api";
 import type {ChatbotMessage, ChatbotTrainerProfile} from "@/lib/api/types";
 import { toast } from "sonner";
+import { trackChatbotMessage, trackChatbotSessionStart } from "@/lib/analytics";
 
 type ConversationMessage = {
     id: string;
@@ -75,6 +76,8 @@ export default function ChatbotPage() {
                 if (!active) return;
                 setProfile(data);
                 initGreeting(data.name);
+                // Track chatbot session start
+                trackChatbotSessionStart(data.trainerId);
             } catch (error: any) {
                 if (!active) return;
                 console.error("Failed to load chatbot profile", error);
@@ -136,6 +139,9 @@ export default function ChatbotPage() {
         setIsSending(true);
 
         try {
+            // Track chatbot message
+            trackChatbotMessage(trimmedValue.length, trainerId);
+
             const response = await chatbotService.sendMessage({
                 trainerId,
                 messages: buildPayloadMessages(updatedHistory),

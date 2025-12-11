@@ -23,6 +23,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useWorkoutStore } from "@/lib/state/workoutStore";
+import { trackWorkoutStart } from "@/lib/analytics";
 
 export default function WorkoutPage() {
   const isLarge = window.matchMedia("(min-width: 1024px)").matches;
@@ -52,6 +53,10 @@ export default function WorkoutPage() {
   const handleMoodSelect = (moodIndex: number) => {
     setPreWorkoutMood(moodIndex);
     setIsMoodModalOpen(false);
+    // Track workout start with mood
+    if (todayWorkoutId) {
+      trackWorkoutStart(todayWorkoutId, moodIndex);
+    }
     navigate(`/workout/${todayWorkoutId}`);
   };
 

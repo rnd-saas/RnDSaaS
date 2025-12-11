@@ -1,10 +1,17 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/card';
 import { XCircle } from 'lucide-react';
+import { trackPaymentCancel } from '@/lib/analytics';
 
 export default function PaymentCancelPage() {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Track payment cancellation
+    trackPaymentCancel();
+  }, []);
 
   return (
     <div className="container mx-auto p-4 flex justify-center items-center min-h-screen">
