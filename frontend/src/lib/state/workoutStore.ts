@@ -84,6 +84,8 @@ export const useWorkoutStore = create<ActiveWorkoutState>()(
           loggedWorkout: null,
           // NEW: Reset mood when workout is fully reset
           preWorkoutMood: null,
+          expandedExerciseId: null
+
         }),
       tick: () =>
         set((state) => ({ elapsedTimeSeconds: state.elapsedTimeSeconds + 1 })),
