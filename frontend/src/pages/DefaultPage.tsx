@@ -14,10 +14,6 @@ export default function DefaultPage() {
   const [loginOpen, setLoginOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
 
-  useEffect(() => {
-    window.tidioChatApi.hide();
-  }, []);
-
   return (
     <div className="w-full min-w-[50vw] min-h-[90vh] relative flex flex-col">
       <header className="px-6 pt-11 pb-4">
