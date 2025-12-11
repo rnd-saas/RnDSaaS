@@ -1,6 +1,7 @@
 //src/pages/Workout/RestScreen.tsx
 import restImg from "@/assets/workout/rest-image.png";
 import { Button } from "@/components/ui/button";
+import ChatbotButton from "@/components/chatbotButton.tsx";
 
 type RestScreenProps = {
   timeLabel: string;
@@ -67,12 +68,7 @@ export default function RestScreen({
 
         {/* Chat button */}
         <div className="mt-4 self-end">
-          <Button
-            size="icon"
-            className="rounded-full bg-emerald-700 text-[var(--color-background)] hover:bg-emerald-800"
-          >
-            💬
-          </Button>
+          <ChatbotButton/>
         </div>
       </div>
     </>

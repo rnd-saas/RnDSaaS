@@ -80,7 +80,7 @@ export default function ProgressPage() {
                 console.error('Error rendering workouts:', error);
                 return <div className="text-sm text-red-500">Error loading workouts</div>;
             }
-        }, label:"This week's workouts" },
+        }, label:"This week's workout durations" },
         { value:"moods", render: () => {
             try {
                 return <Moods />;
