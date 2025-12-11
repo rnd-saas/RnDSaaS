@@ -84,8 +84,8 @@ export interface TargetSet {
 /**
  * Set logged within an exercise during a workout session
  */
-export interface LoggedSet {
-  setNumber: number;
+export interface LoggedSet extends TargetSet { // <--- Extend TargetSet
+  // setNumber is already in TargetSet
   actualReps?: number; //optional actual reps performed
   actualWeightKg?: number; //optional actual weight used
   actualTimeSeconds?: number; //optional actual time taken
