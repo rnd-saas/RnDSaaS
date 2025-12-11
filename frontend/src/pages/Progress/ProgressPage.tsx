@@ -87,7 +87,7 @@ export default function ProgressPage() {
                 console.error('Error rendering calendar:', error);
                 return <div className="text-sm text-red-500">Error loading calendar</div>;
             }
-        }, label:"Planned workouts" },
+        }, label:"Workout Calendar" },
         { value:"data", render: () => {
             try {
                 return <PersonalData />;
