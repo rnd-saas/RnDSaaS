@@ -6,10 +6,11 @@ import Workouts from "@/pages/Progress/ProgressComponents/Workouts";
 import PlannedCalendar from "@/pages/Progress/ProgressComponents/PlannedCalendar";
 import PersonalData from "@/pages/Progress/ProgressComponents/PersonalData";
 import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/WorkoutComponents/button";
 import {useEffect, useState} from "react";
 import { useNavigate } from "react-router-dom";
 import { profileService, type ProfileResponse } from "@/lib/api";
+import ChatbotIcon from "@/assets/chatbotIcon.svg?react"; // Add import
 
 export default function ProgressPage() {
     const navigate = useNavigate();
@@ -159,11 +160,7 @@ export default function ProgressPage() {
         ))}
       </div>
 
-      <div className="fixed bottom-14 right-6 z-50">
-        <div className="shadow-lg rounded-full">
-          <ChatbotButton variant={"default"} />
-        </div>
-      </div>
+      
     </div>
   );
 }
