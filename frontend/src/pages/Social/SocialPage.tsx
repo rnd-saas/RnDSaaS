@@ -99,7 +99,7 @@ export default function SocialPage() {
   const userResults = hasQuery ? searchResults : [];
 
   return (
-    <div className="w-full mx-auto w-[90vw] md:w-[75vw] lg:w-[40vw] min-h-[75vh] flex flex-col items-center space-y-6">
+    <div className="w-full mx-auto w-[90vw] md:w-[75vw] lg:w-[40vw] min-h-[75vh] flex flex-col items-center mb-15 space-y-6">
 
       {/* ✅ TOP ROW: search bar + buttons */}
       <div className="w-full px-4 mt-4 flex items-center gap-2">
