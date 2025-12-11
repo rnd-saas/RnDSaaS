@@ -77,7 +77,7 @@ export default function ProfilePage() {
 
     const FALLBACK_PROFILE: ProfileData = {
         firstName: null,
-        avatarOption: 0,
+        avatarOption: 6,
         level: { label: "Novice", currentXp: 0, nextLevelXp: 1200 },
         onboarding: {
             preferredName: displayName,
@@ -198,7 +198,7 @@ export default function ProfilePage() {
                                 className="grid gap-4 w-full grid-cols-[repeat(auto-fit,minmax(100px,1fr))] md:grid-cols-[repeat(auto-fit,minmax(150px,1fr))]"
                                 value={String(avatarOption ?? 1)} onValueChange={(value) => setAvatarOption(Number(value))}
                             >
-                                    {AvatarOptionValues.map((option) => (
+                                    {AvatarOptionValues.slice(0, 6).map((option) => (
                                         <ToggleGroupItem key={option.value} value={String(option.value)}
                                             className="p-0 w-20 h-20 md:w-25 md:h-25 rounded-full ring-2 ring-transparent data-[state=on]:ring-primary transition "
                                         >

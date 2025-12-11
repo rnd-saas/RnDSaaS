@@ -1,10 +1,7 @@
 ﻿import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import UserSettings from "@/pages/Settings/SettingGroups/UserSettings";
 import SubscriptionSettings from "@/pages/Settings/SettingGroups/SubscriptionSettings";
-import tomAvatar from '../../assets/avatars/tom_avatar.png';
 import { useLocation, useNavigate } from "react-router-dom"; // Added useNavigate
-import ChatbotButton from "@/components/chatbotButton";
 import AccountSettings from "@/pages/Settings/SettingGroups/AccountSettings";
 import { ChevronLeft } from "lucide-react"; // Added ChevronLeft icon
 import { Button } from "@/components/ui/button";
@@ -36,7 +33,7 @@ export default function SettingsPage() {
             </div>
 
             <div className="flex flex-col items-center space-y-4 mt-8"> {/* Added margin-top to clear the back button */}
-                <UserAvatar avatarOption={Number(localStorage.getItem("avatar") ?? 1)} displayName={userName}/>
+                <UserAvatar avatarOption={Number(localStorage.getItem("avatar") ?? 0)} displayName={userName}/>
                 <h2 className="text-3xl font-bold tracking-tight font-serif text-primary">
                     {userName}
                 </h2>

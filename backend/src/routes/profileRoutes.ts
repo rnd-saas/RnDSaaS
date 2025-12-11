@@ -317,7 +317,7 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
                 bio: null,
                 trainer: profileResult.data?.trainer || false,
                 streakDays: streak,
-                avatarOption: profileResult.data?.avatar_option || 0
+                avatarOption: profileResult.data?.avatar_option || 6
             },
             achievements,
             workoutGrid,
