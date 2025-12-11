@@ -219,8 +219,6 @@ export default function PersonalData(){
                                 />
                                 <Button 
                                     size="icon" 
-                                    variant="outline"
-                                    className="h-10 w-10"
                                     onClick={() => {
                                         const input = document.getElementById(item.value) as HTMLInputElement;
                                         if (input) {
