@@ -111,7 +111,7 @@ export default function WorkoutEvaluationPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {/* Header */}
-      <div className="flex items-center justify-center p-4 pt-6">
+      <div className="flex items-center justify-center p-4 pt-6 sticky top-0 bg-background z-10">
         <Button
           variant="ghost"
           size="icon"
@@ -123,7 +123,8 @@ export default function WorkoutEvaluationPage() {
         <h2 className="h2-styles">Workout Evaluation</h2>
       </div>
 
-      <div className="flex-1 flex flex-col items-center p-6 gap-8 max-w-md mx-auto w-full">
+      {/* Main Content - Added pb-32 to clear the fixed footer */}
+      <div className="flex-1 flex flex-col items-center p-6 pb-32 gap-8 max-w-md mx-auto w-full overflow-y-auto">
         {/* AI Feedback */}
         <div className="flex flex-col gap-2 w-full">
           <div className="flex items-center gap-1">
