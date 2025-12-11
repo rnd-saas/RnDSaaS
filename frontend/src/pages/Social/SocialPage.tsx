@@ -278,7 +278,7 @@ export default function SocialPage() {
 
         {posts.map((post) => {
           const authorName = post.author?.display_name ?? "Anonymous athlete";
-          const authorAvatar = post.author?.user_info?.avatar_option ?? 0;
+          const authorAvatar = post.author?.user_info?.avatar_option ?? 6;
           // const authorHandle = post.author?.username
           //   ? `@${post.author.username}`
           //   : "";
