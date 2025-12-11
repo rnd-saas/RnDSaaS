@@ -17,7 +17,9 @@ export default function Step0Welcome() {
             <Carousel className="w-[60vw] ml-[10vw] md:ml-[20vw] lg:ml-[0vw] max-w-xs">
                 <Controller control={control} name="strTrainer" defaultValue="0" rules={{onChange: () => trigger("strTrainer"), required: "Trainer is required" }}
                     render={({ field }) => (
-                        <RadioGroup value={field.value} onValueChange={field.onChange} className="flex flex-row items-center">
+                        <RadioGroup value={field.value} onValueChange={(value) => {
+                            localStorage.setItem("trainerId", String(value));
+                        }} className="flex flex-row items-center">
                             <CarouselContent>
                                 <CarouselItem>
                                     <Field className="flex items-center flex-col" orientation="horizontal">

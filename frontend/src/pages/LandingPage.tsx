@@ -45,7 +45,7 @@ export default function LandingPage() {
 
   // Prefer router state; fall back to localStorage; default to Tom (0)
   const trainerId =
-    state?.trainerId ?? (Number(localStorage.getItem("trainerId")) || 0);
+    state?.trainerId ?? (Number(localStorage.getItem("trainerId")) || 1);
 
   const firstName =
     state?.firstName ?? localStorage.getItem("firstName") ?? "Friend";
