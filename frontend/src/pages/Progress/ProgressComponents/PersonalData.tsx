@@ -91,8 +91,8 @@ export default function PersonalData(){
         });
 
     const dataTracked = [
-        {value: "weight", values: weightValues, setFn: setWeightValues, data: toChart(weightValues), canEdit: true},
-        {value: "bmi", values: bmiValues, setFn: setBmiValues, data: toChart(bmiValues), canEdit: false}
+        {value: "weight", label: "Weight", values: weightValues, setFn: setWeightValues, data: toChart(weightValues), canEdit: true},
+        {value: "bmi", label: "BMI", values: bmiValues, setFn: setBmiValues, data: toChart(bmiValues), canEdit: false}
     ];
     // Calculate start of week (Monday) for consistent X-axis ticks
     const today = new Date();
@@ -145,9 +145,9 @@ export default function PersonalData(){
         <div>
             {dataTracked.map((item) => (
                 <div key={item.value} className="w-full text-left mb-6">
-                    <p className="mb-2">{item.value} over time</p>
+                    <h3 className="h3-styles mb-4">{item.label} over time</h3>
                     {item.data.length === 0 ? (
-                        <div className="h-[300px] flex items-center justify-center text-gray-500 border border-gray-200 rounded">
+                        <div className="h-[300px] flex items-center justify-center text-muted-foreground border border-border rounded">
                             No {item.value} data available. Add your first entry below.
                         </div>
                     ) : (
@@ -202,7 +202,7 @@ export default function PersonalData(){
                     )}
                     {item.canEdit ? (
                         <div className={"pb-10 pt-2 flex items-center gap-2"}>
-                            <Label className={"font-normal"} htmlFor={item.value}>Log {item.value}:</Label>
+                            <Label className="body-styles" htmlFor={item.value}>Log {item.value}:</Label>
                             <div className="flex gap-2">
                                 <Input 
                                     id={item.value} 

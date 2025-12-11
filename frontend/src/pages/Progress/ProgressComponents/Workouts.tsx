@@ -65,7 +65,7 @@ export default function Workouts(){
     }
 
     if (data.length === 0) {
-        return <div className="h-[25vh] w-full flex items-center justify-center text-gray-500">No workout data available</div>;
+        return <div className="h-[25vh] w-full flex items-center justify-center text-muted-foreground">No workout data available</div>;
     }
 
     const minDate = data.length > 0 ? new Date(Math.min(...data.map(d => d.time))) : new Date();

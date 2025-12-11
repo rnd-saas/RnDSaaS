@@ -120,7 +120,7 @@ export default function ProgressPage() {
   return (
     <div className="w-full max-w-lg md:max-w-4xl lg:max-w-6xl mx-auto p-6 pb-24 flex flex-col space-y-8">
       <header>
-        <h1 className="text-3xl font-bold tracking-tight font-serif">
+        <h1 className="h1-styles tracking-tight">
           Progress
         </h1>
         <p className="text-muted-foreground mt-1">
@@ -136,7 +136,7 @@ export default function ProgressPage() {
             style={{ animationDelay: `${index * 100}ms` }}
           >
             <div className="flex items-center gap-4">
-              <h2 className="text-xl font-semibold font-serif text-foreground/90 shrink-0">
+              <h2 className="h2-styles text-foreground shrink-0">
                 {section.label}
               </h2>
               <Separator className="flex-1" />

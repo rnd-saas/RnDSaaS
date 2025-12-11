@@ -71,7 +71,7 @@ export default function Moods(){
     }
 
     if (data.length === 0) {
-        return <div className="h-[25vh] w-full flex items-center justify-center text-gray-500">No mood data available</div>;
+        return <div className="h-[25vh] w-full flex items-center justify-center text-muted-foreground">No mood data available</div>;
     }
 
     // Calculate start of week (Monday) for consistent X-axis ticks
