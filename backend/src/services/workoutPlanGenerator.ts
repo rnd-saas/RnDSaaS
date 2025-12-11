@@ -356,6 +356,31 @@ function clampExperience(value: number | null): number | null {
     return clamped;
 }
 
+function sanitizePlanExercises(plan: any): any {
+    if (!plan || !plan.workout_plans) return plan;
+    
+    return {
+        ...plan,
+        workout_plans: plan.workout_plans.map((wp: any) => ({
+            ...wp,
+            plan_exercises: wp.plan_exercises?.map((ex: any) => {
+                const logMode = getLogModeForExercise(ex.exercise_name);
+                // If exercise doesn't use weight, strip metric2/target_value2
+                if (logMode && !logMode.includes('weight')) {
+                    const { metric2, target_value2, ...rest } = ex;
+                    return rest;
+                }
+                // If metric2/target_value2 are 0 or invalid, remove them
+                if (ex.target_value2 === 0 || ex.target_value2 === null) {
+                    const { metric2, target_value2, ...rest } = ex;
+                    return rest;
+                }
+                return ex;
+            }) || []
+        }))
+    };
+}
+
 async function requestPlanFromAi(profile: RequiredUserProfile): Promise<WorkoutProgram> {
     if (!geminiClient) {
         throw new Error('Gemini client unavailable');
@@ -371,7 +396,9 @@ async function requestPlanFromAi(profile: RequiredUserProfile): Promise<WorkoutP
     console.log('[planner] Raw Gemini response:', content);
     const jsonPayload = extractJsonPayload(content);
     const parsed = JSON.parse(jsonPayload);
-    return workoutProgramSchema.parse(parsed);
+    // Sanitize: remove metric2/target_value2 from non-weight exercises
+    const sanitized = sanitizePlanExercises(parsed);
+    return workoutProgramSchema.parse(sanitized);
 }
 
 function getLogModeForExercise(name: ExerciseName): ExerciseDefinition['logMode'] | undefined {
@@ -423,6 +450,7 @@ function buildPlannerPrompt(profile: RequiredUserProfile): string {
         '- If experience_level <= 2 or comfort is low, emphasize machine or dumbbell options and avoid complex bodyweight moves.',
         '- Metric must be one of reps, weight, distance, duration_s, or height.',
         '- For any exercise that involves load (log_mode contains "weight"), you MUST include both metric2:"weight" AND target_value2 (load in kg). Missing target_value2 is invalid.',
+        '- For exercises without weight (e.g., Treadmill Run/Walk with log_mode "time"), do NOT include metric2 or target_value2. Only use metric and target_value.',
         '- For duration-based cardio like Treadmill Run/Walk, express time in MINUTES, but output target_value as total seconds (minutes × 60) with metric:"duration_s".',
         '- target_value and rest_seconds must be numeric and realistic.',
         '',
