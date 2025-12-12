@@ -32,6 +32,17 @@ import Paywall from "@/components/Paywall";
 import PasswordResetPage from "@/pages/Login/PasswordResetPage.tsx";
 import PasswordChangePage from "@/pages/Login/PasswordChangePage.tsx";
 
+// Component to scroll to top on route changes
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
 // Component to track page views on route changes
 function PageViewTracker() {
   const location = useLocation();
@@ -44,7 +55,9 @@ function PageViewTracker() {
 }
 export default function AppRoutes() {
   return (
+    
     <BrowserRouter>
+      <ScrollToTop />
       <PageViewTracker />
       <Routes>
         <Route path="/password-reset" element={<PasswordResetPage />} />
