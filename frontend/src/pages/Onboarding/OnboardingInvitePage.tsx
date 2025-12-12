@@ -34,7 +34,7 @@ export default function OnboardingInvitePage() {
                         <li>Helpful advice from a supportive virtual fitness buddy</li>
                         <li>Anxiety tracking at the gym so you can see your confidence improve as you go along your fitness journey.</li>
                     </ul>
-                    <p>All for only €5 a month</p>
+                    {/* <p>All for only €5 a month</p> */}
                 </div>
             </main>
             <footer className="sticky bottom-0 w-full max-w-xs space-y-3 bg-white my-5 flex flex-col items-center justify-center text-center">
