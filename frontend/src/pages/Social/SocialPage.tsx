@@ -2,16 +2,16 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import SocialSearchBar from "@/components/ui/searchbar";
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
-import { Check, Clock, Loader2, PlusSquare, UserPlus, Users } from "lucide-react";
+import { Loader2, PlusSquare, UserPlus, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { useDebounce } from "@/lib/hooks/useDebounce";
 import { socialService } from "@/lib/api";
 import type { FriendRelation, SocialPost, SocialUserSummary } from "@/lib/api/socialService";
-import {AvatarOptionValues} from "@/utils/AvatarOptionValues.tsx";
+import { trackFriendRequestSent } from "@/lib/analytics";
 
 const initialsFromName = (value?: string | null) =>
   (value ?? "?")
@@ -21,16 +21,6 @@ const initialsFromName = (value?: string | null) =>
     .join("")
     .slice(0, 2)
     .toUpperCase();
-
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-  }).format(date);
-};
 
 export default function SocialPage() {
   const navigate = useNavigate();
@@ -45,6 +35,7 @@ export default function SocialPage() {
   const friendRequestMutation = useMutation<FriendRelation, Error, FriendRequestVariables>({
     mutationFn: ({ userId }) => socialService.sendFriendRequest(userId),
     onSuccess: (_data, variables) => {
+      trackFriendRequestSent(variables.userId, 'social_page');
       toast.success("Friend request sent ✅", {
         description: `You sent a friend request to ${variables.displayName}.`,
       });
@@ -99,7 +90,7 @@ export default function SocialPage() {
   const userResults = hasQuery ? searchResults : [];
 
   return (
-    <div className="w-full mx-auto w-[90vw] md:w-[75vw] lg:w-[40vw] min-h-[75vh] flex flex-col items-center mb-15 space-y-6">
+    <div className="w-full max-w-md min-h-[75vh] flex flex-col items-center space-y-6">
 
       {/* ✅ TOP ROW: search bar + buttons */}
       <div className="w-full px-4 mt-4 flex items-center gap-2">
@@ -158,17 +149,12 @@ export default function SocialPage() {
             className="flex w-full items-center justify-between rounded-2xl bg-white px-4 py-3 shadow-sm hover:bg-accent/40 transition-colors"
           >
             <div className="flex items-center gap-3 text-left">
-              <Avatar>
-                {user.user_info?.avatar_option != null ? (
-                    <AvatarImage
-                        src={AvatarOptionValues[user.user_info.avatar_option].src}
-                    />
-                ) : (
-                    <AvatarFallback className="bg-white">
-                      {initialsFromName(user.display_name)}
-                    </AvatarFallback>
-                )}
+              <Avatar className="h-10 w-10">
+                <AvatarFallback>
+                  {initialsFromName(user.display_name)}
+                </AvatarFallback>
               </Avatar>
+
               <div className="flex flex-col">
                 <span className="text-sm font-medium leading-tight">
                   {user.display_name}
@@ -184,60 +170,31 @@ export default function SocialPage() {
               </div>
             </div>
 
-            {(() => {
-              const status = user.friend_status;
-              const isMutating =
+            <Button
+              type="button"
+              variant="secondary"
+              size="icon"
+              className="rounded-xl shrink-0"
+              onClick={() =>
+                friendRequestMutation.mutate({
+                  userId: user.id,
+                  displayName: user.display_name,
+                })
+              }
+              disabled={
                 friendRequestMutation.isPending &&
-                friendRequestMutation.variables?.userId === user.id;
-
-              const handleClick = () => {
-                if (status === 'accepted' || status === 'pending_outgoing') return;
-                friendRequestMutation.mutate({ userId: user.id, displayName: user.display_name });
-              };
-
-              const disabled =
-                isMutating || status === 'accepted' || status === 'pending_outgoing';
-
-              const icon = isMutating ? (
+                friendRequestMutation.variables?.userId === user.id
+              }
+              aria-label={`Add ${user.display_name} as friend`}
+              title="Add friend"
+            >
+              {friendRequestMutation.isPending &&
+              friendRequestMutation.variables?.userId === user.id ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
-              ) : status === 'accepted' ? (
-                <Check className="h-5 w-5" />
-              ) : status === 'pending_outgoing' ? (
-                <Clock className="h-5 w-5" />
               ) : (
                 <UserPlus className="h-5 w-5" />
-              );
-
-              const title =
-                status === 'accepted'
-                  ? 'Already friends'
-                  : status === 'pending_outgoing'
-                  ? 'Friend request sent'
-                  : 'Add friend';
-
-              const variant = status === 'accepted' ? 'outline' : 'secondary';
-              const classes =
-                status === 'accepted'
-                  ? 'rounded-xl shrink-0 text-muted-foreground border-muted-foreground/30'
-                  : status === 'pending_outgoing'
-                  ? 'rounded-xl shrink-0 text-muted-foreground'
-                  : 'rounded-xl shrink-0';
-
-              return (
-                <Button
-                  type="button"
-                  variant={variant as any}
-                  size="icon"
-                  className={classes}
-                  onClick={handleClick}
-                  disabled={disabled}
-                  aria-label={title}
-                  title={title}
-                >
-                  {icon}
-                </Button>
-              );
-            })()}
+              )}
+            </Button>
           </div>
         ))}
 
@@ -278,18 +235,16 @@ export default function SocialPage() {
 
         {posts.map((post) => {
           const authorName = post.author?.display_name ?? "Anonymous athlete";
-          const authorAvatar = post.author?.user_info?.avatar_option ?? 0;
-          // const authorHandle = post.author?.username
-          //   ? `@${post.author.username}`
-          //   : "";
+          const authorHandle = post.author?.username
+            ? `@${post.author.username}`
+            : "";
 
           return (
-            <Card key={post.id} className="bg-white hover:scale-none shadow-sm">
+            <Card key={post.id} className="bg-white shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between py-3">
                 <div className="flex items-center gap-3">
-                  <Avatar className="h-15 w-15">
-                    <AvatarImage src={AvatarOptionValues[authorAvatar].src}/>
-                    <AvatarFallback className={"bg-primary/10"}>
+                  <Avatar className="h-10 w-10">
+                    <AvatarFallback>
                       {initialsFromName(authorName)}
                     </AvatarFallback>
                   </Avatar>
@@ -297,19 +252,16 @@ export default function SocialPage() {
                     <CardTitle className="text-base leading-tight">
                       {authorName}
                     </CardTitle>
-                    {/*{authorHandle && (*/}
-                    {/*  <p className="text-xs text-muted-foreground">{authorHandle}</p>*/}
-                    {/*)}*/}
+                    {authorHandle && (
+                      <p className="text-xs text-muted-foreground">{authorHandle}</p>
+                    )}
                   </div>
                 </div>
-                <span className="text-xs text-muted-foreground">
-                  {formatDate(post.created_at)}
-                </span>
               </CardHeader>
 
               <CardContent className="pb-4 text-sm text-muted-foreground">
                 {post.body}
-              </CardContent>
+                image.png              </CardContent>
             </Card>
           );
         })}

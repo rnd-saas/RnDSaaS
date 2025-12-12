@@ -5,6 +5,7 @@ import { authService } from '@/lib/api/authService';
 import { Button } from '@/components/ui/button';
 import { Copy } from 'lucide-react';
 import { toast } from 'sonner';
+import { trackFriendInviteShared } from '@/lib/analytics';
 
 export type SubscriptionSettings = {
     subscriptionType:number,
@@ -57,6 +58,7 @@ export default function SubscriptionSettings() {
     const copyReferralCode = () => {
         if (user?.referral_code) {
             navigator.clipboard.writeText(user.referral_code);
+            trackFriendInviteShared('copy', user.referral_code);
             toast.success("Referral code copied to clipboard!");
         }
     };

@@ -270,3 +270,41 @@ export function trackChatbotSessionStart(trainerId?: number): void {
   });
 }
 
+/**
+ * Track friend/social events
+ */
+export function trackFriendRequestSent(targetUserId: string, source?: string): void {
+  trackEvent('friend_request_sent', {
+    target_user_id: targetUserId,
+    source: source || 'social_page',
+  });
+}
+
+export function trackFriendRequestAccepted(requestId: string, friendUserId?: string): void {
+  trackEvent('friend_request_accepted', {
+    request_id: requestId,
+    friend_user_id: friendUserId,
+  });
+}
+
+export function trackFriendRequestRejected(requestId: string, friendUserId?: string): void {
+  trackEvent('friend_request_rejected', {
+    request_id: requestId,
+    friend_user_id: friendUserId,
+  });
+}
+
+export function trackFriendRequestCancelled(requestId: string, friendUserId?: string): void {
+  trackEvent('friend_request_cancelled', {
+    request_id: requestId,
+    friend_user_id: friendUserId,
+  });
+}
+
+export function trackFriendInviteShared(method?: string, referralCode?: string): void {
+  trackEvent('friend_invite_shared', {
+    method: method || 'unknown',
+    referral_code: referralCode,
+  });
+}
+

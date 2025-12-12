@@ -10,6 +10,7 @@ import type { FriendRequestWithUsers } from "@/lib/api/socialService";
 import { Loader2, CheckCircle2, Clock, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import {AvatarOptionValues} from "@/utils/AvatarOptionValues.tsx";
+import { trackFriendRequestAccepted, trackFriendRequestRejected, trackFriendRequestCancelled } from "@/lib/analytics";
 
 const initialsFromName = (value?: string | null) =>
   (value ?? "?")
@@ -66,7 +67,9 @@ export default function SocialManageFriendsPage() {
 
   const acceptMutation = useMutation({
     mutationFn: (requestId: string) => socialService.acceptFriendRequest(requestId),
-    onSuccess: () => {
+    onSuccess: (data, requestId) => {
+      const friendUserId = data.requester?.id || data.addressee?.id;
+      trackFriendRequestAccepted(requestId, friendUserId);
       toast.success("Friend request accepted!", {
         description: "You are now friends.",
       });
@@ -83,7 +86,11 @@ export default function SocialManageFriendsPage() {
 
   const rejectMutation = useMutation({
     mutationFn: (requestId: string) => socialService.rejectFriendRequest(requestId),
-    onSuccess: () => {
+    onSuccess: (_data, requestId) => {
+      // Find the friend request to get friend user ID
+      const request = friendRequests.find(r => r.id === requestId);
+      const friendUserId = request?.requester?.id || request?.addressee?.id;
+      trackFriendRequestRejected(requestId, friendUserId);
       toast.success("Friend request rejected");
       queryClient.invalidateQueries({ queryKey: ["friend-requests"] });
     },
@@ -96,7 +103,11 @@ export default function SocialManageFriendsPage() {
 
   const cancelMutation = useMutation({
     mutationFn: (requestId: string) => socialService.cancelFriendRequest(requestId),
-    onSuccess: () => {
+    onSuccess: (_data, requestId) => {
+      // Find the friend request to get friend user ID
+      const request = friendRequests.find(r => r.id === requestId);
+      const friendUserId = request?.requester?.id || request?.addressee?.id;
+      trackFriendRequestCancelled(requestId, friendUserId);
       toast.success("Friend request cancelled");
       queryClient.invalidateQueries({ queryKey: ["friend-requests"] });
     },
