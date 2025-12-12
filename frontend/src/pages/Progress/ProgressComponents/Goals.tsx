@@ -19,7 +19,7 @@ export default function Goals(){
 
     const possibleGoals = [
         { label: "Workouts completed", value: "workoutsCompleted", target: 5 },
-        { label: "Exercises completed", value: "exercisesCompleted", target: 10 },
+        { label: "Exercises discovered", value: "exercisesCompleted", target: 10 },
         { label: "Longest streak", value: "longestStreak", target: 7 },
         { label: "Moods logged", value: "moodsLogged", target: 7 },
     ];

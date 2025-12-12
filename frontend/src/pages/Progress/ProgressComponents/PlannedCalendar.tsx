@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from "react";
 import { Calendar, CalendarDayButton } from "@/components/ui/calendar";
-import { useNextPlannedWorkout } from "@/api/workouts";
+import { useNextPlannedWorkout } from "@/lib/api/workouts.tsx";
 import { profileService } from "@/lib/api";
 import { Card, CardContent, CardFooter } from "@/components/card";
 

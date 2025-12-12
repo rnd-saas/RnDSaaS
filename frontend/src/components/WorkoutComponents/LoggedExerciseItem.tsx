@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { calculateRestTimeOptions, formatRestTime } from "@/lib/utils/time";
 import { useWorkoutStore } from "@/lib/state/workoutStore";
-import { usePlannedWorkout } from "@/api/workouts";
+import { usePlannedWorkout } from "@/lib/api/workouts.tsx";
 import { useNavigate } from "react-router-dom";
 
 export default function LoggedExerciseItem({

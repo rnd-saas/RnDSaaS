@@ -2,7 +2,7 @@ import { useParams, useLocation } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef } from "react";
-import { useExercise } from "@/api/workouts";
+import { useExercise } from "@/lib/api/workouts.tsx";
 import { Rating, RatingButton } from "@/components/ui/shadcn-io/rating";
 import type { ExerciseInformation } from "@/lib/types/Workout";
 import { Button } from "@/components/WorkoutComponents/button";

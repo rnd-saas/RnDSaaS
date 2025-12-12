@@ -11,7 +11,7 @@ import { chatbotService } from "@/lib/api";
 import apiClient from "@/lib/api/client";
 import type { ChatbotMessage, ChatbotTrainerProfile } from "@/lib/api/types";
 import { toast } from "sonner";
-import { useExercise } from "@/api/workouts";
+import { useExercise } from "@/lib/api/workouts.tsx";
 
 type ConversationMessage = {
     id: string;

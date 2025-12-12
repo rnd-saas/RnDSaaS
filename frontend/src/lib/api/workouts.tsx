@@ -3,9 +3,9 @@ import type {
   ExerciseInformation,
   WorkoutEvaluation,
   LoggedWorkout,
-} from "@/lib/types/Workout";
+} from "@/lib/types/Workout.tsx";
 import { useQuery, useMutation, useQueries } from "@tanstack/react-query";
-import { workoutService } from "@/lib/api/workoutService";
+import { workoutService } from "@/lib/api/workoutService.ts";
 
 /**
  * API call to fetch planned workout for a specific date and user

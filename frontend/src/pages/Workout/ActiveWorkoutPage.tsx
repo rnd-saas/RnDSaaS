@@ -10,7 +10,7 @@ import {
   ChevronLeft,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { usePlannedWorkout, useSubmitWorkout } from "@/api/workouts";
+import { usePlannedWorkout, useSubmitWorkout } from "@/lib/api/workouts.tsx";
 import type { PlannedExercise, PlannedWorkout } from "@/lib/types/Workout";
 import { useWorkoutStore } from "@/lib/state/workoutStore";
 import { useParams, useNavigate } from "react-router-dom";

@@ -6,7 +6,7 @@ import { ChevronLeft, Info } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useWorkoutStore } from "@/lib/state/workoutStore";
-import { useUpdateWorkoutEvaluation, useAiFeedback } from "@/api/workouts";
+import { useUpdateWorkoutEvaluation, useAiFeedback } from "@/lib/api/workouts.tsx";
 import { useLocation } from "react-router-dom";
 import type { WorkoutEvaluation } from "@/lib/types/Workout";
 import { Skeleton } from "@/components/ui/skeleton";

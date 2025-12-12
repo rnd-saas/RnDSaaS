@@ -13,7 +13,7 @@ import type { Goal } from "@/lib/api/progressService";
 import AchievementList from "@/pages/Profile/ProfileComponents/AchievementList";
 import SwipeableAchievementList from "@/components/SwipeableAchievementList";
 import SettingsButton from "@/components/settingsButton";
-import {usePlannedWorkout, useNextPlannedWorkout} from "@/api/workouts"
+import {usePlannedWorkout, useNextPlannedWorkout} from "@/lib/api/workouts.tsx"
 
 const ACHIEVEMENTS_PER_PAGE = 3;
 
