@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import SocialSearchBar from "@/components/ui/searchbar";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
 import { Loader2, PlusSquare, UserPlus, Users } from "lucide-react";
 import { toast } from "sonner";
@@ -12,6 +12,7 @@ import { useDebounce } from "@/lib/hooks/useDebounce";
 import { socialService } from "@/lib/api";
 import type { FriendRelation, SocialPost, SocialUserSummary } from "@/lib/api/socialService";
 import { trackFriendRequestSent } from "@/lib/analytics";
+import {AvatarOptionValues} from "@/utils/AvatarOptionValues.tsx";
 
 const initialsFromName = (value?: string | null) =>
   (value ?? "?")
@@ -90,7 +91,7 @@ export default function SocialPage() {
   const userResults = hasQuery ? searchResults : [];
 
   return (
-    <div className="w-full max-w-md min-h-[75vh] flex flex-col items-center space-y-6">
+    <div className="w-full mx-auto w-[90vw] md:w-[75vw] lg:w-[40vw] min-h-[75vh] flex flex-col items-center mb-15 space-y-6">
 
       {/* ✅ TOP ROW: search bar + buttons */}
       <div className="w-full px-4 mt-4 flex items-center gap-2">
@@ -149,10 +150,16 @@ export default function SocialPage() {
             className="flex w-full items-center justify-between rounded-2xl bg-white px-4 py-3 shadow-sm hover:bg-accent/40 transition-colors"
           >
             <div className="flex items-center gap-3 text-left">
-              <Avatar className="h-10 w-10">
-                <AvatarFallback>
-                  {initialsFromName(user.display_name)}
-                </AvatarFallback>
+              <Avatar>
+                {user.user_info?.avatar_option != null ? (
+                    <AvatarImage
+                        src={AvatarOptionValues[user.user_info.avatar_option].src}
+                    />
+                ) : (
+                    <AvatarFallback className="bg-white">
+                      {initialsFromName(user.display_name)}
+                    </AvatarFallback>
+                )}
               </Avatar>
 
               <div className="flex flex-col">
@@ -253,8 +260,9 @@ export default function SocialPage() {
             <Card key={post.id} className="bg-white shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between py-3">
                 <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10">
-                    <AvatarFallback>
+                  <Avatar className="h-15 w-15">
+                    <AvatarImage src={AvatarOptionValues[authorAvatar].src}/>
+                    <AvatarFallback className={"bg-primary/10"}>
                       {initialsFromName(authorName)}
                     </AvatarFallback>
                   </Avatar>
