@@ -5,6 +5,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
+import { InstallPWA } from "@/components/InstallPWA"; // Import the component
 
 const queryClient = new QueryClient();
 
@@ -13,6 +14,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <GlobalTimeRunner />
       <AppRoutes />
+      <InstallPWA /> {/* Add the component here */}
     </QueryClientProvider>
   );
 }
