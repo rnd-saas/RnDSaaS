@@ -185,50 +185,50 @@ export default function UserSettings() {
                     </SelectContent>
                 </Select>
             </div>
+
+            {/*<Separator />*/}
             
-            <Separator />
+            {/*/!* Notifications *!/*/}
+            {/*<div className="flex items-center justify-between w-full">*/}
+            {/*    <Label htmlFor="notifications" className="mr-4 whitespace-nowrap">Notifications enabled</Label>*/}
+            {/*    <Switch */}
+            {/*        id="notifications" */}
+            {/*        checked={settings.notifications_enabled}*/}
+            {/*        onCheckedChange={(checked) => updateSetting({ notifications_enabled: checked })}*/}
+            {/*        disabled={isSaving}*/}
+            {/*    />*/}
+            {/*</div>*/}
             
-            {/* Notifications */}
-            <div className="flex items-center justify-between w-full">
-                <Label htmlFor="notifications" className="mr-4 whitespace-nowrap">Notifications enabled</Label>
-                <Switch 
-                    id="notifications" 
-                    checked={settings.notifications_enabled}
-                    onCheckedChange={(checked) => updateSetting({ notifications_enabled: checked })}
-                    disabled={isSaving}
-                />
-            </div>
+            {/*/!* Streak Display *!/*/}
+            {/*<div className="flex items-center justify-between w-full">*/}
+            {/*    <Label htmlFor="streak-display" className="mr-4 whitespace-nowrap">Show streak on dashboard</Label>*/}
+            {/*    <Switch */}
+            {/*        id="streak-display" */}
+            {/*        checked={settings.streak_display}*/}
+            {/*        onCheckedChange={(checked) => updateSetting({ streak_display: checked })}*/}
+            {/*        disabled={isSaving}*/}
+            {/*    />*/}
+            {/*</div>*/}
             
-            {/* Streak Display */}
-            <div className="flex items-center justify-between w-full">
-                <Label htmlFor="streak-display" className="mr-4 whitespace-nowrap">Show streak on dashboard</Label>
-                <Switch 
-                    id="streak-display" 
-                    checked={settings.streak_display}
-                    onCheckedChange={(checked) => updateSetting({ streak_display: checked })}
-                    disabled={isSaving}
-                />
-            </div>
-            
-            {/* Goal Display */}
-            <div className="flex items-center justify-between w-full">
-                <Label htmlFor="goal-display" className="mr-4 whitespace-nowrap">Show goal on dashboard</Label>
-                <Select 
-                    value={settings.goal_display} 
-                    onValueChange={(value: 'big' | 'small' | 'both' | 'none') => updateSetting({ goal_display: value })}
-                    disabled={isSaving}
-                >
-                    <SelectTrigger id="goal-display" className="w-60">
-                        <SelectValue placeholder="Select goal display" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="big">Big</SelectItem>
-                        <SelectItem value="small">Small</SelectItem>
-                        <SelectItem value="both">Both</SelectItem>
-                        <SelectItem value="none">None</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
+            {/*/!* Goal Display *!/*/}
+            {/*<div className="flex items-center justify-between w-full">*/}
+            {/*    <Label htmlFor="goal-display" className="mr-4 whitespace-nowrap">Show goal on dashboard</Label>*/}
+            {/*    <Select */}
+            {/*        value={settings.goal_display} */}
+            {/*        onValueChange={(value: 'big' | 'small' | 'both' | 'none') => updateSetting({ goal_display: value })}*/}
+            {/*        disabled={isSaving}*/}
+            {/*    >*/}
+            {/*        <SelectTrigger id="goal-display" className="w-60">*/}
+            {/*            <SelectValue placeholder="Select goal display" />*/}
+            {/*        </SelectTrigger>*/}
+            {/*        <SelectContent>*/}
+            {/*            <SelectItem value="big">Big</SelectItem>*/}
+            {/*            <SelectItem value="small">Small</SelectItem>*/}
+            {/*            <SelectItem value="both">Both</SelectItem>*/}
+            {/*            <SelectItem value="none">None</SelectItem>*/}
+            {/*        </SelectContent>*/}
+            {/*    </Select>*/}
+            {/*</div>*/}
             
             <Separator />
             
