@@ -1,7 +1,5 @@
 ﻿import {Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet} from "@/components/ui/field";
-import {Checkbox} from "@/components/ui/checkbox";
-import {PreferredSplitValues} from "@/utils/InputTypes";
-import type {PreferredSplit} from "@/utils/InputTypes";
+import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {Controller, useFormContext} from "react-hook-form";
 import type {Inputs} from "@/pages/Onboarding/OnboardingManager";
 import {splitOptions} from "@/utils/SplitOptionLabels";
@@ -21,26 +19,27 @@ export default function Step10WorkoutType() {
                     control={control}
                     defaultValue={[]}
                     rules={{
-                        validate: (value) => (value && value.length > 0) || "Please select at least one option",
+                        required: "Please select one option",
                     }}
                     render={({ field }) => {
-                        const selected: PreferredSplit[] = field.value || [];
-                        const toggleValue = (val: PreferredSplit) => {
-                            if (selected.includes(val)) {
-                                field.onChange(selected.filter((v) => v !== val));
-                            } else {
-                                field.onChange([...selected, val]);
-                            }
-                        };
+                        // Handle array value since Inputs defines it as array
+                        const value = Array.isArray(field.value) && field.value.length > 0 
+                            ? field.value[0] 
+                            : "";
+                            
                         return (
-                            <FieldGroup className="gap-3">
+                            <RadioGroup 
+                                className="gap-3"
+                                value={value} 
+                                onValueChange={(val) => field.onChange([val])}
+                            >
                                 {splitOptions.map(split => (
                                     <Field key={split.value} orientation="horizontal">
-                                        <Checkbox id={split.value} checked={selected.includes(split.value)} onCheckedChange={() => toggleValue(split.value)}/>
+                                        <RadioGroupItem id={split.value} value={split.value}/>
                                         <FieldLabel htmlFor={split.value} className="font-normal">{split.label}</FieldLabel>
                                     </Field>
                                 ))}
-                            </FieldGroup>
+                            </RadioGroup>
                         );
                     }}
                 />

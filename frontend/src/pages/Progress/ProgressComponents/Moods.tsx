@@ -2,8 +2,11 @@ import {MoodOptions} from "@/utils/MoodOptions";
 import {CartesianGrid, ResponsiveContainer, Scatter, ScatterChart, XAxis, YAxis} from "recharts";
 import {useState, useEffect} from "react";
 import {progressService} from "@/lib/api";
+import {Button} from "@/components/ui/button.tsx";
+import {useNavigate} from "react-router-dom";
 
 export default function Moods(){
+    const navigate = useNavigate();
     const moodEmojis: Record<number, string> = {
         [MoodOptions.anxious]: "😣",
         [MoodOptions.insecure]: "😬",
@@ -117,6 +120,7 @@ export default function Moods(){
                     <Scatter name="Mood" data={data} />
                 </ScatterChart>
             </ResponsiveContainer>
+            <Button variant={"link"} onClick={()=>navigate("/mood")}>Log a mood</Button>
         </div>
     )
 }

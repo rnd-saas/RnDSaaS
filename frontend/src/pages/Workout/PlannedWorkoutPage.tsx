@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/shadcn-io/mini-calendar";
 import { useState } from "react";
 import { startOfWeek } from "date-fns";
-import { usePlannedWorkout } from "@/api/workouts";
+import { usePlannedWorkout } from "@/lib/api/workouts.tsx";
 import type { PlannedExercise, PlannedWorkout } from "@/lib/types/Workout";
 import { useNavigate } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";

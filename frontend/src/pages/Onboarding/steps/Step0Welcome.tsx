@@ -15,10 +15,11 @@ export default function Step0Welcome() {
                 Pick who you'd like to work out with!
             </FieldDescription>
             <Carousel className="w-[60vw] ml-[10vw] md:ml-[20vw] lg:ml-[0vw] max-w-xs">
-                <Controller control={control} name="strTrainer" defaultValue="0" rules={{onChange: () => trigger("strTrainer"), required: "Trainer is required" }}
+                <Controller control={control} name="strTrainer" rules={{onChange: () => trigger("strTrainer"), required: "Trainer is required" }}
                     render={({ field }) => (
                         <RadioGroup value={field.value} onValueChange={(value) => {
-                            localStorage.setItem("trainerId", String(value));
+                            field.onChange(value);                     // update form state
+                            localStorage.setItem("trainerId", String(value)); // store in localStorage
                         }} className="flex flex-row items-center">
                             <CarouselContent>
                                 <CarouselItem>
