@@ -5,7 +5,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
-import { InstallPWA } from "@/components/InstallPWA"; // Import the component
+import { InstallPWA } from "./components/installPWA"; // Import the component
 
 const queryClient = new QueryClient();
 
