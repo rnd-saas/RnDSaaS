@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useLayoutEffect, useRef } from "react"; // Import useLayoutEffect
 import { useNavigate } from "react-router-dom";
 import BackButton from "@/components/backButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
@@ -88,6 +88,14 @@ export { MOODS };
 
 export default function MoodPage() {
   const navigate = useNavigate();
+  const topRef = useRef<HTMLDivElement>(null);
+
+  // Use useLayoutEffect to scroll before the browser paints the screen
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+    // Ensure we scroll to top even if the scroll container is not the window
+    topRef.current?.scrollIntoView({ behavior: "instant", block: "start" });
+  }, []);
 
   const savedMoodKey = (localStorage.getItem(STORAGE_KEY) as MoodKey | null) ?? "okay";
   const [selected, setSelected] = useState<MoodKey>(savedMoodKey);
@@ -137,7 +145,7 @@ export default function MoodPage() {
   };
 
   return (
-    <div className="w-full max-w-md min-h-[75vh] flex flex-col mx-auto px-4 py-4 space-y-4">
+    <div ref={topRef} className="w-full max-w-md min-h-[75vh] flex flex-col mx-auto px-4 py-4 space-y-4">
       {/* Header */}
       <header className="flex items-start justify-between">
         <div className="flex items-center gap-3">
