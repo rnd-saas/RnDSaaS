@@ -90,13 +90,6 @@ export default function MoodPage() {
   const navigate = useNavigate();
   const topRef = useRef<HTMLDivElement>(null);
 
-  // Use useLayoutEffect to scroll before the browser paints the screen
-  useLayoutEffect(() => {
-    window.scrollTo(0, 0);
-    // Ensure we scroll to top even if the scroll container is not the window
-    topRef.current?.scrollIntoView({ behavior: "instant", block: "start" });
-  }, []);
-
   const savedMoodKey = (localStorage.getItem(STORAGE_KEY) as MoodKey | null) ?? "okay";
   const [selected, setSelected] = useState<MoodKey>(savedMoodKey);
 
