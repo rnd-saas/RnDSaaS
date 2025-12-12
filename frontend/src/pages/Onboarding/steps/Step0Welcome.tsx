@@ -18,7 +18,8 @@ export default function Step0Welcome() {
                 <Controller control={control} name="strTrainer" defaultValue="0" rules={{onChange: () => trigger("strTrainer"), required: "Trainer is required" }}
                     render={({ field }) => (
                         <RadioGroup value={field.value} onValueChange={(value) => {
-                            localStorage.setItem("trainerId", String(value));
+                            field.onChange(value);                     // update form state
+                            localStorage.setItem("trainerId", String(value)); // store in localStorage
                         }} className="flex flex-row items-center">
                             <CarouselContent>
                                 <CarouselItem>

@@ -199,6 +199,21 @@ router.put('/', requireAuth, async (req: any, res) => {
             return res.status(400).json({ error: { message: result.error.message } });
         }
 
+        if (trainer !== undefined) {
+            const trainerBool = trainer === 1;
+            const { error: userInfoError } = await userClient
+                .from('user_info')
+                .update({ trainer: trainerBool })
+                .eq('user_id', userId);
+
+            if (userInfoError) {
+                console.error('Failed updating trainer in user_info:', userInfoError);
+                return res.status(400).json({
+                    error: { message: userInfoError.message }
+                });
+            }
+        }
+
         res.json(result.data);
     } catch (error: any) {
         console.error('Update settings error:', error);

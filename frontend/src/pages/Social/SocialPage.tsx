@@ -240,6 +240,15 @@ export default function SocialPage() {
             })()}
           </div>
         ))}
+        {hasQuery && (
+            <div className="w-full text-left">
+              <Button variant="link" className="text-sm p-0"
+                      onClick={() => navigate("/settings", { state: { openAccordion: "subscription" } })}
+              >
+                Refer a friend
+              </Button>
+            </div>
+        )}
 
         {hasQuery && userResults.length > 0 && <div className="h-3" />}
       </div>
@@ -278,7 +287,7 @@ export default function SocialPage() {
 
         {posts.map((post) => {
           const authorName = post.author?.display_name ?? "Anonymous athlete";
-          const authorAvatar = post.author?.user_info?.avatar_option ?? 0;
+          const authorAvatar = post.author?.user_info?.avatar_option ?? 6;
           // const authorHandle = post.author?.username
           //   ? `@${post.author.username}`
           //   : "";
