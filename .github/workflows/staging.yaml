@@ -13,11 +13,11 @@ on:
 jobs:
   deploy-staging:
     runs-on: ubuntu-latest
-    environment: staging
+#    environment: staging
     timeout-minutes: 20
-    concurrency:
-      group: supabase-deploy-staging
-      cancel-in-progress: true
+#    concurrency:
+#      group: supabase-deploy-staging
+#      cancel-in-progress: true
     permissions:
       contents: read
     env:
@@ -30,6 +30,6 @@ jobs:
         with:
           version: latest
       - name: Link to staging project
-        run: supabase link --project-ref "$SUPABASE_PROJECT_ID" --password "$SUPABASE_DB_PASSWORD"
+        run: supabase link --project-ref "$SUPABASE_PROJECT_ID"
       - name: Apply migrations to staging
         run: supabase db push
