@@ -2,7 +2,9 @@ name: Supabase Deploy to Staging
 
 on:
   push:
-    branches: [feat/backend-setup]
+    branches:
+      - feat/backend-setup
+      - db_messages
     paths:
       - 'supabase/migrations/**'
       - '.github/workflows/staging.yaml'
@@ -28,6 +30,6 @@ jobs:
         with:
           version: latest
       - name: Link to staging project
-        run: supabase link --project-ref "$SUPABASE_PROJECT_ID"
+        run: supabase link --project-ref "$SUPABASE_PROJECT_ID" --password "$SUPABASE_DB_PASSWORD"
       - name: Apply migrations to staging
         run: supabase db push
